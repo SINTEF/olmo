@@ -1,14 +1,6 @@
 # olmo
 OceanLab Observatory
 
-
-# grafana front end
-
-This can be found hosted at:
-
-THIS IS CURRENTLY NOT PUBLIC KNOWLEDGE
-
-
 # Data collection
 
 ## Munkholmen sensor data
@@ -86,3 +78,8 @@ Step 2 (optional): We also installed some helpful extensions to notebooks, but t
 Step 3: Finally start the notebook server (`jupyter notebook`). This will open up a page in your brower with the files in this repo.
 
 Notebooks are found in the `Notebooks` folder. You will also note there is a tab at the top called `Nbextensions`. I like to click on that and enable `Table of Contents (2)`.
+
+
+# Front end
+
+We have implemented a grafana front end, and have some data being displayed on the website. However these are not currently open resources.

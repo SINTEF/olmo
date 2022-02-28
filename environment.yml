@@ -1,0 +1,25 @@
+name: olmo
+channels:
+    - conda-forge
+dependencies:
+    - flake8
+    - python=3.9
+    - jupyter=1.0
+    - jupyter_contrib_nbextensions=0.5.1
+    - matplotlib=3.4
+    - netCDF4=1.5.7
+    - numpy=1.20.2
+    - pandas=1.2.4
+    - paramiko=2.7.2
+    - pip=21.1
+    - pytest=6.2.4
+    - scipy=1.6.3
+    - xarray=0.18.2
+    - pip:
+        - sphinx==4.1.2
+        - sphinx_rtd_theme==0.5.2
+        - influxdb
+        - nose
+        - mock
+        - plotly
+        - cufflinks

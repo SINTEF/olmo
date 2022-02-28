@@ -1,0 +1,48 @@
+version: "3"
+
+
+services:
+  influxdb:
+    build: .
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    env_file:
+      - olmo_db/influx_setup.env
+    volumes:
+      - $HOME/backups/:/home/backups/
+      - $HOME/containers-secrets/:/home/Secrets/
+      - $HOME/containers-output/:/home/Output/
+      - $HOME/containers-data/influxdb/var/:/var/lib/influxdb/
+      - $HOME/containers-data/influxdb/etc/:/etc/influxdb/
+    restart: always
+
+
+  grafana:
+    image: grafana/grafana:8.3.3
+    container_name: grafana
+    ports:
+      -  "3000:3000"
+    depends_on:
+      - influxdb
+    volumes:
+      - $HOME/containers-data/grafana/lib/:/var/lib/grafana/
+    restart: always
+
+
+# note, the persmissions of the mounted volumes need to be writable by grafana:
+# sudo chown -R 472:472 lib
+# sudo chown -R 472:472 influxdb
+
+# to run, do this:
+# docker-compose up -d
+ 
+# to enter a container iterractively:
+# docker exec -it grafana bash
+
+# to check what is running:
+# docker ps
+
+# to stop a container:
+# docker stop influxdb
+# (restart by running: docker-compose up -d

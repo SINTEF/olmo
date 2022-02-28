@@ -1,0 +1,9 @@
+name: olmo_munkholmen
+channels:
+    - conda-forge
+dependencies:
+    - python
+    - pip
+    - numpy
+    - pandas
+    - pyserial

@@ -1,0 +1,13 @@
+name: olmo_db
+channels:
+    - conda-forge
+dependencies:
+    - flake8
+    - python=3.9
+    - pip=21.1
+    - numpy=1.20.2
+    - pandas=1.2.4
+    - pip:
+        - influxdb
+        - nose
+        - mock

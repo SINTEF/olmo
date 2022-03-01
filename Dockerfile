@@ -18,6 +18,9 @@ RUN conda env create -f ./olmo_db/environment.yml
 RUN conda init bash
 RUN echo "source activate olmo_db" >> ~/.bashrc
 
+# Install the az cli:
+curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
 # RUN /root/mambaforge/envs/olmo_db/bin/python backup_influx_to_az.py
 
 # Set up cron jobs:

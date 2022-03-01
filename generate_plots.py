@@ -2,6 +2,8 @@ import os
 import subprocess
 import datetime
 import pandas as pd
+import numpy as np
+from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 from influxdb import InfluxDBClient
 
@@ -9,7 +11,6 @@ import config
 import util
 
 
-# NOTE I changed Time to time in the df key.
 def time_series(df, key, label, title):
 
     trace1 = go.Scatter(x=df['time'], y=df[key], name=label)
@@ -43,7 +44,7 @@ def time_series_2(df, keys, labels, ylabel, title):
     return fig
 
 
-def query_influxdb(measurement, variable, timeslice):
+def query_influxdb(client, measurement, variable, timeslice):
     result = client.query(f'SELECT "{variable}" FROM "{measurement}" WHERE {timeslice}')
     df = pd.DataFrame(columns=['time', variable])
     for table in result:
@@ -57,9 +58,13 @@ def query_influxdb(measurement, variable, timeslice):
 
 def query_and_upload_measurement(
         name, axis_label, plotname,
-        variable, measurement, timeslice):
+        variable, measurement, timeslice, client,
+        lower_filter=-100., upper_filter=100.):
 
-    data = query_influxdb(measurement, variable, timeslice)
+    data = query_influxdb(client, measurement, variable, timeslice)
+
+    data.loc[data[variable] < lower_filter, variable] = np.nan
+    data.loc[data[variable] > upper_filter, variable] = np.nan
 
     filename = f"{name}.html"
     fig = time_series(data, variable, axis_label, plotname)
@@ -86,35 +91,46 @@ def query_and_upload_measurement(
         raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
     # logger.info('Backup, archive and transfer to azure completed successfully.')
 
-print("Starting running generate_plots.py at "
-        + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+def main():
+    print("Starting running generate_plots.py at "
+          + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-# Below is the Azure DB client:
-client = InfluxDBClient(
-    host=config.az_influx_pc, port=8086,
-    username=admin_user, password=admin_pwd,
-    database='example')
+    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 
-query_and_upload_measurement(
-    'wind_1d', 'Wind speed [m/s]', 'Munkholmen Wind Speed',
-    'wind_speed_digital', 'loggernet_public', 'time > now() - 1d')
+    # Below is the Azure DB client:
+    client = InfluxDBClient(
+        host=config.az_influx_pc, port=8086,
+        username=admin_user, password=admin_pwd,
+        database='example')
 
-query_and_upload_measurement(
-    'wind_direction_1d', 'Wind direction [deg]', 'Munkholmen Wind Direction',
-    'wind_direction_digital', 'loggernet_public', 'time > now() - 1d')
+    query_and_upload_measurement(
+        'wind_1d', 'Wind speed [m/s]', 'Munkholmen Wind Speed',
+        'wind_speed_digital', 'loggernet_public', 'time > now() - 1d', client,
+        lower_filter=-100., upper_filter=100.)
 
-query_and_upload_measurement(
-    'temp_1d', 'Temperature [deg]', 'Munkholmen Air Temperature',
-    'temperature_digital', 'loggernet_public', 'time > now() - 1d')
+    query_and_upload_measurement(
+        'wind_direction_1d', 'Wind direction [deg]', 'Munkholmen Wind Direction',
+        'wind_direction_digital', 'loggernet_public', 'time > now() - 1d', client,
+        lower_filter=-10., upper_filter=370.)
 
-query_and_upload_measurement(
-    'pressure_1d', 'Air pressure [hPa]', 'Munkholmen Air Pressure',
-    'pressure_digital', 'loggernet_public', 'time > now() - 1d')
+    query_and_upload_measurement(
+        'temp_1d', 'Temperature [deg]', 'Munkholmen Air Temperature',
+        'temperature_digital', 'loggernet_public', 'time > now() - 1d', client,
+        lower_filter=-100., upper_filter=100.)
 
-query_and_upload_measurement(
-    'humidity_1d', 'Humidity', 'Munkholmen Humidity',
-    'humidity_digital', 'loggernet_public', 'time > now() - 1d')
+    query_and_upload_measurement(
+        'pressure_1d', 'Air pressure [hPa]', 'Munkholmen Air Pressure',
+        'pressure_digital', 'loggernet_public', 'time > now() - 1d', client,
+        lower_filter=0., upper_filter=1500.)
 
-print("done with all")
+    query_and_upload_measurement(
+        'humidity_1d', 'Humidity', 'Munkholmen Humidity',
+        'humidity_digital', 'loggernet_public', 'time > now() - 1d', client,
+        lower_filter=-10., upper_filter=110.)
+
+    print("done with all")
+
+
+if __name__ == "__main__":
+    main()

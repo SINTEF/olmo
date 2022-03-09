@@ -67,16 +67,17 @@ def query_and_upload_measurement(
     data.loc[data[variable] > upper_filter, variable] = np.nan
 
     filename = f"{name}.html"
+    local_file = os.path.join(config.webfigs_dir, filename)
+    az_file = 'influx_data/' + filename
     fig = time_series(data, variable, axis_label, plotname)
-    fig.write_html(filename)
+    fig.write_html(local_file)
 
     # ---- Upload to azure:
     with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
         aztoken = f.read()
-    az_filename = 'influx_data/' + filename
     process = subprocess.Popen([
         'az', 'storage', 'fs', 'file', 'upload',
-        '--source', filename, '-p', az_filename,
+        '--source', local_file, '-p', az_file,
         '-f', '$web', '--account-name', 'oceanlabdlstorage', '--overwrite',
         '--content-type', 'text/html',
         '--sas-token', aztoken[:-1]],

@@ -48,6 +48,10 @@ backup_basename = 'influxbackup_test_'
 az_backups_folder = 'influx_backups_test'
 
 
+# Website figures
+webfigs_dir = os.path.join(output_dir, 'Website_figures')
+
+
 # Silcam ingestion:
 
 

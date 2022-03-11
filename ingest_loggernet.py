@@ -119,12 +119,12 @@ def main():
             logger.info(f"No new files to be ingested for file type: {file_type}.")
             continue
 
-        print(f"Number of files: {len(files)}")
+        # print(f"Number of files: {len(files)}")
 
         # ---- scp the files over, then delete
         for f in files[:-1]:  # files[:-1]:  # Don't copy the latest file - it might be being written to.
 
-            print(f"Ingesting file: {f}")
+            # print(f"Ingesting file: {f}")
 
             # Check we don't have a version of the file locally.
             if os.path.isfile(os.path.join(config.loggernet_inbox, f)):

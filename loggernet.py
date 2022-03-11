@@ -310,3 +310,83 @@ def ingest_loggernet_file(file_path, file_type):
         # Data processing:
         df = filter_df(df, 'wind_direction_avg', lower=0, upper=360)
         ingest_df(measurement_name, df, clients)
+
+    # ==================================================================== #
+    if file_type == 'CR6_EOL2p0_Wave_sensor_':
+
+        data_cols = [
+            "heading", "Hs", "Period", "Hmax", "direction"
+        ]
+        float_cols = data_cols
+
+        df_all = load_data(file_path, data_cols, float_cols)  # , rows_to_skip=2, time_col="TIMESTAMP"
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_heading_munkholmen'
+        field_keys = {"heading": 'heading'}
+        tag_values = {'tag_sensor': 'seaview',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'heading', lower=0, upper=360)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_hs_munkholmen'
+        field_keys = {"Hs": 'hs'}
+        tag_values = {'tag_sensor': 'seaview',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'metres'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'hs', lower=-100, upper=100)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_period_munkholmen'
+        field_keys = {"Period": 'period'}
+        tag_values = {'tag_sensor': 'seaview',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'seconds'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'period', lower=0, upper=100)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_hmax_munkholmen'
+        field_keys = {"Hmax": 'hmax'}
+        tag_values = {'tag_sensor': 'seaview',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'metres'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'hmax', lower=-100, upper=100)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_direction_munkholmen'
+        field_keys = {"direction": 'direction'}
+        tag_values = {'tag_sensor': 'seaview',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'direction', lower=0, upper=360)
+        ingest_df(measurement_name, df, clients)

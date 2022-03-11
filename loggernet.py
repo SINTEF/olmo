@@ -82,7 +82,7 @@ def ingest_loggernet_file(file_path, file_type):
         The 'basename' of the file, should correspond to one of those in the config.
     '''
 
-    def load_data(file_path, data_cols, float_cols, rows_to_skip=None, time_col="TIMESTAMP"):
+    def load_data(file_path, data_cols, float_cols, rows_to_skip=None, time_col="TMSTAMP"):
 
         pd.set_option('precision', 6)
         df = pd.read_csv(file_path, sep=',', skiprows=0, header=1)
@@ -105,7 +105,7 @@ def ingest_loggernet_file(file_path, file_type):
         return df
 
     # ==================================================================== #
-    if file_type == 'CR6_EOL2,0_meteo_ais_':
+    if file_type == 'CR6_EOL2p0_meteo_ais_':
 
         data_cols = [
             "distance", "Latitude_decimal", "Longitude_decimal", "temperature_digital",
@@ -114,7 +114,7 @@ def ingest_loggernet_file(file_path, file_type):
         ]
         float_cols = data_cols
 
-        df_all = load_data(file_path, data_cols, float_cols, rows_to_skip=2)
+        df_all = load_data(file_path, data_cols, float_cols)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_position_munkholmen'
@@ -231,7 +231,7 @@ def ingest_loggernet_file(file_path, file_type):
         ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
-    if file_type == 'CR6_EOL2,0_Meteo_avgd_':
+    if file_type == 'CR6_EOL2p0_Meteo_avgd_':
 
         data_cols = [
             "temperature_digital_Avg", "pressure_digital_Avg",
@@ -239,7 +239,7 @@ def ingest_loggernet_file(file_path, file_type):
         ]
         float_cols = data_cols
 
-        df_all = load_data(file_path, data_cols, float_cols, rows_to_skip=2)
+        df_all = load_data(file_path, data_cols, float_cols)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_temperature_avg_munkholmen'

@@ -30,9 +30,9 @@ main_logfile = "log_munkholmen_ingest_"
 loggernet_outbox = f"c:\\Users\{loggernet_user}\LoggerNet_output"
 loggernet_inbox = os.path.join(base_dir, 'Loggernet_inbox')
 loggernet_files_basenames = [
-    "CR6_EOL2,0_meteo_ais_",
+    "CR6_EOL2p0_meteo_ais_",
     # "CR6_EOL2p0_Power_",  # instr.: solar_regulator
-    "CR6_EOL2,0_Meteo_avgd_",
+    # "CR6_EOL2p0_Meteo_avgd_",
     # "CR6_EOL2p0_Current_",  # intr.: signature_100
     # "CR6_EOL2,0_Wave_sensor_",  # instr.: seaview
     # "CR6_EOL2p0_Winch_log_",  # none

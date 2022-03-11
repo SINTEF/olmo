@@ -180,7 +180,7 @@ def main():
                 msg = "Max tries exceeded. Ignoring (this may cause build up of files on sintefutv012)."
                 logger.error(msg)
                 print(msg)
-            print(f'Data for file {f} added to influxDB, file removed from sintefuvt012.')
+            # print(f'Data for file {f} added to influxDB, file removed from sintefuvt012.')
 
     logger.info("All files transferred and ingested successfully, exiting.")
 

@@ -16,7 +16,10 @@ into the database.
 logger = logging.getLogger('olmo.loggernet')
 
 admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-client = InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'test')
+clients = [
+    InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+    InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+]
 
 
 def filter_df(df, col, lower=None, upper=None):
@@ -46,7 +49,7 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     return df
 
 
-def ingest_df(measurement, df, client):
+def ingest_df(measurement, df, clients):
 
     all_cols = df.columns
     tag_cols = [c for c in all_cols if c[:4] == 'tag_']
@@ -61,7 +64,8 @@ def ingest_df(measurement, df, client):
             'fields': {f: row[f] for f in field_cols},
         })
 
-    client.write_points(data)
+    for c in clients:
+        c.write_points(data)
     # print("data written!!!")
 
 
@@ -88,28 +92,17 @@ def ingest_loggernet_file(file_path, file_type):
         df['date'] = pd.to_datetime(df[time_col], format='%Y-%m-%d %H:%M:%S')
         df = df[['date'] + data_cols]
 
+        # There can be strings inserted as "NAN", set these to the -7999 nan.
+        for col in df.columns:
+            if df[col].dtypes == 'object':
+                df.loc[df[col].str.match('NAN'), col] = -7999
+
         # Force cols to have time np.float64
         df = ingest.float_col_fix(df, float_cols)
         # Loggernet data is in CET, but all influx data should be utc.
         df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
         return df
-
-    # def get_tag_values(
-    #         tag_sensor='loggernet',
-    #         tag_platform='munkholmen',
-    #         tag_data_level='raw',
-    #         tag_approved='none',
-    #         tag_unit='none'):
-    #     '''Function to return the tag_values dict, helps with default values.'''
-    #     tag_values = {
-    #         'tag_sensor': tag_sensor,
-    #         'tag_platform': tag_platform,
-    #         'tag_data_level': tag_data_level,
-    #         'tag_approved': tag_approved,
-    #         'tag_unit': tag_unit,
-    #     }
-    #     return tag_values
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2,0_meteo_ais_':
@@ -137,7 +130,7 @@ def ingest_loggernet_file(file_path, file_type):
         # Data processing:
         # df = filter_df(df, 'latitude', lower=62.5, upper=64)
         # df = filter_df(df, 'longitude', lower=10, upper=11)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_position_displacement_munkholmen'
@@ -151,7 +144,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         # df = filter_df(df, 'displacement', lower=0, upper=100)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_temperature_munkholmen'
@@ -165,7 +158,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'temperature', lower=-50, upper=100)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_munkholmen'
@@ -179,7 +172,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'atmospheric_pressure', lower=500, upper=1500)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_munkholmen'
@@ -193,7 +186,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'humidity', lower=0, upper=100)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_dew_point_munkholmen'
@@ -207,7 +200,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         # df = filter_df(df, 'dew_point', lower=-50, upper=100)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_munkholmen'
@@ -221,7 +214,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'wind_speed', lower=0, upper=140)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_munkholmen'
@@ -235,34 +228,85 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'wind_direction', lower=0, upper=360)
-        ingest_df(measurement_name, df, client)
+        ingest_df(measurement_name, df, clients)
 
-    # # ==================================================================== #
-    # if file_type == 'CR6_EOL2,0_meteo_ais_':
-    #     print("in FT: 'CR6_EOL2,0_meteo_ais_'")
+    # ==================================================================== #
+    if file_type == 'CR6_EOL2,0_Meteo_avgd_':
 
-    #     data_cols = [
-    #         "distance", "Latitude_decimal", "Longitude_decimal", "temperature_digital",
-    #         "pressure_digital", "humidity_digital", "dew_point", "wind_speed_digital",
-    #         "wind_direction_digital"
-    #     ]
-    #     float_cols = data_cols
+        data_cols = [
+            "temperature_digital_Avg", "pressure_digital_Avg",
+            "humidity_digital_Avg", "wind_speed_digital", "wind_direction_digital"
+        ]
+        float_cols = data_cols
 
-    #     df_all = load_data(file_path, data_cols, float_cols, rows_to_skip=2)
+        df_all = load_data(file_path, data_cols, float_cols, rows_to_skip=2)
 
-    #     # ---------------------------------------------------------------- #
-    #     measurement_name = 'meteo_position_munkholmen'
-    #     field_keys = {"Latitude_decimal": 'latitude',
-    #                   "Longitude_decimal": 'longitude'}
-    #     tag_values = {'tag_sensor': 'loggernet',
-                    #   'tag_edge_device': 'cr6',
-    #                   'tag_platform': 'munkholmen',
-    #                   'tag_data_level': 'raw',  
-    #                   'tag_approved': 'none',
-    #                   'tag_unit': 'degrees'}
-    #     df = filter_and_tag_df(df_all, field_keys, tag_values)
-    #     # Data processing:
-    #     # df = filter_df(df, 'latitude', lower=62.5, upper=64)
-    #     # df = filter_df(df, 'longitude', lower=10, upper=11)
-    #     print(df.head())
-    #     ingest_df(measurement_name, df, client)
+        # ---------------------------------------------------------------- #
+        measurement_name = 'meteo_temperature_avg_munkholmen'
+        field_keys = {"temperature_digital_Avg": 'temperature_avg'}
+        tag_values = {'tag_sensor': 'gill_weatherstation',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'processed',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees_celsius'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'temperature_avg', lower=-50, upper=100)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'meteo_atmospheric_pressure_avg_munkholmen'
+        field_keys = {"pressure_digital_Avg": 'atmospheric_pressure_avg'}
+        tag_values = {'tag_sensor': 'gill_weatherstation',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'processed',
+                      'tag_approved': 'none',
+                      'tag_unit': 'hecto_pascal'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'atmospheric_pressure_avg', lower=500, upper=1500)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'meteo_humidity_avg_munkholmen'
+        field_keys = {"humidity_digital_Avg": 'humidity_avg'}
+        tag_values = {'tag_sensor': 'gill_weatherstation',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'processed',
+                      'tag_approved': 'none',
+                      'tag_unit': 'percent'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'humidity_avg', lower=0, upper=100)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'meteo_wind_speed_avg_munkholmen'
+        field_keys = {"wind_speed_digital": 'wind_speed_avg'}
+        tag_values = {'tag_sensor': 'gill_weatherstation',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'processed',
+                      'tag_approved': 'none',
+                      'tag_unit': 'metres_per_second'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'wind_speed_avg', lower=0, upper=140)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'meteo_wind_direction_avg_munkholmen'
+        field_keys = {"wind_direction_digital": 'wind_direction_avg'}
+        tag_values = {'tag_sensor': 'gill_weatherstation',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'processed',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'wind_direction_avg', lower=0, upper=360)
+        ingest_df(measurement_name, df, clients)

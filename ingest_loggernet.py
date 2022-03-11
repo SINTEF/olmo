@@ -6,7 +6,7 @@ import time
 import paramiko
 
 import config
-import sensor_conversions
+import loggernet
 
 # I couldn't install rsync on the cmd prompt on the remote
 # (although I could on git bash...) but since I could get
@@ -119,8 +119,13 @@ def main():
             logger.info(f"No new files to be ingested for file type: {file_type}.")
             continue
 
+        print(files[:4])
+        print(len(files))
+
         # ---- scp the files over, then delete
-        for f in files[:-1]:
+        for f in files[3:4]:  # files[:-1]:  # Don't copy the latest file - it might be being written to.
+
+            print(f)
 
             # Check we don't have a version of the file locally.
             if os.path.isfile(os.path.join(config.loggernet_inbox, f)):
@@ -155,26 +160,26 @@ def main():
                 print(msg)
                 continue
 
-            # Remove the file from the origin PC (sintefutv012)
-            i = 0
-            rm_output = os.popen(f'''ssh {config.loggernet_user}@{config.loggernet_pc} "Del {config.loggernet_outbox}\\{f}"''').read()
-            if rm_output:
-                logger.warning("Remove original file failed.")
-                while i < config.logpc_ssh_max_attempts:
-                    logger.info("Will try again.")
-                    time.sleep(2)
-                    rm_output = os.popen(f'''ssh {config.loggernet_user}@{config.loggernet_pc} "Del {config.loggernet_outbox}\\{f}"''').read()
-                    if not rm_output:
-                        break
-                    logger.warning(f'Error: File {f} not copied.')
-                    i += 1
-            if i == config.logpc_ssh_max_attempts:
-                msg = "Max tries exceeded. Ignoring (this may cause build up of files on sintefutv012)."
-                logger.error(msg)
-                print(msg)
+            # # Remove the file from the origin PC (sintefutv012)
+            # i = 0
+            # rm_output = os.popen(f'''ssh {config.loggernet_user}@{config.loggernet_pc} "Del {config.loggernet_outbox}\\{f}"''').read()
+            # if rm_output:
+            #     logger.warning("Remove original file failed.")
+            #     while i < config.logpc_ssh_max_attempts:
+            #         logger.info("Will try again.")
+            #         time.sleep(2)
+            #         rm_output = os.popen(f'''ssh {config.loggernet_user}@{config.loggernet_pc} "Del {config.loggernet_outbox}\\{f}"''').read()
+            #         if not rm_output:
+            #             break
+            #         logger.warning(f'Error: File {f} not copied.')
+            #         i += 1
+            # if i == config.logpc_ssh_max_attempts:
+            #     msg = "Max tries exceeded. Ignoring (this may cause build up of files on sintefutv012)."
+            #     logger.error(msg)
+            #     print(msg)
 
             # ---- Ingest the file:
-            sensor_conversions.ingest_loggernet_file(os.path.join(config.loggernet_inbox, f), file_type)
+            loggernet.ingest_loggernet_file(os.path.join(config.loggernet_inbox, f), file_type)
             logger.info(f'Data for file {f} added to influxDB.')
     logger.info("All files transferred and ingested successfully, exiting.")
 

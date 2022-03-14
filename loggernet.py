@@ -231,6 +231,106 @@ def ingest_loggernet_file(file_path, file_type):
         ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
+    if file_type == 'CR6_EOL2p0_Power_':
+
+        data_cols = [
+            "battery_voltage", "PV_Voltage1",
+            "Total_of_battery", "PV1_current", "Input_current",
+            "Total_charge_current_of_battery", "Load_current",
+            "Total_discharge_of_battery", "Solar_reg_temperature",
+            "error", "Load_output", "AUX1", "AUX2",
+            "Energy_input_24H", "Energy_input_total", "Energy_output_24H",
+            "Energy_output_total", "Derating", "Tarom_checksum"
+        ]
+        float_cols = data_cols
+
+        df_all = load_data(file_path, data_cols, float_cols)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'solar_regulator_power_munkholmen'
+        field_keys = {"battery_voltage": 'battery_voltage',
+                      "PV_Voltage1": "pv_voltage1",
+                      }
+        tag_values = {'tag_sensor': 'solar_regulator',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'volts'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = filter_df(df, 'battery_voltage', lower=0, upper=50)
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'solar_regulator_power_munkholmen'
+        field_keys = {"PV1_current": "input_current",
+                      "Load_current": "load_current",
+                      }
+        tag_values = {'tag_sensor': 'solar_regulator',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'amps'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'solar_regulator_power_munkholmen'
+        field_keys = {"Energy_input_24H": "energy_input_24h",
+                      "Energy_input_total": "energy_input_total",
+                      "Energy_output_24H": "energy_output_24h",
+                      "Energy_output_total": "energy_output_total"
+                      }
+        tag_values = {'tag_sensor': 'solar_regulator',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'amp_hours'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'solar_regulator_power_munkholmen'
+        field_keys = {"error": "error",
+                      "AUX1": "aux1",
+                      "AUX2": "aux2",
+                      "Derating": "derating",
+                      "Tarom_checksum": "tarom_checksum",
+                      "Total_discharge_of_battery": "total_discharge_of_battery",
+                      "Total_charge_current_of_battery": "total_charge_current_of_battery",
+                      "Load_output": "load_output",
+                      "Total_of_battery": "total_of_battery"
+                      }
+        tag_values = {'tag_sensor': 'solar_regulator',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'none'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'solar_regulator_power_munkholmen'
+        field_keys = {"Solar_reg_temperature": "Solar_reg_temperature"}
+        tag_values = {'tag_sensor': 'solar_regulator',
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees_celsius'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+
+        ingest_df(measurement_name, df, clients)
+
+
+    # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Meteo_avgd_':
 
         data_cols = [

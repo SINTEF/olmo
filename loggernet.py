@@ -247,7 +247,7 @@ def ingest_loggernet_file(file_path, file_type):
         df_all = load_data(file_path, data_cols, float_cols)
 
         # ---------------------------------------------------------------- #
-        measurement_name = 'solar_regulator_power_munkholmen'
+        measurement_name = 'power_voltage_munkholmen'
         field_keys = {"battery_voltage": 'battery_voltage',
                       "PV_Voltage1": "pv_voltage1",
                       }
@@ -263,7 +263,7 @@ def ingest_loggernet_file(file_path, file_type):
         ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
-        measurement_name = 'solar_regulator_power_munkholmen'
+        measurement_name = 'power_current_munkholmen'
         field_keys = {"PV1_current": "input_current",
                       "Load_current": "load_current",
                       }
@@ -278,7 +278,7 @@ def ingest_loggernet_file(file_path, file_type):
         ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
-        measurement_name = 'solar_regulator_power_munkholmen'
+        measurement_name = 'power_energy_use_munkholmen'
         field_keys = {"Energy_input_24H": "energy_input_24h",
                       "Energy_input_total": "energy_input_total",
                       "Energy_output_24H": "energy_output_24h",
@@ -295,7 +295,7 @@ def ingest_loggernet_file(file_path, file_type):
         ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
-        measurement_name = 'solar_regulator_power_munkholmen'
+        measurement_name = 'power_aux_munkholmen'
         field_keys = {"error": "error",
                       "AUX1": "aux1",
                       "AUX2": "aux2",

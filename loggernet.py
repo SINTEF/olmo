@@ -207,8 +207,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # ---------------------------------------------------------------- #
         measurement_name = 'power_voltage_munkholmen'
         field_keys = {"battery_voltage": 'battery_voltage',
-                      "PV_Voltage1": "pv_voltage1",
-                      }
+                      "PV_Voltage1": "pv_voltage1"}
         tag_values = {'tag_sensor': 'solar_regulator',
                       'tag_edge_device': 'cr6',
                       'tag_platform': 'munkholmen',
@@ -223,8 +222,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # ---------------------------------------------------------------- #
         measurement_name = 'power_current_munkholmen'
         field_keys = {"PV1_current": "input_current",
-                      "Load_current": "load_current",
-                      }
+                      "Load_current": "load_current"}
         tag_values = {'tag_sensor': 'solar_regulator',
                       'tag_edge_device': 'cr6',
                       'tag_platform': 'munkholmen',
@@ -232,7 +230,6 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_approved': 'none',
                       'tag_unit': 'amps'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -240,8 +237,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         field_keys = {"Energy_input_24H": "energy_input_24h",
                       "Energy_input_total": "energy_input_total",
                       "Energy_output_24H": "energy_output_24h",
-                      "Energy_output_total": "energy_output_total"
-                      }
+                      "Energy_output_total": "energy_output_total"}
         tag_values = {'tag_sensor': 'solar_regulator',
                       'tag_edge_device': 'cr6',
                       'tag_platform': 'munkholmen',
@@ -249,7 +245,6 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_approved': 'none',
                       'tag_unit': 'amp_hours'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -262,8 +257,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "Total_discharge_of_battery": "total_discharge_of_battery",
                       "Total_charge_current_of_battery": "total_charge_current_of_battery",
                       "Load_output": "load_output",
-                      "Total_of_battery": "total_of_battery"
-                      }
+                      "Total_of_battery": "total_of_battery"}
         tag_values = {'tag_sensor': 'solar_regulator',
                       'tag_edge_device': 'cr6',
                       'tag_platform': 'munkholmen',
@@ -271,7 +265,6 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_approved': 'none',
                       'tag_unit': 'none'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -284,7 +277,6 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_approved': 'none',
                       'tag_unit': 'degrees_celsius'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #

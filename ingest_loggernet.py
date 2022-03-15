@@ -4,9 +4,11 @@ import datetime
 import subprocess
 import time
 import paramiko
+from influxdb import InfluxDBClient
 
 import config
 import loggernet
+import util
 
 # I couldn't install rsync on the cmd prompt on the remote
 # (although I could on git bash...) but since I could get
@@ -35,7 +37,7 @@ def move_remote(username, address, filename):
     return stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
 
 
-def scp_file(username, address, file_path, destination, return_info=False, timeout=240):
+def scp_file(username, address, file_path, destination, timeout=240):
     '''
     Parameters
     ----------
@@ -48,8 +50,6 @@ def scp_file(username, address, file_path, destination, return_info=False, timeo
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     process.wait(timeout=timeout)
-    if return_info:  # This is not working, as we don't assign these.
-        return stdout, stderr
 
 
 def get_file_list(dir_output, file_basename, logger):
@@ -106,6 +106,13 @@ def main():
     logger.addHandler(fh)
 
     logger.info("\n\n------ Starting data collection in main()")
+
+    logger.info("Fetching the influxdb clients.")
+    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    clients = [
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+    ]
     # ---- List files in the remote directory:
     stdout, stderr = dir_remote(config.loggernet_user, config.loggernet_pc)
 
@@ -160,7 +167,7 @@ def main():
                 continue
 
             # ---- Ingest the file:
-            loggernet.ingest_loggernet_file(os.path.join(config.loggernet_inbox, f), file_type)
+            loggernet.ingest_loggernet_file(os.path.join(config.loggernet_inbox, f), file_type, clients)
             logger.info(f'Data for file {f} added to influxDB.')
 
             # ---- Remove the file from the origin PC (sintefutv012)
@@ -180,7 +187,6 @@ def main():
                 msg = "Max tries exceeded. Ignoring (this may cause build up of files on sintefutv012)."
                 logger.error(msg)
                 print(msg)
-            # print(f'Data for file {f} added to influxDB, file removed from sintefuvt012.')
 
     logger.info("All files transferred and ingested successfully, exiting.")
 

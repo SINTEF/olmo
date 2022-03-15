@@ -1,10 +1,6 @@
-import os
 import logging
 import pandas as pd
-from influxdb import InfluxDBClient
 
-import config
-import util
 import ingest
 
 '''
@@ -14,12 +10,6 @@ into the database.
 '''
 
 logger = logging.getLogger('olmo.loggernet')
-
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-clients = [
-    InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
-    InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
-]
 
 
 def filter_df(df, col, lower=None, upper=None):
@@ -49,27 +39,7 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     return df
 
 
-def ingest_df(measurement, df, clients):
-
-    all_cols = df.columns
-    tag_cols = [c for c in all_cols if c[:4] == 'tag_']
-    field_cols = [c for c in all_cols if c not in tag_cols]
-
-    data = []
-    for index, row in df.iterrows():
-        data.append({
-            'measurement': measurement,
-            'time': index,
-            'tags': {t[4:]: row[t] for t in tag_cols},
-            'fields': {f: row[f] for f in field_cols},
-        })
-
-    for c in clients:
-        c.write_points(data)
-    # print("data written!!!")
-
-
-def ingest_loggernet_file(file_path, file_type):
+def ingest_loggernet_file(file_path, file_type, clients):
     '''Ingest loggernet files.
 
     NOTE: All cols that aren't strings should be floats, even if you think
@@ -130,7 +100,7 @@ def ingest_loggernet_file(file_path, file_type):
         # Data processing:
         # df = filter_df(df, 'latitude', lower=62.5, upper=64)
         # df = filter_df(df, 'longitude', lower=10, upper=11)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_position_displacement_munkholmen'
@@ -144,7 +114,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         # df = filter_df(df, 'displacement', lower=0, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_temperature_munkholmen'
@@ -158,7 +128,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'temperature', lower=-50, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_munkholmen'
@@ -172,7 +142,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'atmospheric_pressure', lower=500, upper=1500)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_munkholmen'
@@ -186,7 +156,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'humidity', lower=0, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_dew_point_munkholmen'
@@ -200,7 +170,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         # df = filter_df(df, 'dew_point', lower=-50, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_munkholmen'
@@ -214,7 +184,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'wind_speed', lower=0, upper=140)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_munkholmen'
@@ -228,7 +198,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'wind_direction', lower=0, upper=360)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Power_':
@@ -260,7 +230,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'battery_voltage', lower=0, upper=50)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_current_munkholmen'
@@ -275,7 +245,7 @@ def ingest_loggernet_file(file_path, file_type):
                       'tag_unit': 'amps'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
 
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_energy_use_munkholmen'
@@ -292,7 +262,7 @@ def ingest_loggernet_file(file_path, file_type):
                       'tag_unit': 'amp_hours'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
 
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_aux_munkholmen'
@@ -314,7 +284,7 @@ def ingest_loggernet_file(file_path, file_type):
                       'tag_unit': 'none'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
 
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'solar_regulator_power_munkholmen'
@@ -327,8 +297,7 @@ def ingest_loggernet_file(file_path, file_type):
                       'tag_unit': 'degrees_celsius'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
 
-        ingest_df(measurement_name, df, clients)
-
+        ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Meteo_avgd_':
@@ -353,7 +322,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'temperature_avg', lower=-50, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_avg_munkholmen'
@@ -367,7 +336,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'atmospheric_pressure_avg', lower=500, upper=1500)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_avg_munkholmen'
@@ -381,7 +350,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'humidity_avg', lower=0, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_avg_munkholmen'
@@ -395,7 +364,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'wind_speed_avg', lower=0, upper=140)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_avg_munkholmen'
@@ -409,7 +378,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'wind_direction_avg', lower=0, upper=360)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Wave_sensor_':
@@ -433,7 +402,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'heading', lower=0, upper=360)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hs_munkholmen'
@@ -447,7 +416,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'hs', lower=-100, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_period_munkholmen'
@@ -461,7 +430,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'period', lower=0, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hmax_munkholmen'
@@ -475,7 +444,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'hmax', lower=-100, upper=100)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_direction_munkholmen'
@@ -489,4 +458,4 @@ def ingest_loggernet_file(file_path, file_type):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = filter_df(df, 'direction', lower=0, upper=360)
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)

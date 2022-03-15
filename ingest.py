@@ -24,15 +24,20 @@ def float_col_fix(df, float_cols):
     return df
 
 
-# def df_ingest(measurement, df, tag_sensor, tag_station, tag_dlevel, tag_approved, tag_unit):
+def ingest_df(measurement, df, clients):
 
-#     # client = InfluxDBClient('localhost', database='my_db')
-#     # measurement = 'measurement1'
-#     # db_data = client.query('select value from %s' % (measurement))
-#     data_to_write = [{
-#         'measurement': measurement,
-#         'tags': ['measurement1'],
-#         'time': d['time'],
-#         'fields': {'value': d['value']},
-#         } for d in db_data.get_points()]
-#     client.write_points(data_to_write)
+    all_cols = df.columns
+    tag_cols = [c for c in all_cols if c[:4] == 'tag_']
+    field_cols = [c for c in all_cols if c not in tag_cols]
+
+    data = []
+    for index, row in df.iterrows():
+        data.append({
+            'measurement': measurement,
+            'time': index,
+            'tags': {t[4:]: row[t] for t in tag_cols},
+            'fields': {f: row[f] for f in field_cols},
+        })
+
+    for c in clients:
+        c.write_points(data)

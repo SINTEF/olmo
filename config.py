@@ -52,6 +52,9 @@ az_backups_folder = 'influx_backups_test'
 webfigs_dir = os.path.join(output_dir, 'Website_figures')
 
 
+# Node 2 ingestion:
+node2_logfile = "log_node2_ingest_"
+
 # Silcam ingestion:
 
 

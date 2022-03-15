@@ -1,8 +1,11 @@
 import os
 import re
 import logging
+import datetime
 import paramiko
 import numpy as np
+
+import config
 
 logger = logging.getLogger('olmo.util')
 
@@ -123,6 +126,19 @@ def get_influx_user_pwd(file):
     user = user_line[5:]
     pwd = pwd_line[4:]
     return user, pwd
+
+
+def init_logger(logfile, name='olmo'):
+    '''Define the logger object for logging.'''
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(os.path.join(
+        config.output_dir, logfile + datetime.datetime.now().strftime('%Y%m%d')), 'a+')
+    fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger.addHandler(fh)
+
+    return logger
 
 
 # Currently not sure if I need this, so ignoring for now.

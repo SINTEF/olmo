@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 
 import ingest
+import processing
 
 '''
 File equivelent to a specific 'sensor' file, but for the loggernet data.
@@ -10,19 +11,6 @@ into the database.
 '''
 
 logger = logging.getLogger('olmo.loggernet')
-
-
-def filter_df(df, col, lower=None, upper=None):
-
-    assert ((lower is not None) or (upper is not None)), "You must filter either upper or lower bounds"
-    # Assume that all data points will be approved or not (not none)
-    df.loc[df['tag_approved'] == 'none', 'tag_approved'] = 'yes'
-    if upper is not None:
-        df.loc[df[col] > upper, 'tag_approved'] = 'no'
-    if lower is not None:
-        df.loc[df[col] < lower, 'tag_approved'] = 'no'
-
-    return df
 
 
 def add_tags(df, tag_values):
@@ -98,8 +86,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        # df = filter_df(df, 'latitude', lower=62.5, upper=64)
-        # df = filter_df(df, 'longitude', lower=10, upper=11)
+        # df = processing.constant_val_filter(df, 'latitude', lower=62.5, upper=64)
+        # df = processing.constant_val_filter(df, 'longitude', lower=10, upper=11)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -113,7 +101,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'metres'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        # df = filter_df(df, 'displacement', lower=0, upper=100)
+        # df = processing.constant_val_filter(df, 'displacement', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -127,7 +115,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees_celsius'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'temperature', lower=-50, upper=100)
+        df = processing.constant_val_filter(df, 'temperature', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -141,7 +129,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'hecto_pascal'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'atmospheric_pressure', lower=500, upper=1500)
+        df = processing.constant_val_filter(df, 'atmospheric_pressure', lower=500, upper=1500)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -155,7 +143,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'percent'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'humidity', lower=0, upper=100)
+        df = processing.constant_val_filter(df, 'humidity', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -169,7 +157,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees_celsius'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        # df = filter_df(df, 'dew_point', lower=-50, upper=100)
+        # df = processing.constant_val_filter(df, 'dew_point', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -183,7 +171,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'metres_per_second'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'wind_speed', lower=0, upper=140)
+        df = processing.constant_val_filter(df, 'wind_speed', lower=0, upper=140)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -197,7 +185,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'wind_direction', lower=0, upper=360)
+        df = processing.constant_val_filter(df, 'wind_direction', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
@@ -229,7 +217,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'volts'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'battery_voltage', lower=0, upper=50)
+        df = processing.constant_val_filter(df, 'battery_voltage', lower=0, upper=50)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -321,7 +309,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees_celsius'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'temperature_avg', lower=-50, upper=100)
+        df = processing.constant_val_filter(df, 'temperature_avg', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -335,7 +323,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'hecto_pascal'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'atmospheric_pressure_avg', lower=500, upper=1500)
+        df = processing.constant_val_filter(df, 'atmospheric_pressure_avg', lower=500, upper=1500)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -349,7 +337,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'percent'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'humidity_avg', lower=0, upper=100)
+        df = processing.constant_val_filter(df, 'humidity_avg', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -363,7 +351,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'metres_per_second'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'wind_speed_avg', lower=0, upper=140)
+        df = processing.constant_val_filter(df, 'wind_speed_avg', lower=0, upper=140)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -377,7 +365,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'wind_direction_avg', lower=0, upper=360)
+        df = processing.constant_val_filter(df, 'wind_direction_avg', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
@@ -401,7 +389,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'heading', lower=0, upper=360)
+        df = processing.constant_val_filter(df, 'heading', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -415,7 +403,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'metres'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'hs', lower=-100, upper=100)
+        df = processing.constant_val_filter(df, 'hs', lower=-100, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -429,7 +417,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'seconds'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'period', lower=0, upper=100)
+        df = processing.constant_val_filter(df, 'period', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -443,7 +431,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'metres'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'hmax', lower=-100, upper=100)
+        df = processing.constant_val_filter(df, 'hmax', lower=-100, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -457,5 +445,5 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = filter_df(df, 'direction', lower=0, upper=360)
+        df = processing.constant_val_filter(df, 'direction', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)

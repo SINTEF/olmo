@@ -1,17 +1,22 @@
-import os
 import datetime
-import logging
+import sqlalchemy as db
+from urllib.parse import quote_plus as url_quote
 
 import config
 import util
 
 
-# host = os.getenv('DB_AZURE_HOST')
-# dbname = 'smartshiprouting'
-# user = os.getenv('DB_AZURE_USERNAME')
-# password = os.getenv('DB_AZURE_PASSWORD')
-# db_url = 'postgresql+psycopg2://{}:{}@{}:5432/{}'.format(user, url_quote(password), host, dbname)
-# engine, meta = db_create_engine(db_url)
+def db_create_engine(url: str):
+    engine = db.create_engine(url, echo=False, pool_pre_ping=True)
+    engine.dialect.description_encoding = None
+    meta = db.MetaData(engine)
+    return engine, meta
+
+
+def check_table(engine, tablename):
+    insp = db.inspect(engine)
+    ret = insp.dialect.has_table(engine.connect(), tablename)
+    return ret
 
 
 def main():
@@ -29,17 +34,23 @@ def main():
     # dbname = 'smartshiprouting'
     # user = os.getenv('DB_AZURE_USERNAME')
     # password = os.getenv('DB_AZURE_PASSWORD')
-    # db_url = 'postgresql+psycopg2://{}:{}@{}:5432/{}'.format(user, url_quote(password), host, dbname)
-    # engine, meta = db_create_engine(db_url)
+    db_url = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
+        config.node2_user, url_quote(config.node2_pwd), config.node2_host, config.node2_port, config.node2_dbname
+    )
+    engine, meta = db_create_engine(db_url)
 
-    # tablename = 'nesdata_new'
-    # exist = check_table(engine, tablename)
-    # if not exist:
-    #     print(f'Table {tablename} does not exist. Create it first.')
-    #     exit()
+    print("engine", engine)
+    print("meta", meta)
+    print(config.node2_pwd)
+
+    tablename = 'nesdata_new'
+    exist = check_table(engine, tablename)
+    if not exist:
+        print(f'Table {tablename} does not exist. Create it first.')
+        exit()
 
     # nes_table = db.Table(tablename, meta, autoload=True, autoload_with=engine)
 
-    
+
 if __name__ == "__main__":
     main()

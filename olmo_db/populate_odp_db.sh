@@ -7,13 +7,13 @@ source /home/Secrets/influx_admin_credentials
 export INFLUX_USERNAME=$USER
 export INFLUX_PASSWORD=$PWD
 
-influx -execute 'SELECT Latitude_decimal INTO share_odp..Latitude_decimal FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
-influx -execute 'SELECT Longitude_decimal INTO share_odp..Longitude_decimal FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
-influx -execute 'SELECT temperature_digital INTO share_odp..temperature_digital FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
-influx -execute 'SELECT wind_speed_digital INTO share_odp..wind_speed_digital FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
-influx -execute 'SELECT wind_direction_digital INTO share_odp..wind_direction_digital FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
-influx -execute 'SELECT pressure_digital INTO share_odp..pressure_digital FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
-influx -execute 'SELECT humidity_digital INTO share_odp..humidity_digital FROM example..loggernet_public WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT latitude AS Latitude_decimal INTO share_odp..Latitude_decimal FROM oceanlab..meteo_position_munkholmen WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT longitude AS Longitude_decimal INTO share_odp..Longitude_decimal FROM oceanlab..meteo_position_munkholmen WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT temperature AS temperature_digital INTO share_odp..temperature_digital FROM oceanlab..meteo_temperature_munkholmen WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT wind_speed AS wind_speed_digital INTO share_odp..wind_speed_digital FROM oceanlab..meteo_wind_speed_munkholmen WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT wind_direction AS wind_direction_digital INTO share_odp..wind_direction_digital FROM oceanlab..meteo_wind_direction_munkholmen WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT atmospheric_pressure AS pressure_digital INTO share_odp..pressure_digital FROM oceanlab..meteo_atmospheric_pressure_munkholmen WHERE time >= now() - 120m GROUP BY *'
+influx -execute 'SELECT humidity AS humidity_digital INTO share_odp..humidity_digital FROM oceanlab..meteo_humidity_munkholmen WHERE time >= now() - 120m GROUP BY *'
 
 now=$(date +"%T")
 echo "Finished at $now"

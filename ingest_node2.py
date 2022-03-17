@@ -39,9 +39,13 @@ def main():
     )
     engine, meta = db_create_engine(db_url)
 
-    print("engine", engine)
-    print("meta", meta)
-    print(config.node2_pwd)
+    print("engine:", engine)
+    print("meta:", meta)
+    # print(config.node2_pwd)
+    print("config.node2_user:", config.node2_user)
+    print("config.node2_host:", config.node2_host)
+    print("config.node2_port:", config.node2_port)
+    print("config.node2_dbname:", config.node2_dbname)
 
     tablename = 'nesdata_new'
     exist = check_table(engine, tablename)

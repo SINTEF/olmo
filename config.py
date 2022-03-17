@@ -54,7 +54,7 @@ webfigs_dir = os.path.join(output_dir, 'Website_figures')
 
 # Node 2 ingestion:
 with open(os.path.join(secrets_dir, 'node2_password'), 'r') as f:
-    node2_pwd = f.read()
+    node2_pwd = f.read()[:-1]
 with open(os.path.join(secrets_dir, 'node2_secrets.json'), 'r') as f:
     data = json.load(f)
 node2_dbname = data['dbname']

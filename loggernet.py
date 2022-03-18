@@ -412,6 +412,79 @@ def ingest_loggernet_file(file_path, file_type):
         ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
+    if file_type == 'CR6_EOL2p0_Current_':
+        df = pd.read_csv(file_path, skiprows=1)
+        data_cols = list(df.columns[2:])
+        float_cols = data_cols
+
+        df_all = load_data(file_path, data_cols, float_cols)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_current_speed_munkholmen'
+        field_keys = {i:i for i in data_cols if i.startswith('current_speed')}
+        tag_values = {'tag_sensor': 'signature_100',
+                    'tag_edge_device': 'cr6',
+                    'tag_platform': 'munkholmen',
+                    'tag_data_level': 'raw',
+                    'tag_approved': 'none',
+                    'tag_unit': 'cm_per_second'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_current_direction_munkholmen'
+        field_keys = {i:i for i in data_cols if i.startswith('current_direction')}
+        tag_values = {'tag_sensor': 'signature_100',
+                    'tag_edge_device': 'cr6',
+                    'tag_platform': 'munkholmen',
+                    'tag_data_level': 'raw',
+                    'tag_approved': 'none',
+                    'tag_unit': 'degrees'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_amplitude_munkholmen'
+        field_keys = {i:i for i in data_cols if i.startswith('amplitude')}
+        tag_values = {'tag_sensor': 'signature_100',
+                    'tag_edge_device': 'cr6',
+                    'tag_platform': 'munkholmen',
+                    'tag_data_level': 'raw',
+                    'tag_approved': 'none',
+                    'tag_unit': 'db'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_correlation_munkholmen'
+        field_keys = {i:i for i in data_cols if i.startswith('correlation')}
+        tag_values = {'tag_sensor': 'signature_100',
+                    'tag_edge_device': 'cr6',
+                    'tag_platform': 'munkholmen',
+                    'tag_data_level': 'raw',
+                    'tag_approved': 'none',
+                    'tag_unit': 'none'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_velocity_munkholmen'
+        field_keys = {i:i for i in data_cols if i.startswith('velocity')}
+        tag_values = {'tag_sensor': 'signature_100',
+                    'tag_edge_device': 'cr6',
+                    'tag_platform': 'munkholmen',
+                    'tag_data_level': 'raw',
+                    'tag_approved': 'none',
+                    'tag_unit': 'cm_per_second'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        ingest_df(measurement_name, df, clients)
+
+    # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Wave_sensor_':
 
         data_cols = [

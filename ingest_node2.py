@@ -75,6 +75,32 @@ def main():
 
         df = sql_to_df(rs, col_names)
 
+        # Map the unit to our format:
+        unit_mapping = {"°": 'degrees', "m/s": 'metres_per_second'}
+        df = df.replace({"unit": unit_mapping})
+
+        # Rename columns so they match our schema:
+        new_keys = {
+            'timestamp': 'time',
+            'logger_sn': 'tag_edge_device',
+            'sensor_sn': 'tag_sensor',
+            'value': d[1].lower().replace(' ', '_'),
+            'unit': 'tag_unit',
+        }
+        df = df.rename(columns=new_keys)
+
+        # Add additional static tags:
+        additional_tag_values = {
+            'tag_platform': 'node2_weather_station',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+        }
+        for (k, v) in additional_tag_values.items():
+            df[k] = v
+
+        # Remove duplicate / unwanted data
+        df.drop(['sensor_measurement_type', 'id'], axis=1, inplace=True)
+
         print(d[1], d[0])
         print(df)
     # print(df.dtypes)

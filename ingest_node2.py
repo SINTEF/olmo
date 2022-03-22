@@ -44,34 +44,43 @@ def main():
     cols = db.inspect(engine).get_columns('wind_sensors')  # This is the db schema
     col_names = [c['name'] for c in cols]
 
-    with engine.connect() as con:
-        rs = con.execute("SELECT * FROM wind_sensors WHERE sensor_measurement_type = 'Wind Speed' LIMIT 3")
-        # rs = con.execute("SELECT * FROM wind_sensors WHERE sensor_measurement_type = 'Wind Speed' AND timestamp BETWEEN now() - (interval '24 hours') AND now()")
+    # sensor_measurement_type = ["Wind Direction", "Wind Speed", "Gust Speed"]
+    # sensor_sn = ['21124500', '21139640']
+    data_types = [
+        ('21124500-1', 'Wind Speed'),
+        ('21124500-2', 'Gust Speed'),
+        ('21124500-3', 'Wind Direction'),
+        ('21139640-1', 'Wind Speed'),
+        ('21139640-2', 'Gust Speed'),
+        ('21139640-3', 'Wind Direction'),
 
-    def sql_to_df(rs, col_names):
-        data = []
-        for row in rs:
-            d = [i for i in row]
-            data.append(d)
-        df = pd.DataFrame(data, columns=col_names)
-        # Manually reformat cols:
-        df['logger_sn'] = df['logger_sn'].astype(str)
-        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # Remove white space
-        df['value'] = df['value'].astype(np.float64)
-        return df
+    ]
 
-    df = sql_to_df(rs, col_names)
+    for d in data_types:
+        with engine.connect() as con:
+            rs = con.execute(f"SELECT * FROM wind_sensors WHERE sensor_sn = '{d[0]}' AND sensor_measurement_type = '{d[1]}' AND timestamp BETWEEN now() - (interval '12 hours') AND now()")
+            # rs = con.execute("SELECT * FROM wind_sensors WHERE sensor_measurement_type = 'Wind Speed' AND timestamp BETWEEN now() - (interval '24 hours') AND now()")
 
-    print(df)
-    print(df.dtypes)
+        def sql_to_df(rs, col_names):
+            data = []
+            for row in rs:
+                d = [i for i in row]
+                data.append(d)
+            df = pd.DataFrame(data, columns=col_names)
+            # Manually reformat cols:
+            df['logger_sn'] = df['logger_sn'].astype(str)
+            df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # Remove white space
+            df['value'] = df['value'].astype(np.float64)
+            return df
 
-    print(df.sensor_sn[0])
-    print(type(df.sensor_sn[0]))
-    print(len(df.sensor_sn[0]))
+        df = sql_to_df(rs, col_names)
 
+        print(d[1], d[0])
+        print(df)
+    # print(df.dtypes)
 
-
-    # nes_table = db.Table(tablename, meta, autoload=True, autoload_with=engine)
+    print("Finished running ingest_node2.py at "
+          + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 
 if __name__ == "__main__":

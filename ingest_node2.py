@@ -1,4 +1,6 @@
 import datetime
+import numpy as np
+import pandas as pd
 import sqlalchemy as db
 from urllib.parse import quote_plus as url_quote
 
@@ -39,15 +41,34 @@ def main():
         print(f'Table {tablename} does not exist. Create it first.')
         exit()
 
-    # table_names = db.inspect(engine).get_table_names()
-    cols = db.inspect(engine).get_columns('wind_sensors')
-    for c in cols:
-        print(c)
+    cols = db.inspect(engine).get_columns('wind_sensors')  # This is the db schema
+    col_names = [c['name'] for c in cols]
 
     with engine.connect() as con:
         rs = con.execute("SELECT * FROM wind_sensors WHERE sensor_measurement_type = 'Wind Speed' LIMIT 3")
+        # rs = con.execute("SELECT * FROM wind_sensors WHERE sensor_measurement_type = 'Wind Speed' AND timestamp BETWEEN now() - (interval '24 hours') AND now()")
+
+    def sql_to_df(rs, col_names):
+        data = []
         for row in rs:
-            print(row)
+            d = [i for i in row]
+            data.append(d)
+        df = pd.DataFrame(data, columns=col_names)
+        # Manually reformat cols:
+        df['logger_sn'] = df['logger_sn'].astype(str)
+        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # Remove white space
+        df['value'] = df['value'].astype(np.float64)
+        return df
+
+    df = sql_to_df(rs, col_names)
+
+    print(df)
+    print(df.dtypes)
+
+    print(df.sensor_sn[0])
+    print(type(df.sensor_sn[0]))
+    print(len(df.sensor_sn[0]))
+
 
 
     # nes_table = db.Table(tablename, meta, autoload=True, autoload_with=engine)

@@ -8,19 +8,18 @@ influx -execute 'CREATE RETENTION POLICY "one_week" ON "share_odp" DURATION 1w R
 influx -execute 'ALTER RETENTION POLICY one_week ON share_odp DEFAULT'
 
 # Create the users
-
 # Fetch the passwords from the secrets folder
 source /home/Secrets/influx_odp_credentials
-influx -execute "CREATE USER '${USER}' WITH PASSWORD '${PWD}'"
-influx -execute "GRANT READ ON share_odp TO '${USER}'"
-influx -execute "SHOW GRANTS FOR '${USER}'"
+influx -execute "CREATE USER ${USER} WITH PASSWORD '${PWD}'"
+influx -execute "GRANT READ ON share_odp TO ${USER}"
+influx -execute "SHOW GRANTS FOR ${USER}"
 
 source /home/Secrets/influx_tdv_credentials
-influx -execute "CREATE USER '${USER}' WITH PASSWORD '${PWD}'"
-influx -execute "GRANT READ ON share_odp TO '${USER}'"
-influx -execute "SHOW GRANTS FOR '${USER}'"
+influx -execute "CREATE USER ${USER} WITH PASSWORD '${PWD}'"
+influx -execute "GRANT READ ON share_odp TO ${USER}"
+influx -execute "SHOW GRANTS FOR ${USER}"
 
 source /home/Secrets/influx_node2_credentials
-influx -execute "CREATE USER '${USER}' WITH PASSWORD '${PWD}'"
-influx -execute "GRANT READ ON share_odp TO '${USER}'"
-influx -execute "SHOW GRANTS FOR '${USER}'"
+influx -execute "CREATE USER ${USER} WITH PASSWORD '${PWD}'"
+influx -execute "GRANT READ ON share_odp TO ${USER}"
+influx -execute "SHOW GRANTS FOR ${USER}"

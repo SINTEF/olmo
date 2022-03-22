@@ -1,20 +1,12 @@
-import os
 import logging
 import numpy as np
-from influxdb import InfluxDBClient
 
-import config
-import util
 
 '''
 Functions to be directly used in ingesting data into influxdb.
 '''
 
 logger = logging.getLogger('olmo.ingest')
-
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-client = InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
-client = InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test')
 
 
 def float_col_fix(df, float_cols):

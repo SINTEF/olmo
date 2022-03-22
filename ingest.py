@@ -1,7 +1,5 @@
 import logging
 import numpy as np
-from influxdb import InfluxDBClient
-
 
 '''
 Functions to be directly used in ingesting data into influxdb.

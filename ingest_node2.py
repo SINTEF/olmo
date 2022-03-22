@@ -8,6 +8,7 @@ from influxdb import InfluxDBClient
 
 import config
 import util
+import ingest
 
 
 def db_create_engine(url: str):
@@ -46,29 +47,30 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
-        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+        # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
     ]
-
 
     cols = db.inspect(engine).get_columns('wind_sensors')  # This is the db schema
     col_names = [c['name'] for c in cols]
 
-    # sensor_measurement_type = ["Wind Direction", "Wind Speed", "Gust Speed"]
-    # sensor_sn = ['21124500', '21139640']
+    # Hack variable with:
+    #     sensor_sn (in postgres),
+    #     sensor_measurement_type (in postgres),
+    #     measurement name (in influx)
     data_types = [
-        ('21124500-1', 'Wind Speed'),
-        ('21124500-2', 'Gust Speed'),
-        ('21124500-3', 'Wind Direction'),
-        ('21139640-1', 'Wind Speed'),
-        ('21139640-2', 'Gust Speed'),
-        ('21139640-3', 'Wind Direction'),
-
+        ('21124500-1', 'Wind Speed', 'wind_speed_brattora1'),
+        ('21124500-2', 'Gust Speed', 'gust_speed_brattora1'),
+        ('21124500-3', 'Wind Direction', 'wind_direction_brattora1'),
+        ('21139640-1', 'Wind Speed', 'wind_speed_brattora1'),
+        ('21139640-2', 'Gust Speed', 'gust_speed_brattora1'),
+        ('21139640-3', 'Wind Direction', 'wind_direction_brattora1'),
     ]
 
-    for d in data_types:
+    for d in data_types[:1]:
+        print(d)
         with engine.connect() as con:
-            rs = con.execute(f"SELECT * FROM wind_sensors WHERE sensor_sn = '{d[0]}' AND sensor_measurement_type = '{d[1]}' AND timestamp BETWEEN now() - (interval '12 hours') AND now()")
+            rs = con.execute(f"SELECT * FROM wind_sensors WHERE sensor_sn = '{d[0]}' AND sensor_measurement_type = '{d[1]}' AND timestamp BETWEEN now() - (interval '24 hours') AND now()")
             # rs = con.execute("SELECT * FROM wind_sensors WHERE sensor_measurement_type = 'Wind Speed' AND timestamp BETWEEN now() - (interval '24 hours') AND now()")
 
         def sql_to_df(rs, col_names):
@@ -91,7 +93,7 @@ def main():
 
         # Rename columns so they match our schema:
         new_keys = {
-            'timestamp': 'time',
+            'timestamp': 'date',
             'logger_sn': 'tag_edge_device',
             'sensor_sn': 'tag_sensor',
             'value': d[1].lower().replace(' ', '_'),
@@ -101,19 +103,25 @@ def main():
 
         # Add additional static tags:
         additional_tag_values = {
-            'tag_platform': 'node2_weather_station_1',
+            'tag_platform': 'brattora1',
             'tag_data_level': 'raw',
             'tag_approved': 'none',
         }
         for (k, v) in additional_tag_values.items():
             df[k] = v
 
-        # Remove duplicate / unwanted data
+        # Remove duplicate / unwanted data:
         df.drop(['sensor_measurement_type', 'id'], axis=1, inplace=True)
 
+        # date column should be the index, with utc timezone:
+        # df = df.set_index('date').tz_localize('UTC', ambiguous='infer').tz_convert('UTC')
+        df = df.set_index('date').tz_convert('UTC')
+        # .tz_localize('CET', ambiguous='infer')
         print(d[1], d[0])
         print(df)
-    # print(df.dtypes)
+
+        ingest.ingest_df(d[2], df, clients)
+        print("data ingested")
 
     print("Finished running ingest_node2.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))

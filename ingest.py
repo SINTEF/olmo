@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+from influxdb import InfluxDBClient
 
 
 '''
@@ -19,9 +20,8 @@ def float_col_fix(df, float_cols):
 
 def ingest_df(measurement, df, clients):
 
-    all_cols = df.columns
-    tag_cols = [c for c in all_cols if c[:4] == 'tag_']
-    field_cols = [c for c in all_cols if c not in tag_cols]
+    tag_cols = [c for c in df.columns if c[:4] == 'tag_']
+    field_cols = [c for c in df.columns if c not in tag_cols]
 
     data = []
     for index, row in df.iterrows():

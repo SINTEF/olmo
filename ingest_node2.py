@@ -1,8 +1,10 @@
+import os
 import datetime
 import numpy as np
 import pandas as pd
 import sqlalchemy as db
 from urllib.parse import quote_plus as url_quote
+from influxdb import InfluxDBClient
 
 import config
 import util
@@ -40,6 +42,14 @@ def main():
     if not exist:
         print(f'Table {tablename} does not exist. Create it first.')
         exit()
+
+    logger.info("Fetching the influxdb clients.")
+    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    clients = [
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+    ]
+
 
     cols = db.inspect(engine).get_columns('wind_sensors')  # This is the db schema
     col_names = [c['name'] for c in cols]
@@ -91,7 +101,7 @@ def main():
 
         # Add additional static tags:
         additional_tag_values = {
-            'tag_platform': 'node2_weather_station',
+            'tag_platform': 'node2_weather_station_1',
             'tag_data_level': 'raw',
             'tag_approved': 'none',
         }
@@ -111,9 +121,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Engine(postgresql+psycopg2://share_odp%40adaptive-postgresql:***@adaptive-postgresql.postgres.database.azure.com:5432/hobolink)
-# Engine(postgresql+psycopg2://share_odp%40adaptive-postgresql:***@adaptive-postgresql.postgres.database.azure.com:5432/hobolink)
-
-# MetaData(bind=Engine(postgresql+psycopg2://share_odp%40adaptive-postgresql:***@adaptive-postgresql.postgres.database.azure.com:5432/hobolink))
-# MetaData(bind=Engine(postgresql+psycopg2://share_odp%40adaptive-postgresql:***@adaptive-postgresql.postgres.database.azure.com:5432/hobolink))

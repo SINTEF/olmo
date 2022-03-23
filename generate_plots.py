@@ -11,22 +11,6 @@ import config
 import util
 
 
-def time_series(df, key, label, title):
-
-    trace1 = go.Scatter(x=df['time'], y=df[key], name=label)
-    # trace2 = go.Scatter(x=df['date'], y=df['tmin [degC]'], name='tmin [degC]')
-
-    data = [trace1]  # , trace2]
-
-    layout = go.Layout(title=title,
-                       yaxis=dict(title=label),
-                       template='plotly_white'
-                       )
-
-    fig = go.Figure(data=data, layout=layout)
-    return fig
-
-
 def query_influxdb(client, measurement, variable, timeslice, downsample):
 
     if downsample:
@@ -46,27 +30,13 @@ def query_influxdb(client, measurement, variable, timeslice, downsample):
     return df
 
 
-def make_subplot(df):
-    return go.Scatter(x=[3, 4, 5], y=[1000, 1100, 1200])
+def make_subplot(df, key, label):
+    subplot = go.Scatter(x=df['time'], y=df[key], name=label)
+    return subplot
 
 
-def query_and_upload_measurement(
-        name, axis_label, plotname,
-        variable, measurement, timeslice, client,
-        lower_filter=-100., upper_filter=100.):
+def upload_figure(local_file, az_file):
 
-    data = query_influxdb(client, measurement, variable, timeslice)
-
-    data.loc[data[variable] < lower_filter, variable] = np.nan
-    data.loc[data[variable] > upper_filter, variable] = np.nan
-
-    filename = f"{name}.html"
-    local_file = os.path.join(config.webfigs_dir, filename)
-    az_file = 'influx_data/' + filename
-    fig = time_series(data, variable, axis_label, plotname)
-    fig.write_html(local_file)
-
-    # ---- Upload to azure:
     with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
         aztoken = f.read()
     process = subprocess.Popen([
@@ -79,7 +49,6 @@ def query_and_upload_measurement(
         stderr=subprocess.PIPE)
     stdout, stderr = process.communicate(timeout=600)
     # logger.info("STDOUT from 'az file upload':\n" + stdout.decode(errors="ignore"))
-    print(f"file uploaded for {name}")
     if process.returncode != 0:
         # logger.error("az file upload failed. stderr:\n" + stderr.decode(errors="ignore"))
         print("we got an error")
@@ -87,18 +56,59 @@ def query_and_upload_measurement(
     # logger.info('Backup, archive and transfer to azure completed successfully.')
 
 
+standard_timeslice = 'time > now() - 1d'
+standard_downsample = 'time(1m)'
 plots = [
     {
-        'name': 'wind_1d',
+        'title': 'Munkholmen Air Temperature',
+        'ylabel': 'Temperature [deg]',
+        'measurement': 'meteo_temperature_munkholmen',
+        'variable': 'temperature',
+        'timeslice': standard_timeslice,
+        'lower_filter': -30,
+        'upper_filter': 50,
+        'downsample': standard_downsample,
+    },
+    {
         'title': 'Munkholmen Wind Speed',
         'ylabel': 'Wind speed [m/s]',
         'measurement': 'meteo_wind_speed_munkholmen',
         'variable': 'wind_speed',
-        'timeslice': 'time > now() - 1d',
-        'lower_filter': -100,
+        'timeslice': standard_timeslice,
+        'lower_filter': 0,
         'upper_filter': 100,
-        'downsample': 'time(1m)'
-    }
+        'downsample': standard_downsample,
+    },
+    {
+        'title': 'Munkholmen Wind Direction',
+        'ylabel': 'Wind direction [deg]',
+        'measurement': 'meteo_wind_direction_munkholmen',
+        'variable': 'wind_direction',
+        'timeslice': standard_timeslice,
+        'lower_filter': 0,
+        'upper_filter': 360,
+        'downsample': standard_downsample,
+    },
+    # {
+    #     'title': 'Munkholmen Air Pressure',
+    #     'ylabel': 'Air pressure [hPa]',
+    #     'measurement': 'meteo_atmospheric_pressure_munkholmen',
+    #     'variable': 'atmospheric_pressure',
+    #     'timeslice': standard_timeslice,
+    #     'lower_filter': 800,
+    #     'upper_filter': 1200,
+    #     'downsample': standard_downsample,
+    # },
+    {
+        'title': 'Munkholmen Humidity',
+        'ylabel': 'Humidity [%]',
+        'measurement': 'meteo_humidity_munkholmen',
+        'variable': 'humidity',
+        'timeslice': standard_timeslice,
+        'lower_filter': 0,
+        'upper_filter': 100,
+        'downsample': standard_downsample,
+    },
 ]
 
 
@@ -113,48 +123,29 @@ def main():
         username=admin_user, password=admin_pwd,
         database='oceanlab')
 
-    fig = make_subplots(rows=len(plots), cols=1)
+    fig = make_subplots(rows=len(plots), cols=1, subplot_titles=[p['title'] for p in plots])
+    fig.update_layout(template='plotly_white')
     for i, p in enumerate(plots):
         df = query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'])
-        print(i)
-        print(df)
 
-        subplot = make_subplot(df)
-        print(subplot)
+        # Simple simple filtering:
+        df.loc[df[p['variable']] < p['lower_filter'], p['variable']] = np.nan
+        df.loc[df[p['variable']] > p['upper_filter'], p['variable']] = np.nan
 
-        fig.append_trace(subplot), row=i + 1, col=1)
+        # Make the actual 'plot'
+        subplot = make_subplot(df, p['variable'], p['title'])
+        fig.append_trace(subplot, row=i + 1, col=1)
 
-        # fig.append_trace(go.Scatter(
-        # x=[3, 4, 5],
-        # y=[1000, 1100, 1200],
-        # ), row=1, col=1)
+        # Add axis labels:
+        # fig.update_xaxes(title_text='Time', row=i + 1, col=1)  # Removed as overlaps with title
+        fig.update_yaxes(title_text=p['ylabel'], row=i + 1, col=1)
 
-    # query_and_upload_measurement(
-    #     'wind_1d', 'Wind speed [m/s]', 'Munkholmen Wind Speed',
-    #     'wind_speed_digital', 'loggernet_public', 'time > now() - 1d', client,
-    #     lower_filter=-100., upper_filter=100.)
-
-    # query_and_upload_measurement(
-    #     'wind_direction_1d', 'Wind direction [deg]', 'Munkholmen Wind Direction',
-    #     'wind_direction_digital', 'loggernet_public', 'time > now() - 1d', client,
-    #     lower_filter=-10., upper_filter=370.)
-
-    # query_and_upload_measurement(
-    #     'temp_1d', 'Temperature [deg]', 'Munkholmen Air Temperature',
-    #     'temperature_digital', 'loggernet_public', 'time > now() - 1d', client,
-    #     lower_filter=-100., upper_filter=100.)
-
-    # query_and_upload_measurement(
-    #     'pressure_1d', 'Air pressure [hPa]', 'Munkholmen Air Pressure',
-    #     'pressure_digital', 'loggernet_public', 'time > now() - 1d', client,
-    #     lower_filter=0., upper_filter=1500.)
-
-    # query_and_upload_measurement(
-    #     'humidity_1d', 'Humidity', 'Munkholmen Humidity',
-    #     'humidity_digital', 'loggernet_public', 'time > now() - 1d', client,
-    #     lower_filter=-10., upper_filter=110.)
-
-    print("done with all")
+    filename = "weather_1d.html"
+    local_file = os.path.join(config.webfigs_dir, filename)
+    az_file = 'influx_data/' + filename
+    fig.update_layout(height=100 + 400 * len(plots), width=1200, showlegend=False)
+    fig.write_html(local_file)
+    upload_figure(local_file, az_file)
 
 
 if __name__ == "__main__":

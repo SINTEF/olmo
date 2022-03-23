@@ -1,7 +1,7 @@
 # olmo
 OceanLab Observatory
 
-![System diagram](https://oceanlabdlstorage.blob.core.windows.net/public/Datapipeline_diagra.png)
+![System diagram](https://oceanlabdlstorage.blob.core.windows.net/public/Datapipeline_diagram.png)
 
 # Data collection
 

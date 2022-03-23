@@ -17,7 +17,6 @@ def query_influxdb(client, measurement, variable, timeslice, downsample):
         q = f'SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} GROUP BY {downsample}'
     else:
         q = f'SELECT "{variable}" FROM "{measurement}" WHERE {timeslice}'
-    print(q)
 
     result = client.query(q)
     df = pd.DataFrame(columns=['time', variable])

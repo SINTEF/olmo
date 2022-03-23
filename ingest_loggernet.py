@@ -1,5 +1,4 @@
 import os
-import logging
 import datetime
 import subprocess
 import time
@@ -97,14 +96,7 @@ def main():
     print("Starting running ingest_loggernet.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    # ---- Set up logging:
-    logger = logging.getLogger('olmo')
-    logger.setLevel(logging.INFO)
-    fh = logging.FileHandler(os.path.join(
-        config.output_dir, config.loggernet_logfile + datetime.datetime.now().strftime('%Y%m%d')), 'a+')
-    fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(fh)
-
+    logger = util.init_logger(config.loggernet_logfile, name='ingest_loggernet')
     logger.info("\n\n------ Starting data collection in main()")
 
     logger.info("Fetching the influxdb clients.")

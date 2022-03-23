@@ -3,7 +3,7 @@ import subprocess
 import datetime
 import pandas as pd
 import numpy as np
-from plotly.subplots import make_subplots
+# from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 from influxdb import InfluxDBClient
 

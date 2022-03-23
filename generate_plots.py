@@ -59,7 +59,7 @@ standard_timeslice = 'time > now() - 1d'
 standard_downsample = 'time(1m)'
 plots = [
     {
-        'title': 'Munkholmen Air Temperature',
+        'title': 'Munkholmen Buoy Air Temperature',
         'ylabel': 'Temperature [deg]',
         'measurement': 'meteo_temperature_munkholmen',
         'variable': 'temperature',
@@ -69,7 +69,7 @@ plots = [
         'downsample': standard_downsample,
     },
     {
-        'title': 'Munkholmen Wind Speed',
+        'title': 'Munkholmen Buoy Wind Speed',
         'ylabel': 'Wind speed [m/s]',
         'measurement': 'meteo_wind_speed_munkholmen',
         'variable': 'wind_speed',
@@ -79,7 +79,7 @@ plots = [
         'downsample': standard_downsample,
     },
     {
-        'title': 'Munkholmen Wind Direction',
+        'title': 'Munkholmen Buoy Wind Direction',
         'ylabel': 'Wind direction [deg]',
         'measurement': 'meteo_wind_direction_munkholmen',
         'variable': 'wind_direction',
@@ -89,7 +89,7 @@ plots = [
         'downsample': standard_downsample,
     },
     # {
-    #     'title': 'Munkholmen Air Pressure',
+    #     'title': 'Munkholmen Buoy Air Pressure',
     #     'ylabel': 'Air pressure [hPa]',
     #     'measurement': 'meteo_atmospheric_pressure_munkholmen',
     #     'variable': 'atmospheric_pressure',
@@ -99,7 +99,7 @@ plots = [
     #     'downsample': standard_downsample,
     # },
     {
-        'title': 'Munkholmen Humidity',
+        'title': 'Munkholmen Buoy Humidity',
         'ylabel': 'Humidity [%]',
         'measurement': 'meteo_humidity_munkholmen',
         'variable': 'humidity',

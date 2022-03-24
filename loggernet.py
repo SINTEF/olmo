@@ -185,7 +185,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = processing.constant_val_filter(df, 'wind_direction', lower=0, upper=360)
+        df = processing.constant_val_filter(df, 'wind_direction', lower=1, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
@@ -357,7 +357,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        df = processing.constant_val_filter(df, 'wind_direction_avg', lower=0, upper=360)
+        df = processing.constant_val_filter(df, 'wind_direction_avg', lower=1, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #

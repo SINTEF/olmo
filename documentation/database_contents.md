@@ -1,7 +1,7 @@
 # Database contents, explanation and help
 
 Note that in influxDB the following nomencalture is used:
- * `measurement` -> A sql table
+ * `measurement` -> The equivelent of a sql table
  * `field value` -> An actual measurement value (almost always a float).
  * `tag value` -> A string 'tag' for a measurement value. The tags are included in the index.
 

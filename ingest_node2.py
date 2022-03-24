@@ -60,24 +60,25 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'test'),
-        # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
     ]
 
     cols = db.inspect(engine).get_columns('wind_sensors')  # This is the db schema
     col_names = [c['name'] for c in cols]
 
-    # Hack variable with:
+    # Hack variable to input correct information. Has form:
     #     sensor_sn (in postgres),
     #     sensor_measurement_type (in postgres),
-    #     measurement name (in influx)
+    #     measurement name (in influx),
+    #     platform,
     data_types = [
-        ('21124500-1', 'Wind Speed', 'wind_speed_brattora1'),
-        ('21124500-2', 'Gust Speed', 'gust_speed_brattora1'),
-        ('21124500-3', 'Wind Direction', 'wind_direction_brattora1'),
-        ('21139640-1', 'Wind Speed', 'wind_speed_brattora1'),
-        ('21139640-2', 'Gust Speed', 'gust_speed_brattora1'),
-        ('21139640-3', 'Wind Direction', 'wind_direction_brattora1'),
+        ('21124500-1', 'Wind Speed', 'wind_speed_brattora01', 'brattora01'),
+        ('21124500-2', 'Gust Speed', 'gust_speed_brattora01', 'brattora01'),
+        ('21124500-3', 'Wind Direction', 'wind_direction_brattora01', 'brattora01'),
+        ('21139640-1', 'Wind Speed', 'wind_speed_brattora02', 'brattora02'),
+        ('21139640-2', 'Gust Speed', 'gust_speed_brattora02', 'brattora02'),
+        ('21139640-3', 'Wind Direction', 'wind_direction_brattora02', 'brattora02'),
     ]
 
     logger.info("Looping through data types.")
@@ -104,7 +105,7 @@ def main():
 
         # Add additional static tags:
         additional_tag_values = {
-            'tag_platform': 'brattora1',
+            'tag_platform': d[3],
             'tag_data_level': 'raw',
             'tag_approved': 'none',
         }

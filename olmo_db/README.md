@@ -9,6 +9,7 @@ Log onto `Grafana-vm1` (on azure). The simplest (in the case that there is nothi
   2. Run `docker-compose up -d`
   3. Go into the influx docker container: `docker exec -it influxdb bash`
   4. Start the cron deamon: `service cron start`
+  5. Finally once grafana is up and running you need to update the token (alerting->notification channels)
 
 A More complete restart would be:
 

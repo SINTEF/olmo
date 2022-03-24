@@ -11,12 +11,12 @@ import config
 import util
 
 
-def query_influxdb(client, measurement, variable, timeslice, downsample):
+def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
 
     if downsample:
-        q = f'SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} GROUP BY {downsample}'
+        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' GROUP BY {downsample}'''
     else:
-        q = f'SELECT "{variable}" FROM "{measurement}" WHERE {timeslice}'
+        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
 
     result = client.query(q)
     df = pd.DataFrame(columns=['time', variable])

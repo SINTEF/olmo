@@ -60,14 +60,14 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'test'),
-        # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
     ]
 
     cols = db.inspect(engine).get_columns('wind_sensors')  # This is the db schema
     col_names = [c['name'] for c in cols]
 
-    # Hack variable with:
+    # Hack variable to input correct information. Has form:
     #     sensor_sn (in postgres),
     #     sensor_measurement_type (in postgres),
     #     measurement name (in influx),

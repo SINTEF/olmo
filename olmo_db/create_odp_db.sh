@@ -7,7 +7,11 @@ influx -execute 'CREATE RETENTION POLICY "one_day" ON "share_odp" DURATION 1d RE
 influx -execute 'CREATE RETENTION POLICY "one_week" ON "share_odp" DURATION 1w REPLICATION 1'
 influx -execute 'ALTER RETENTION POLICY one_week ON share_odp DEFAULT'
 
-# Create the users
+# Create the users, follows this pattern:
+# CREATE USER username WITH PASSWORD 'password'
+# GRANT READ ON share_odp TO username
+# SHOW GRANTS FOR username
+
 # Fetch the passwords from the secrets folder
 source /home/Secrets/influx_odp_credentials
 influx -execute "CREATE USER ${USER} WITH PASSWORD '${PWD}'"

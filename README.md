@@ -1,8 +1,6 @@
 # olmo
 OceanLab Observatory
 
-![System diagram](https://oceanlabdlstorage.blob.core.windows.net/public/Datapipeline_diagram_2.png)
-
 # Data collection
 
 ## Munkholmen sensor data

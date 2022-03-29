@@ -56,7 +56,7 @@ def upload_figure(local_file, az_file):
 
 
 standard_timeslice = 'time > now() - 1d'
-standard_downsample = 'time(1m)'
+standard_downsample = 'time(1m)'  # To turn off use: False
 plots = [
     {
         'title': 'Munkholmen Buoy Air Temperature',

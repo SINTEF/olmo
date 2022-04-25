@@ -86,8 +86,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        # df = processing.constant_val_filter(df, 'latitude', lower=62.5, upper=64)
-        # df = processing.constant_val_filter(df, 'longitude', lower=10, upper=11)
+        df = processing.constant_val_filter(df, 'latitude', lower=62.5, upper=64)
+        df = processing.constant_val_filter(df, 'longitude', lower=10, upper=11)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -217,6 +217,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
         df = processing.constant_val_filter(df, 'battery_voltage', lower=0, upper=50)
+        df = processing.constant_val_filter(df, 'pv_voltage1', lower=0, upper=50)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -230,6 +231,9 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_approved': 'none',
                       'tag_unit': 'amps'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = processing.constant_val_filter(df, 'input_current', lower=0, upper=100)
+        df = processing.constant_val_filter(df, 'load_current', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -277,6 +281,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       'tag_approved': 'none',
                       'tag_unit': 'degrees_celsius'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # Data processing:
+        df = processing.constant_val_filter(df, 'Solar_reg_temperature', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #

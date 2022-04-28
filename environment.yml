@@ -12,8 +12,10 @@ dependencies:
     - pandas=1.2.4
     - paramiko=2.7.2
     - pip=21.1
+    - psycopg2-binary=2.9.3  # Node2. They use 2.8.6
     - pytest=6.2.4
     - scipy=1.6.3
+    - sqlalchemy=1.4.27  # Node2
     - xarray=0.18.2
     - pip:
         - sphinx==4.1.2

@@ -1,19 +1,11 @@
-import os
 import logging
 import numpy as np
-from influxdb import InfluxDBClient
-
-import config
-import util
 
 '''
 Functions to be directly used in ingesting data into influxdb.
 '''
 
 logger = logging.getLogger('olmo.ingest')
-
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-client = InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
 
 
 def float_col_fix(df, float_cols):
@@ -24,15 +16,19 @@ def float_col_fix(df, float_cols):
     return df
 
 
-# def df_ingest(measurement, df, tag_sensor, tag_station, tag_dlevel, tag_approved, tag_unit):
+def ingest_df(measurement, df, clients):
 
-#     # client = InfluxDBClient('localhost', database='my_db')
-#     # measurement = 'measurement1'
-#     # db_data = client.query('select value from %s' % (measurement))
-#     data_to_write = [{
-#         'measurement': measurement,
-#         'tags': ['measurement1'],
-#         'time': d['time'],
-#         'fields': {'value': d['value']},
-#         } for d in db_data.get_points()]
-#     client.write_points(data_to_write)
+    tag_cols = [c for c in df.columns if c[:4] == 'tag_']
+    field_cols = [c for c in df.columns if c not in tag_cols]
+
+    data = []
+    for index, row in df.iterrows():
+        data.append({
+            'measurement': measurement,
+            'time': index,
+            'tags': {t[4:]: row[t] for t in tag_cols},
+            'fields': {f: row[f] for f in field_cols},
+        })
+
+    for c in clients:
+        c.write_points(data)

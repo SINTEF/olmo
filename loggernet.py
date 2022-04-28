@@ -373,45 +373,48 @@ def ingest_loggernet_file(file_path, file_type, clients):
         float_cols = data_cols
 
         df_all = load_data(file_path, data_cols, float_cols)
+        print(df_all.head())
+
+        '''
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_current_speed_munkholmen'
-        field_keys = {i:i for i in data_cols if i.startswith('current_speed')}
+        field_keys = {i: i for i in data_cols if i.startswith('current_speed')}
         tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'cm_per_second'}
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'cm_per_second'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_current_direction_munkholmen'
-        field_keys = {i:i for i in data_cols if i.startswith('current_direction')}
+        field_keys = {i: i for i in data_cols if i.startswith('current_direction')}
         tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'degrees'}
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_amplitude_munkholmen'
-        field_keys = {i:i for i in data_cols if i.startswith('amplitude')}
+        field_keys = {i: i for i in data_cols if i.startswith('amplitude')}
         tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'db'}
+                      'tag_edge_device': 'cr6',
+                      'tag_platform': 'munkholmen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'db'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_correlation_munkholmen'
@@ -424,7 +427,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                     'tag_unit': 'none'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_velocity_munkholmen'
@@ -437,7 +440,9 @@ def ingest_loggernet_file(file_path, file_type, clients):
                     'tag_unit': 'cm_per_second'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         # Data processing:
-        ingest_df(measurement_name, df, clients)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        '''
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Wave_sensor_':

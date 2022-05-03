@@ -32,6 +32,10 @@ for r in result:
 
 f = open(os.path.join(config.output_dir, 'Database_overview.txt'), 'w')
 
+f.write("ALL TABLES (MEASUREMENTS) IN DATABASE:\n")
+for m in measurements:
+    f.write(f"{m}\n")
+
 
 def add_measurement_to_file(result, m, f):
     d = next(result.items()[0][1])
@@ -41,15 +45,15 @@ def add_measurement_to_file(result, m, f):
     f.write('\n\n')
 
 
+f.write("\n\nSAMPLE DATAPOINT FROM TABLES (MEASUREMENTS) IN DATABASE:\n")
 time = 'time > now() - 1w'
 backup_time = 'time > now() - 52w'
 for m in measurements:
-    # q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
     q = f'''SELECT * FROM "{m}" WHERE {time} LIMIT 1'''
     result = client.query(q)
 
     if not list(result.items()):
-        q = f'''SELECT * FROM "{m}" WHERE {backup_time} LIM IT 1'''
+        q = f'''SELECT * FROM "{m}" WHERE {backup_time} LIMIT 1'''
         result = client.query(q)
         if not list(result.items()):
             continue

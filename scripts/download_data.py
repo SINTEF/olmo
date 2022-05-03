@@ -24,8 +24,9 @@ client.switch_database(DATABASE)
 res = client.get_list_measurements()
 # print('got measurements', res)
 
-measurement = 'wave_direction_munkholmen'
-timeslice = 'time > now() - 1d'
+measurement = 'wave_period_munkholmen'
+var_name = 'period'
+# timeslice = 'time > now() - 1d'
 timeslice = "(time > '2022-03-15T23:00:00Z' AND time < '2022-04-21T23:59:59Z')"
 # q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
 q = f'''SELECT * FROM "{measurement}" WHERE {timeslice}'''
@@ -46,7 +47,6 @@ df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
 df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
 
 print(df.shape)
-print(df.loc[:, ['time', 'approved', 'direction']].head())
-print(df.tail())
+print(df.loc[:, ['time', 'approved', var_name]].head())
 
-df.loc[:, ['time', 'approved', 'direction']].to_csv(os.path.join(config.output_dir, 'direction.csv'), index=False)
+df.loc[:, ['time', 'approved', var_name]].to_csv(os.path.join(config.output_dir, 'period.csv'), index=False)

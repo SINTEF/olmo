@@ -12,7 +12,7 @@ the influxDB instance on the Azure VM over the internet.
 
 
 USER, PASSWORD = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-AZVM_HOST_IP = '10.217.32.11'
+AZVM_HOST_IP = config.az_influx_pc
 DATABASE = 'oceanlab'
 
 client = InfluxDBClient(host=AZVM_HOST_IP, port=8086, username=USER, password=PASSWORD)

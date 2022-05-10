@@ -1,0 +1,224 @@
+ALL TABLES (MEASUREMENTS) IN DATABASE:
+gust_speed_brattora01
+gust_speed_brattora02
+meteo_atmospheric_pressure_avg_munkholmen
+meteo_atmospheric_pressure_munkholmen
+meteo_dew_point_munkholmen
+meteo_humidity_avg_munkholmen
+meteo_humidity_munkholmen
+meteo_position_displacement_munkholmen
+meteo_position_munkholmen
+meteo_temperature_avg_munkholmen
+meteo_temperature_munkholmen
+meteo_wind_direction_avg_munkholmen
+meteo_wind_direction_munkholmen
+meteo_wind_speed_avg_munkholmen
+meteo_wind_speed_munkholmen
+position_brattora01
+position_brattora02
+power_aux_munkholmen
+power_current_munkholmen
+power_energy_use_munkholmen
+power_voltage_munkholmen
+signature_100_amplitude_munkholmen
+signature_100_battery_voltage_munkholmen
+signature_100_correlation_munkholmen
+signature_100_current_direction_munkholmen
+signature_100_current_speed_munkholmen
+signature_100_error_code_munkholmen
+signature_100_heading_munkholmen
+signature_100_pitch_munkholmen
+signature_100_pressure_munkholmen
+signature_100_roll_munkholmen
+signature_100_sound_speed_munkholmen
+signature_100_temperature_munkholmen
+signature_100_velocity_munkholmen
+solar_regulator_power_munkholmen
+wave_direction_munkholmen
+wave_heading_munkholmen
+wave_hmax_munkholmen
+wave_hs_munkholmen
+wave_period_munkholmen
+wind_direction_brattora01
+wind_direction_brattora02
+wind_speed_brattora01
+wind_speed_brattora02
+
+
+SAMPLE DATAPOINT FROM TABLES (MEASUREMENTS) IN DATABASE:
+---- gust_speed_brattora01:
+                time approved data_level edge_device  gust_speed   platform  postgres_id     sensor              unit
+2022-05-03T07:28:00Z     none        raw    21124087     2.34696 brattora01      1870281 21124500-2 metres_per_second
+
+---- gust_speed_brattora02:
+                time approved data_level edge_device  gust_speed   platform  postgres_id     sensor              unit
+2022-05-03T07:28:00Z     none        raw    21124087    1.001896 brattora02      1870283 21139640-2 metres_per_second
+
+---- meteo_atmospheric_pressure_avg_munkholmen:
+                time approved  atmospheric_pressure_avg data_level edge_device   platform              sensor         unit
+2022-05-03T07:30:00Z      yes                    1018.0  processed         cr6 munkholmen gill_weatherstation hecto_pascal
+
+---- meteo_atmospheric_pressure_munkholmen:
+                time approved  atmospheric_pressure data_level edge_device   platform              sensor         unit
+2022-05-03T07:27:12Z      yes                1017.8        raw         cr6 munkholmen gill_weatherstation hecto_pascal
+
+---- meteo_dew_point_munkholmen:
+                time approved data_level  dew_point edge_device   platform              sensor            unit
+2022-05-03T07:27:12Z     none  processed       -0.3         cr6 munkholmen gill_weatherstation degrees_celsius
+
+---- meteo_humidity_avg_munkholmen:
+                time approved data_level edge_device  humidity_avg   platform              sensor    unit
+2022-05-03T07:30:00Z      yes  processed         cr6         79.67 munkholmen gill_weatherstation percent
+
+---- meteo_humidity_munkholmen:
+                time approved data_level edge_device  humidity   platform              sensor    unit
+2022-05-03T07:27:12Z      yes        raw         cr6      78.0 munkholmen gill_weatherstation percent
+
+---- meteo_position_displacement_munkholmen:
+                time approved data_level edge_device   platform  position_displacement sensor   unit
+2022-05-03T07:27:12Z     none  processed         cr6 munkholmen                  3.526    gps metres
+
+---- meteo_position_munkholmen:
+                time approved data_level edge_device  latitude  longitude   platform sensor    unit
+2022-05-03T07:27:12Z      yes        raw         cr6  63.45747  10.372313 munkholmen    gps degrees
+
+---- meteo_temperature_avg_munkholmen:
+                time approved data_level edge_device   platform              sensor  temperature_avg            unit
+2022-05-03T07:30:00Z      yes  processed         cr6 munkholmen gill_weatherstation            3.032 degrees_celsius
+
+---- meteo_temperature_munkholmen:
+                time approved data_level edge_device   platform              sensor  temperature            unit
+2022-05-03T07:27:12Z      yes        raw         cr6 munkholmen gill_weatherstation          3.0 degrees_celsius
+
+---- meteo_wind_direction_avg_munkholmen:
+                time approved data_level edge_device   platform              sensor    unit  wind_direction_avg
+2022-05-03T07:30:00Z      yes  processed         cr6 munkholmen gill_weatherstation degrees               272.0
+
+---- meteo_wind_direction_munkholmen:
+                time approved data_level edge_device   platform              sensor    unit  wind_direction
+2022-05-03T07:27:12Z      yes        raw         cr6 munkholmen gill_weatherstation degrees           282.0
+
+---- meteo_wind_speed_avg_munkholmen:
+                time approved data_level edge_device   platform              sensor              unit  wind_speed_avg
+2022-05-03T07:30:00Z      yes  processed         cr6 munkholmen gill_weatherstation metres_per_second           5.691
+
+---- meteo_wind_speed_munkholmen:
+                time approved data_level edge_device   platform              sensor              unit  wind_speed
+2022-05-03T07:27:12Z      yes        raw         cr6 munkholmen gill_weatherstation metres_per_second        6.73
+
+---- position_brattora01:
+                       time approved data_level edge_device          latitude          longitude   platform sensor    unit
+2022-03-24T13:03:54.763458Z     none        raw        none 63.44299217727422 10.406427997855554 brattora01   none degrees
+
+---- position_brattora02:
+                       time approved data_level edge_device          latitude          longitude   platform sensor    unit
+2022-03-24T13:03:03.948579Z     none        raw        none 63.44351859681912 10.406564461000668 brattora02   none degrees
+
+---- power_aux_munkholmen:
+                time approved  aux1  aux2 data_level  derating edge_device  error  load_output   platform          sensor  tarom_checksum  total_charge_current_of_battery  total_discharge_of_battery  total_of_battery unit
+2022-05-03T07:28:00Z     none   0.0   0.0        raw       0.0         cr6    1.0          1.0 munkholmen solar_regulator          6665.0                              2.0                         0.0               2.0 none
+
+---- power_current_munkholmen:
+                time approved data_level edge_device  input_current  load_current   platform          sensor unit
+2022-05-03T07:28:00Z      yes        raw         cr6           14.1           0.5 munkholmen solar_regulator amps
+
+---- power_energy_use_munkholmen:
+                time approved data_level edge_device  energy_input_24h  energy_input_total  energy_output_24h  energy_output_total   platform          sensor      unit
+2022-05-03T07:28:00Z     none        raw         cr6            1462.0              1462.0              691.0                691.0 munkholmen solar_regulator amp_hours
+
+---- power_voltage_munkholmen:
+                time approved  battery_voltage data_level edge_device   platform  pv_voltage1          sensor  unit
+2022-05-03T07:28:00Z      yes             28.7        raw         cr6 munkholmen         30.0 solar_regulator volts
+
+---- signature_100_amplitude_munkholmen:
+                time  amplitude1(1)  amplitude1(10)  amplitude1(11)  amplitude1(12)  amplitude1(13)  amplitude1(14)  amplitude1(15)  amplitude1(16)  amplitude1(17)  amplitude1(18)  amplitude1(19)  amplitude1(2)  amplitude1(20)  amplitude1(21)  amplitude1(22)  amplitude1(23)  amplitude1(24)  amplitude1(25)  amplitude1(26)  amplitude1(27)  amplitude1(28)  amplitude1(3)  amplitude1(4)  amplitude1(5)  amplitude1(6)  amplitude1(7)  amplitude1(8)  amplitude1(9)  amplitude2(1)  amplitude2(10)  amplitude2(11)  amplitude2(12)  amplitude2(13)  amplitude2(14)  amplitude2(15)  amplitude2(16)  amplitude2(17)  amplitude2(18)  amplitude2(19)  amplitude2(2)  amplitude2(20)  amplitude2(21)  amplitude2(22)  amplitude2(23)  amplitude2(24)  amplitude2(25)  amplitude2(26)  amplitude2(27)  amplitude2(28)  amplitude2(3)  amplitude2(4)  amplitude2(5)  amplitude2(6)  amplitude2(7)  amplitude2(8)  amplitude2(9)  amplitude3(1)  amplitude3(10)  amplitude3(11)  amplitude3(12)  amplitude3(13)  amplitude3(14)  amplitude3(15)  amplitude3(16)  amplitude3(17)  amplitude3(18)  amplitude3(19)  amplitude3(2)  amplitude3(20)  amplitude3(21)  amplitude3(22)  amplitude3(23)  amplitude3(24)  amplitude3(25)  amplitude3(26)  amplitude3(27)  amplitude3(28)  amplitude3(3)  amplitude3(4)  amplitude3(5)  amplitude3(6)  amplitude3(7)  amplitude3(8)  amplitude3(9)  amplitude4(1)  amplitude4(10)  amplitude4(11)  amplitude4(12)  amplitude4(13)  amplitude4(14)  amplitude4(15)  amplitude4(16)  amplitude4(17)  amplitude4(18)  amplitude4(19)  amplitude4(2)  amplitude4(20)  amplitude4(21)  amplitude4(22)  amplitude4(23)  amplitude4(24)  amplitude4(25)  amplitude4(26)  amplitude4(27)  amplitude4(28)  amplitude4(3)  amplitude4(4)  amplitude4(5)  amplitude4(6)  amplitude4(7)  amplitude4(8)  amplitude4(9) approved data_level edge_device   platform        sensor unit
+2022-05-03T07:30:00Z          186.0           118.0           122.0           130.0           128.0           124.0           121.0           113.0            99.0            95.0            95.0          156.0            91.0           106.0           159.0           185.0           207.0           207.0           190.0           162.0           136.0          150.0          147.0          143.0          138.0          134.0          132.0          128.0          173.0           124.0           124.0           130.0           129.0           123.0           125.0           114.0            99.0            97.0            89.0          152.0            82.0           115.0           206.0           215.0           183.0           148.0           134.0           118.0           108.0          139.0          137.0          141.0          142.0          134.0          122.0          123.0          174.0           124.0           121.0           124.0           127.0           120.0           124.0           113.0            99.0            97.0            95.0          155.0            87.0           117.0           205.0           215.0           189.0           148.0           133.0           116.0           107.0          145.0          140.0          132.0          133.0          135.0          134.0          129.0          183.0           123.0           125.0           131.0           130.0           123.0           120.0           114.0           102.0            98.0            94.0          158.0            92.0            97.0           154.0           182.0           208.0           209.0           188.0           152.0           135.0          148.0          138.0          142.0          134.0          133.0          131.0          125.0     none        raw         cr6 munkholmen signature_100   db
+
+---- signature_100_battery_voltage_munkholmen:
+                time approved  battery_voltage data_level edge_device   platform        sensor  unit
+2022-05-03T07:30:00Z     none             23.7        raw         cr6 munkholmen signature_100 volts
+
+---- signature_100_correlation_munkholmen:
+                time approved  correlation1(1)  correlation1(10)  correlation1(11)  correlation1(12)  correlation1(13)  correlation1(14)  correlation1(15)  correlation1(16)  correlation1(17)  correlation1(18)  correlation1(19)  correlation1(2)  correlation1(20)  correlation1(21)  correlation1(22)  correlation1(23)  correlation1(24)  correlation1(25)  correlation1(26)  correlation1(27)  correlation1(28)  correlation1(3)  correlation1(4)  correlation1(5)  correlation1(6)  correlation1(7)  correlation1(8)  correlation1(9)  correlation2(1)  correlation2(10)  correlation2(11)  correlation2(12)  correlation2(13)  correlation2(14)  correlation2(15)  correlation2(16)  correlation2(17)  correlation2(18)  correlation2(19)  correlation2(2)  correlation2(20)  correlation2(21)  correlation2(22)  correlation2(23)  correlation2(24)  correlation2(25)  correlation2(26)  correlation2(27)  correlation2(28)  correlation2(3)  correlation2(4)  correlation2(5)  correlation2(6)  correlation2(7)  correlation2(8)  correlation2(9)  correlation3(1)  correlation3(10)  correlation3(11)  correlation3(12)  correlation3(13)  correlation3(14)  correlation3(15)  correlation3(16)  correlation3(17)  correlation3(18)  correlation3(19)  correlation3(2)  correlation3(20)  correlation3(21)  correlation3(22)  correlation3(23)  correlation3(24)  correlation3(25)  correlation3(26)  correlation3(27)  correlation3(28)  correlation3(3)  correlation3(4)  correlation3(5)  correlation3(6)  correlation3(7)  correlation3(8)  correlation3(9)  correlation4(1)  correlation4(10)  correlation4(11)  correlation4(12)  correlation4(13)  correlation4(14)  correlation4(15)  correlation4(16)  correlation4(17)  correlation4(18)  correlation4(19)  correlation4(2)  correlation4(20)  correlation4(21)  correlation4(22)  correlation4(23)  correlation4(24)  correlation4(25)  correlation4(26)  correlation4(27)  correlation4(28)  correlation4(3)  correlation4(4)  correlation4(5)  correlation4(6)  correlation4(7)  correlation4(8)  correlation4(9) data_level edge_device   platform        sensor    unit
+2022-05-03T07:30:00Z     none              8.0              75.0              92.0             100.0              92.0              96.0             100.0              81.0              80.0              84.0              76.0             83.0              44.0              12.0              92.0              53.0              96.0              91.0              51.0              68.0              91.0             95.0             99.0             91.0             98.0             96.0             95.0             97.0             56.0              98.0              90.0             100.0              99.0              93.0             100.0              83.0              77.0              91.0              33.0             90.0              55.0               6.0              91.0              98.0               9.0              81.0              84.0              85.0              93.0             91.0             85.0             96.0             99.0             63.0             97.0             98.0             51.0              87.0              98.0              96.0             100.0              86.0             100.0              76.0              85.0              81.0              75.0             91.0              58.0               7.0              87.0              98.0              14.0              83.0              83.0              86.0              91.0             97.0             94.0             78.0             94.0            100.0             98.0             87.0             62.0              84.0              95.0             100.0              99.0              97.0              96.0              82.0              78.0              88.0              67.0             63.0              78.0              12.0              91.0              42.0              97.0              92.0              39.0              70.0              88.0             99.0             72.0            100.0             66.0            100.0             96.0             97.0        raw         cr6 munkholmen signature_100 percent
+
+---- signature_100_current_direction_munkholmen:
+                time approved  current_direction_adcp(1)  current_direction_adcp(10)  current_direction_adcp(11)  current_direction_adcp(12)  current_direction_adcp(13)  current_direction_adcp(14)  current_direction_adcp(15)  current_direction_adcp(16)  current_direction_adcp(17)  current_direction_adcp(18)  current_direction_adcp(19)  current_direction_adcp(2)  current_direction_adcp(20)  current_direction_adcp(21)  current_direction_adcp(22)  current_direction_adcp(23)  current_direction_adcp(24)  current_direction_adcp(25)  current_direction_adcp(26)  current_direction_adcp(27)  current_direction_adcp(28)  current_direction_adcp(3)  current_direction_adcp(4)  current_direction_adcp(5)  current_direction_adcp(6)  current_direction_adcp(7)  current_direction_adcp(8)  current_direction_adcp(9) data_level edge_device   platform        sensor    unit
+2022-05-03T07:30:00Z     none                      225.0                       228.4                       320.2                        26.6                       303.1                       285.4                       228.2                       241.2                       169.0                       225.0                       225.0                      223.9                       225.0                       225.0                       318.0                       225.0                       225.0                       315.3                       225.0                       337.1                         5.8                       98.0                      102.6                       77.8                       42.5                       13.3                      332.6                      344.0        raw         cr6 munkholmen signature_100 degrees
+
+---- signature_100_current_speed_munkholmen:
+                time approved  current_speed_adcp(1)  current_speed_adcp(10)  current_speed_adcp(11)  current_speed_adcp(12)  current_speed_adcp(13)  current_speed_adcp(14)  current_speed_adcp(15)  current_speed_adcp(16)  current_speed_adcp(17)  current_speed_adcp(18)  current_speed_adcp(19)  current_speed_adcp(2)  current_speed_adcp(20)  current_speed_adcp(21)  current_speed_adcp(22)  current_speed_adcp(23)  current_speed_adcp(24)  current_speed_adcp(25)  current_speed_adcp(26)  current_speed_adcp(27)  current_speed_adcp(28)  current_speed_adcp(3)  current_speed_adcp(4)  current_speed_adcp(5)  current_speed_adcp(6)  current_speed_adcp(7)  current_speed_adcp(8)  current_speed_adcp(9) data_level edge_device   platform        sensor              unit
+2022-05-03T07:30:00Z     none                  46.34                    0.02                    0.11                    0.08                    0.08                    0.15                    0.13                    0.13                    0.04                    0.05                   46.34                   0.18                   46.34                   46.34                    0.11                   46.34                   46.34                    0.16                   46.34                    0.14                    0.14                   0.09                   0.23                   0.17                   0.18                   0.04                   0.16                   0.15        raw         cr6 munkholmen signature_100 metres_per_second
+
+---- signature_100_error_code_munkholmen:
+                time approved data_level edge_device  error_code   platform        sensor unit
+2022-05-03T07:30:00Z     none        raw         cr6         0.0 munkholmen signature_100 none
+
+---- signature_100_heading_munkholmen:
+                time approved data_level edge_device  heading   platform        sensor    unit
+2022-05-03T07:30:00Z     none        raw         cr6    130.0 munkholmen signature_100 degrees
+
+---- signature_100_pitch_munkholmen:
+                time approved data_level edge_device  pitch   platform        sensor    unit
+2022-05-03T07:30:00Z     none        raw         cr6    0.7 munkholmen signature_100 degrees
+
+---- signature_100_pressure_munkholmen:
+                time approved data_level edge_device   platform  pressure        sensor unit
+2022-05-03T07:30:00Z     none        raw         cr6 munkholmen     2.086 signature_100 dbar
+
+---- signature_100_roll_munkholmen:
+                time approved data_level edge_device   platform  roll        sensor    unit
+2022-05-03T07:30:00Z     none        raw         cr6 munkholmen   0.2 signature_100 degrees
+
+---- signature_100_sound_speed_munkholmen:
+                time approved data_level edge_device   platform        sensor  sound_speed              unit
+2022-05-03T07:30:00Z     none        raw         cr6 munkholmen signature_100       1479.4 metres_per_second
+
+---- signature_100_temperature_munkholmen:
+                time approved data_level edge_device   platform        sensor  temperature            unit
+2022-05-03T07:30:00Z     none        raw         cr6 munkholmen signature_100         7.19 degrees_celsius
+
+---- signature_100_velocity_munkholmen:
+                time approved data_level edge_device   platform        sensor              unit  velocity1(1)  velocity1(10)  velocity1(11)  velocity1(12)  velocity1(13)  velocity1(14)  velocity1(15)  velocity1(16)  velocity1(17)  velocity1(18)  velocity1(19)  velocity1(2)  velocity1(20)  velocity1(21)  velocity1(22)  velocity1(23)  velocity1(24)  velocity1(25)  velocity1(26)  velocity1(27)  velocity1(28)  velocity1(3)  velocity1(4)  velocity1(5)  velocity1(6)  velocity1(7)  velocity1(8)  velocity1(9)  velocity2(1)  velocity2(10)  velocity2(11)  velocity2(12)  velocity2(13)  velocity2(14)  velocity2(15)  velocity2(16)  velocity2(17)  velocity2(18)  velocity2(19)  velocity2(2)  velocity2(20)  velocity2(21)  velocity2(22)  velocity2(23)  velocity2(24)  velocity2(25)  velocity2(26)  velocity2(27)  velocity2(28)  velocity2(3)  velocity2(4)  velocity2(5)  velocity2(6)  velocity2(7)  velocity2(8)  velocity2(9)  velocity3(1)  velocity3(10)  velocity3(11)  velocity3(12)  velocity3(13)  velocity3(14)  velocity3(15)  velocity3(16)  velocity3(17)  velocity3(18)  velocity3(19)  velocity3(2)  velocity3(20)  velocity3(21)  velocity3(22)  velocity3(23)  velocity3(24)  velocity3(25)  velocity3(26)  velocity3(27)  velocity3(28)  velocity3(3)  velocity3(4)  velocity3(5)  velocity3(6)  velocity3(7)  velocity3(8)  velocity3(9)  velocity4(1)  velocity4(10)  velocity4(11)  velocity4(12)  velocity4(13)  velocity4(14)  velocity4(15)  velocity4(16)  velocity4(17)  velocity4(18)  velocity4(19)  velocity4(2)  velocity4(20)  velocity4(21)  velocity4(22)  velocity4(23)  velocity4(24)  velocity4(25)  velocity4(26)  velocity4(27)  velocity4(28)  velocity4(3)  velocity4(4)  velocity4(5)  velocity4(6)  velocity4(7)  velocity4(8)  velocity4(9)
+2022-05-03T07:30:00Z     none        raw         cr6 munkholmen signature_100 metres_per_second        -32.77          -0.02          -0.07           0.04          -0.06          -0.14          -0.09          -0.12           0.01          -0.04         -32.77         -0.12         -32.77         -32.77          -0.07         -32.77         -32.77          -0.11         -32.77          -0.05           0.01          0.09          0.23          0.17          0.12          0.01         -0.07         -0.04        -32.77          -0.02           0.08           0.07           0.04           0.04          -0.08          -0.07          -0.04          -0.04         -32.77         -0.13         -32.77         -32.77           0.08         -32.77         -32.77           0.11         -32.77           0.13           0.14         -0.01         -0.05          0.04          0.13          0.04          0.14          0.14        -32.77          -0.05           0.02            0.0          -0.02            0.0           0.01          -0.01          -0.05          -0.06         -32.77         -0.04         -32.77         -32.77          -0.07         -32.77         -32.77           0.02         -32.77           0.07            0.0         -0.01          0.01           0.0          0.01           0.0          0.01          0.01        -32.77          -0.03          -0.01          -0.01           0.01           0.02          -0.01           0.01          -0.02          -0.04         -32.77         -0.02         -32.77         -32.77          -0.06         -32.77         -32.77           0.04         -32.77           0.02           0.01         -0.02         -0.06           0.0          0.01         -0.03         -0.04         -0.04
+
+---- solar_regulator_power_munkholmen:
+                time  Solar_reg_temperature approved data_level edge_device   platform          sensor            unit
+2022-05-03T07:28:00Z                   12.4      yes        raw         cr6 munkholmen solar_regulator degrees_celsius
+
+---- wave_direction_munkholmen:
+                time approved data_level  direction edge_device   platform  sensor    unit
+2022-05-03T07:40:00Z      yes        raw      331.5         cr6 munkholmen seaview degrees
+
+---- wave_heading_munkholmen:
+                time approved data_level edge_device  heading   platform  sensor    unit
+2022-05-03T07:40:00Z      yes        raw         cr6    55.91 munkholmen seaview degrees
+
+---- wave_hmax_munkholmen:
+                time approved data_level edge_device  hmax   platform  sensor   unit
+2022-05-03T07:40:00Z      yes        raw         cr6 0.287 munkholmen seaview metres
+
+---- wave_hs_munkholmen:
+                time approved data_level edge_device    hs   platform  sensor   unit
+2022-05-03T07:40:00Z      yes        raw         cr6 0.183 munkholmen seaview metres
+
+---- wave_period_munkholmen:
+                time approved data_level edge_device  period   platform  sensor    unit
+2022-05-03T07:40:00Z      yes        raw         cr6   17.82 munkholmen seaview seconds
+
+---- wind_direction_brattora01:
+                time approved data_level edge_device   platform  postgres_id     sensor    unit  wind_direction
+2022-05-03T07:28:00Z     none        raw    21124087 brattora01      1870278 21124500-3 degrees      202.164706
+
+---- wind_direction_brattora02:
+                time approved data_level edge_device   platform  postgres_id     sensor    unit  wind_direction
+2022-05-03T07:28:00Z     none        raw    21124087 brattora02      1870284 21139640-3 degrees      178.298039
+
+---- wind_speed_brattora01:
+                time approved data_level edge_device   platform  postgres_id     sensor              unit  wind_speed
+2022-05-03T07:28:00Z     none        raw    21124087 brattora01      1870279 21124500-1 metres_per_second     1.00584
+
+---- wind_speed_brattora02:
+                time approved data_level edge_device   platform  postgres_id     sensor              unit  wind_speed
+2022-05-03T07:28:00Z     none        raw    21124087 brattora02      1870282 21139640-1 metres_per_second    0.333965
+

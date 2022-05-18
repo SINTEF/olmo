@@ -127,8 +127,8 @@ class Lisst_200(sensor.Sensor):
             # TODO: Check this time is correct with what the instrument gives.
             df = df.set_index('date').tz_localize('UTC', ambiguous='infer')
 
-            logger.info(f'Ingesting file {f} to {self.measurement_name}.')
-            influx_client.write_points(df, self.measurement_name)
+            logger.info(f'Ingesting file {f} to {self.measurement_name_l1}.')
+            influx_client.write_points(df, self.measurement_name_l1)
 
     def rsync_and_ingest(self):
 

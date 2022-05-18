@@ -23,7 +23,7 @@ class Lisst_200(sensor.Sensor):
             remove_remote_files_l0=True,
             max_files_l0=10,
             measurement_name_l0='munk_lisst-200_l0',
-            file_regex_l1=r"lisst_I(\d{7})\.CSV",
+            file_regex_l1=r"ready_lisst_I(\d{7})\.CSV",
             drop_recent_files_l1=0,
             remove_remote_files_l1=True,
             max_files_l1=None,

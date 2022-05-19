@@ -141,6 +141,12 @@ def init_logger(logfile, name='olmo'):
     return logger
 
 
+def add_tags(df, tag_values):
+    '''Adds tags to a dataframe. tag_values needs be a correct dict.'''
+    for (k, v) in tag_values.items():
+        df[k] = v
+    return df
+
 # Currently not sure if I need this, so ignoring for now.
 # def execute_subprocess(command, communicate=True, timeout=600):
 #     '''Executes a terminal command using subrpocess.Popen.

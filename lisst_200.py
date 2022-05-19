@@ -128,7 +128,6 @@ class Lisst_200(sensor.Sensor):
             df = util.force_float_cols(df, not_float_cols=['date'])
             # TODO: Check this time is correct with what the instrument gives.
             df = df.set_index('date').tz_localize('UTC', ambiguous='infer')
-            print(df)
 
             tag_values = {'tag_sensor': 'lisst_200',
                           'tag_edge_device': 'munkholmen_topside_pi',
@@ -140,15 +139,12 @@ class Lisst_200(sensor.Sensor):
             df = util.add_tags(df, tag_values)
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l1}.')
-            print(logger)
             ingest.ingest_df(self.measurement_name_l1, df, self.influx_clients)
-            # influx_client.write_points(df, self.measurement_name_l1)
 
     def rsync_and_ingest(self):
 
         files = self.rsync()
         logger.info('Lisst_200.rsync() finished.')
-        print("rsynced")
 
         if files['l0'] is not None:
             self.ingest_l0(files['l0'])

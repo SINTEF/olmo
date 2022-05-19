@@ -1,2 +1,3 @@
-*/10 * * * * root bash /home/olmo/olmo_db/populate_odp_db.sh >> /var/log/cron.log 2>&1
+*/10 * * * * root bash /home/olmo/olmo_db/populate_odp_db.sh >> /var/log/cron_odp.log 2>&1
+0 2 * * * root /root/mambaforge/envs/olmo_db/bin/python /home/olmo/backup_influx_to_az.py >> /var/log/cron_backup.log 2>&1
 #

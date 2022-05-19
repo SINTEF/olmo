@@ -131,10 +131,10 @@ class Lisst_200(sensor.Sensor):
             print(df)
 
             tag_values = {'tag_sensor': 'lisst_200',
-                          'tag_edge_device': 'raspberrypi',
+                          'tag_edge_device': 'munkholmen_topside_pi',
                           'tag_platform': 'munkholmen',
                           'tag_data_level': 'processed',
-                          'tag_approved': 'none',
+                          'tag_approved': 'no',
                           'tag_unit': 'none'}
 
             df = util.add_tags(df, tag_values)

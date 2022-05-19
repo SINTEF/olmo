@@ -30,12 +30,12 @@ main_logfile = "log_munkholmen_ingest_"
 loggernet_outbox = f"c:\\Users\{loggernet_user}\LoggerNet_output"
 loggernet_inbox = os.path.join(base_dir, 'Loggernet_inbox')
 loggernet_files_basenames = [
-    "CR6_EOL2p0_Public_",
-    "CR6_EOL2p0_Meteo_",
-    "CR6_EOL2p0_Position_",
-    "CR6_EOL2p0_Seaview_",
-    "CR6_EOL2p0_Power_"
-    # "CR6_EOL2p0_Status_",
+    "CR6_EOL2p0_meteo_ais_",
+    "CR6_EOL2p0_Power_",  # instr.: solar_regulator
+    "CR6_EOL2p0_Meteo_avgd_",
+    "CR6_EOL2p0_Current_",  # intr.: signature_100
+    "CR6_EOL2p0_Wave_sensor_",  # instr.: seaview
+    # "CR6_EOL2p0_Winch_log_",  # none
 ]
 loggernet_logfile = "log_loggernet_ingest_"
 logpc_ssh_max_attempts = 3
@@ -47,6 +47,22 @@ bu_logfile_basename = "log_influx_backup_"
 backup_basename = 'influxbackup_test_'
 az_backups_folder = 'influx_backups_test'
 
+
+# Website figures
+webfigs_dir = os.path.join(output_dir, 'Website_figures')
+
+
+# Node 2 ingestion:
+with open(os.path.join(secrets_dir, 'node2_password'), 'r') as f:
+    node2_pwd = f.read()[:-1]
+with open(os.path.join(secrets_dir, 'node2_secrets.json'), 'r') as f:
+    data = json.load(f)
+node2_dbname = data['dbname']
+node2_user = data['user']
+node2_host = data['host']
+node2_port = data['port']
+node2_sslmode = data['sslmode']
+node2_logfile = "log_node2_ingest_"
 
 # Silcam ingestion:
 

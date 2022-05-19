@@ -27,6 +27,8 @@ services:
       - influxdb
     volumes:
       - $HOME/containers-data/grafana/lib/:/var/lib/grafana/
+    environment:
+      - GF_PATHS_CONFIG=/var/lib/grafana/grafana.ini
     restart: always
 
 

@@ -1,12 +1,13 @@
 import os
-import logging
 import datetime
 import subprocess
 import time
 import paramiko
+from influxdb import InfluxDBClient
 
 import config
-import sensor_conversions
+import loggernet
+import util
 
 # I couldn't install rsync on the cmd prompt on the remote
 # (although I could on git bash...) but since I could get
@@ -35,7 +36,7 @@ def move_remote(username, address, filename):
     return stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
 
 
-def scp_file(username, address, file_path, destination, return_info=False, timeout=240):
+def scp_file(username, address, file_path, destination, timeout=240):
     '''
     Parameters
     ----------
@@ -48,8 +49,6 @@ def scp_file(username, address, file_path, destination, return_info=False, timeo
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     process.wait(timeout=timeout)
-    if return_info:  # This is not working, as we don't assign these.
-        return stdout, stderr
 
 
 def get_file_list(dir_output, file_basename, logger):
@@ -97,15 +96,15 @@ def main():
     print("Starting running ingest_loggernet.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    # ---- Set up logging:
-    logger = logging.getLogger('olmo')
-    logger.setLevel(logging.INFO)
-    fh = logging.FileHandler(os.path.join(
-        config.output_dir, config.loggernet_logfile + datetime.datetime.now().strftime('%Y%m%d')), 'a+')
-    fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(fh)
-
+    logger = util.init_logger(config.loggernet_logfile, name='ingest_loggernet')
     logger.info("\n\n------ Starting data collection in main()")
+
+    logger.info("Fetching the influxdb clients.")
+    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    clients = [
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+    ]
     # ---- List files in the remote directory:
     stdout, stderr = dir_remote(config.loggernet_user, config.loggernet_pc)
 
@@ -119,8 +118,12 @@ def main():
             logger.info(f"No new files to be ingested for file type: {file_type}.")
             continue
 
+        # print(f"Number of files: {len(files)}")
+
         # ---- scp the files over, then delete
-        for f in files[:-1]:
+        for f in files[:-1]:  # files[:-1]:  # Don't copy the latest file - it might be being written to.
+
+            # print(f"Ingesting file: {f}")
 
             # Check we don't have a version of the file locally.
             if os.path.isfile(os.path.join(config.loggernet_inbox, f)):
@@ -132,7 +135,7 @@ def main():
                     logger.warning(f"File {f} move not successful with message: {stderr}")
                 continue
 
-            # scp over file:
+            # ---- scp over file:
             i = 0
             scp_file(
                 config.loggernet_user, config.loggernet_pc,
@@ -155,7 +158,11 @@ def main():
                 print(msg)
                 continue
 
-            # Remove the file from the origin PC (sintefutv012)
+            # ---- Ingest the file:
+            loggernet.ingest_loggernet_file(os.path.join(config.loggernet_inbox, f), file_type, clients)
+            logger.info(f'Data for file {f} added to influxDB.')
+
+            # ---- Remove the file from the origin PC (sintefutv012)
             i = 0
             rm_output = os.popen(f'''ssh {config.loggernet_user}@{config.loggernet_pc} "Del {config.loggernet_outbox}\\{f}"''').read()
             if rm_output:
@@ -173,9 +180,6 @@ def main():
                 logger.error(msg)
                 print(msg)
 
-            # ---- Ingest the file:
-            sensor_conversions.ingest_loggernet_file(os.path.join(config.loggernet_inbox, f), file_type)
-            logger.info(f'Data for file {f} added to influxDB.')
     logger.info("All files transferred and ingested successfully, exiting.")
 
 

@@ -19,7 +19,7 @@ RUN conda init bash
 RUN echo "source activate olmo_db" >> ~/.bashrc
 
 # Install the az cli:
-curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 # RUN /root/mambaforge/envs/olmo_db/bin/python backup_influx_to_az.py
 

@@ -1,6 +1,5 @@
 import os
 import subprocess
-import logging
 import datetime
 import pandas as pd
 from influxdb import DataFrameClient
@@ -8,8 +7,9 @@ from influxdb import DataFrameClient
 import sensor
 import config
 import util
+import ingest
 
-logger = logging.getLogger('olmo.lisst_200')
+logger = util.init_logger(config.main_logfile, name='olmo.lisst_200')
 
 
 class Lisst_200(sensor.Sensor):
@@ -26,8 +26,9 @@ class Lisst_200(sensor.Sensor):
             file_regex_l1=r"ready_lisst_I(\d{7})\.CSV",
             drop_recent_files_l1=0,
             remove_remote_files_l1=True,
-            max_files_l1=None,
-            measurement_name_l1='lisst_200'):
+            max_files_l1=1,
+            measurement_name_l1='lisst_200',
+            influx_clients=None):
 
         # Init the Sensor() class: Unused vars/levels are set to None.
         super(Lisst_200, self).__init__()
@@ -43,6 +44,7 @@ class Lisst_200(sensor.Sensor):
         self.remove_remote_files_l1 = remove_remote_files_l1
         self.max_files_l1 = max_files_l1
         self.measurement_name_l1 = measurement_name_l1
+        self.influx_clients = influx_clients
 
     def lisst200_csv_to_df(self, csv_filename):
         '''Take a LISST-200 .CSV file and returns a pandas DataFrame'''
@@ -117,8 +119,8 @@ class Lisst_200(sensor.Sensor):
 
     def ingest_l1(self, files):
 
-        influx_client = DataFrameClient(
-            config.sintef_influx_pc, 8086, self.get_influx_user(), self.get_influx_pwd(), self.db_name)
+        # influx_client = DataFrameClient(
+        #     config.sintef_influx_pc, 8086, self.get_influx_user(), self.get_influx_pwd(), self.db_name)
 
         for f in files:
             df = self.lisst200_csv_to_df(f)
@@ -126,14 +128,27 @@ class Lisst_200(sensor.Sensor):
             df = util.force_float_cols(df, not_float_cols=['date'])
             # TODO: Check this time is correct with what the instrument gives.
             df = df.set_index('date').tz_localize('UTC', ambiguous='infer')
+            print(df)
+
+            tag_values = {'tag_sensor': 'lisst_200',
+                          'tag_edge_device': 'raspberrypi',
+                          'tag_platform': 'munkholmen',
+                          'tag_data_level': 'processed',
+                          'tag_approved': 'none',
+                          'tag_unit': 'none'}
+
+            df = util.add_tags(df, tag_values)
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l1}.')
-            influx_client.write_points(df, self.measurement_name_l1)
+            print(logger)
+            ingest.ingest_df(self.measurement_name_l1, df, self.influx_clients)
+            # influx_client.write_points(df, self.measurement_name_l1)
 
     def rsync_and_ingest(self):
 
         files = self.rsync()
         logger.info('Lisst_200.rsync() finished.')
+        print("rsynced")
 
         if files['l0'] is not None:
             self.ingest_l0(files['l0'])

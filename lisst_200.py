@@ -112,7 +112,8 @@ class Lisst_200(sensor.Sensor):
                 'azure_location': storage_location}
             df = pd.DataFrame(columns=ingest_data.keys())
             df = df.append(ingest_data, ignore_index=True)
-            df = df.set_index('date').tz_localize('CET', ambiguous='infer')
+            # df = df.set_index('date').tz_localize('CET', ambiguous='infer')
+            df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l0}.')
             influx_client.write_points(df, self.measurement_name_l0)

@@ -26,7 +26,7 @@ class Lisst_200(sensor.Sensor):
             file_regex_l1=r"ready_lisst_I(\d{7})\.CSV",
             drop_recent_files_l1=0,
             remove_remote_files_l1=True,
-            max_files_l1=1,
+            max_files_l1=None,
             measurement_name_l1='lisst_200',
             influx_clients=None):
 

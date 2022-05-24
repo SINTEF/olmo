@@ -32,7 +32,7 @@ def main():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     stdout, stderr = process.communicate(timeout=600)
-    logger.info("STDOUT from 'influxd backup':\n" + stdout.decode(errors="ignore"))
+    # logger.info("STDOUT from 'influxd backup':\n" + stdout.decode(errors="ignore"))
     if process.returncode != 0:
         logger.error("Backup of influxdb failed at backup step. stderr:\n" + stderr.decode(errors="ignore"))
         raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))

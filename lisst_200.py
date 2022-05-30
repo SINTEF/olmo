@@ -112,7 +112,8 @@ class Lisst_200(sensor.Sensor):
                 'azure_location': storage_location}
             df = pd.DataFrame(columns=ingest_data.keys())
             df = df.append(ingest_data, ignore_index=True)
-            df = df.set_index('date').tz_localize('CET', ambiguous='infer')
+            # df = df.set_index('date').tz_localize('CET', ambiguous='infer')
+            df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l0}.')
             influx_client.write_points(df, self.measurement_name_l0)
@@ -127,7 +128,7 @@ class Lisst_200(sensor.Sensor):
 
             df = util.force_float_cols(df, not_float_cols=['date'])
             # TODO: Check this time is correct with what the instrument gives.
-            df = df.set_index('date').tz_localize('UTC', ambiguous='infer')
+            df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
             tag_values = {'tag_sensor': 'lisst_200',
                           'tag_edge_device': 'munkholmen_topside_pi',

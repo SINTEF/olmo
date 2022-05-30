@@ -622,3 +622,110 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # Data processing:
         df = processing.constant_val_filter(df, 'direction', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
+
+    # ==================================================================== #
+    if file_type == 'IngdalenCR6_System_':
+
+        data_cols = [
+            "systemTemperature", "systemAirPressure", "systemRelHumidity",
+            "victron_BattVolts", "victron_ChargeCurr", "victron_PanelVolts",
+            "LoggerVoltage", "LoggerTemperature"
+        ]
+        float_cols = data_cols
+        df_all = load_data(file_path, data_cols, float_cols)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'system_temperature_ingdalen'
+        field_keys = {"systemTemperature": 'system_temperature'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'system_atmospheric_pressure_ingdalen'
+        field_keys = {"systemAirPressure": 'atmospheric_pressure'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'hecto_pascal'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'system_humidity_ingdalen'
+        field_keys = {"systemRelHumidity": 'humidity'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'percent'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_battery_voltage_ingdalen'
+        field_keys = {"victron_BattVolts": 'battery_voltage'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'volts'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_charge_current_ingdalen'
+        field_keys = {"victron_ChargeCurr": 'charge_current'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'amps'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_panel_voltage_ingdalen'
+        field_keys = {"victron_PanelVolts": 'panel_voltage'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'volts'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_logger_voltage_ingdalen'
+        field_keys = {"LoggerVoltage": 'logger_voltage'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'volts'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_logger_temperature_ingdalen'
+        field_keys = {"LoggerTemperature": 'logger_temperature'}
+        tag_values = {'tag_sensor': 'none',
+                      'tag_edge_device': 'cr6_ingdalen',
+                      'tag_platform': 'ingdalen',
+                      'tag_data_level': 'raw',
+                      'tag_approved': 'none',
+                      'tag_unit': 'degrees'}
+        df = filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)

@@ -163,21 +163,22 @@ def ingest_loggernet_file(file_path, file_type, clients):
             "Energy_output_total", "Derating", "Tarom_checksum"
         ]
         float_cols = data_cols
-
         df_all = load_data(file_path, data_cols, float_cols)
 
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'solar_regulator',
+            'tag_edge_device': 'cr6',
+            'tag_platform': 'munkholmen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
         # ---------------------------------------------------------------- #
         measurement_name = 'power_voltage_munkholmen'
         field_keys = {"battery_voltage": 'battery_voltage',
                       "PV_Voltage1": "pv_voltage1"}
-        tag_values = {'tag_sensor': 'solar_regulator',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'volts'}
+        tag_values['tag_unit'] = 'volts'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'battery_voltage', lower=0, upper=50)
         df = processing.constant_val_filter(df, 'pv_voltage1', lower=0, upper=50)
         ingest.ingest_df(measurement_name, df, clients)
@@ -186,14 +187,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'power_current_munkholmen'
         field_keys = {"PV1_current": "input_current",
                       "Load_current": "load_current"}
-        tag_values = {'tag_sensor': 'solar_regulator',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'amps'}
+        tag_values['tag_unit'] = 'amperes'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'input_current', lower=0, upper=100)
         df = processing.constant_val_filter(df, 'load_current', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
@@ -204,12 +199,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "Energy_input_total": "energy_input_total",
                       "Energy_output_24H": "energy_output_24h",
                       "Energy_output_total": "energy_output_total"}
-        tag_values = {'tag_sensor': 'solar_regulator',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'amp_hours'}
+        tag_values['tag_unit'] = 'amp_hours'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
@@ -224,26 +214,15 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "Total_charge_current_of_battery": "total_charge_current_of_battery",
                       "Load_output": "load_output",
                       "Total_of_battery": "total_of_battery"}
-        tag_values = {'tag_sensor': 'solar_regulator',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'none'}
+        tag_values['tag_unit'] = 'none'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'solar_regulator_power_munkholmen'
         field_keys = {"Solar_reg_temperature": "Solar_reg_temperature"}
-        tag_values = {'tag_sensor': 'solar_regulator',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees_celsius'}
+        tag_values['tag_unit'] = 'degrees_celsius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'Solar_reg_temperature', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
@@ -255,76 +234,54 @@ def ingest_loggernet_file(file_path, file_type, clients):
             "humidity_digital_Avg", "wind_speed_digital", "wind_direction_digital"
         ]
         float_cols = data_cols
-
         df_all = load_data(file_path, data_cols, float_cols)
+
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'gill_weatherstation',
+            'tag_edge_device': 'cr6',
+            'tag_platform': 'munkholmen',
+            'tag_data_level': 'processed',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_temperature_avg_munkholmen'
         field_keys = {"temperature_digital_Avg": 'temperature_avg'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees_celsius'}
+        tag_values['tag_unit'] = 'degrees_celsius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'temperature_avg', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_avg_munkholmen'
         field_keys = {"pressure_digital_Avg": 'atmospheric_pressure_avg'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'hecto_pascal'}
+        tag_values['tag_unit'] = 'hecto_pascal'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'atmospheric_pressure_avg', lower=500, upper=1500)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_avg_munkholmen'
         field_keys = {"humidity_digital_Avg": 'humidity_avg'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'percent'}
+        tag_values['tag_unit'] = 'percent'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'humidity_avg', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_avg_munkholmen'
         field_keys = {"wind_speed_digital": 'wind_speed_avg'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'metres_per_second'}
+        tag_values['tag_unit'] = 'metres_per_second'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'wind_speed_avg', lower=0, upper=140)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_avg_munkholmen'
         field_keys = {"wind_direction_digital": 'wind_direction_avg'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'wind_direction_avg', lower=1, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
@@ -333,176 +290,105 @@ def ingest_loggernet_file(file_path, file_type, clients):
         df = pd.read_csv(file_path, skiprows=1)
         data_cols = list(df.columns[2:])
         float_cols = [d for d in data_cols if d not in ['ADCP_status_code', 'data_adcp(1)']]
-
         df_all = load_data(file_path, data_cols, float_cols)
+
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'signature_100',
+            'tag_edge_device': 'cr6',
+            'tag_platform': 'munkholmen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_current_speed_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('current_speed')}
-        tag_values = {'tag_sensor': 'signature_100',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'metres_per_second'}
+        tag_values['tag_unit'] = 'metres_per_second'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_current_direction_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('current_direction')}
-        tag_values = {'tag_sensor': 'signature_100',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_amplitude_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('amplitude')}
-        tag_values = {'tag_sensor': 'signature_100',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'db'}
+        tag_values['tag_unit'] = 'db'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_correlation_munkholmen'
-        field_keys = {i:i for i in data_cols if i.startswith('correlation')}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'percent'}
+        field_keys = {i: i for i in data_cols if i.startswith('correlation')}
+        tag_values['tag_unit'] = 'percent'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_velocity_munkholmen'
-        field_keys = {i:i for i in data_cols if i.startswith('velocity')}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'metres_per_second'}
+        field_keys = {i: i for i in data_cols if i.startswith('velocity')}
+        tag_values['tag_unit'] = 'metres_per_second'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_battery_voltage_munkholmen'
         field_keys = {'ADCP_battery_voltage': 'battery_voltage'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'volts'}
+        tag_values['tag_unit'] = 'volts'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_error_code_munkholmen'
         field_keys = {'ADCP_error_code': 'error_code'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'none'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_heading_munkholmen'
         field_keys = {'ADCP_heading': 'heading'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_pitch_munkholmen'
         field_keys = {'ADCP_pitch': 'pitch'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_pressure_munkholmen'
         field_keys = {'ADCP_pressure': 'pressure'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'dbar'}
+        tag_values['tag_unit'] = 'dbar'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_roll_munkholmen'
         field_keys = {'ADCP_Roll': 'roll'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_sound_speed_munkholmen'
         field_keys = {'ADCP_sound_speed': 'sound_speed'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'metres_per_second'}
+        tag_values['tag_unit'] = 'metres_per_second'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_temperature_munkholmen'
         field_keys = {'ADCP_temperature': 'temperature'}
-        tag_values = {'tag_sensor': 'signature_100',
-                    'tag_edge_device': 'cr6',
-                    'tag_platform': 'munkholmen',
-                    'tag_data_level': 'raw',
-                    'tag_approved': 'none',
-                    'tag_unit': 'degrees_celsius'}
+        tag_values['tag_unit'] = 'degrees_celsius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
@@ -512,76 +398,54 @@ def ingest_loggernet_file(file_path, file_type, clients):
             "heading", "Hs", "Period", "Hmax", "direction"
         ]
         float_cols = data_cols
-
         df_all = load_data(file_path, data_cols, float_cols)  # , rows_to_skip=2, time_col="TIMESTAMP"
+
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'seaview',
+            'tag_edge_device': 'cr6',
+            'tag_platform': 'munkholmen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_heading_munkholmen'
         field_keys = {"heading": 'heading'}
-        tag_values = {'tag_sensor': 'seaview',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'heading', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hs_munkholmen'
         field_keys = {"Hs": 'hs'}
-        tag_values = {'tag_sensor': 'seaview',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'metres'}
+        tag_values['tag_unit'] = 'metres'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'hs', lower=-100, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_period_munkholmen'
         field_keys = {"Period": 'period'}
-        tag_values = {'tag_sensor': 'seaview',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'seconds'}
+        tag_values['tag_unit'] = 'seconds'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'period', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hmax_munkholmen'
         field_keys = {"Hmax": 'hmax'}
-        tag_values = {'tag_sensor': 'seaview',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'metres'}
+        tag_values['tag_unit'] = 'metres'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'hmax', lower=-100, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_direction_munkholmen'
         field_keys = {"direction": 'direction'}
-        tag_values = {'tag_sensor': 'seaview',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'direction', lower=0, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 

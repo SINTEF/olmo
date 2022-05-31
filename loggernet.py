@@ -40,7 +40,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         The 'basename' of the file, should correspond to one of those in the config.
     '''
 
-    def load_data(file_path, data_cols, float_cols, rows_to_skip=None, time_col="TMSTAMP"):
+    def load_data(file_path, data_cols, float_cols, timezone='CET', rows_to_skip=None, time_col="TMSTAMP"):
 
         pd.set_option('precision', 6)
         df = pd.read_csv(file_path, sep=',', skiprows=0, header=1)
@@ -58,7 +58,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # Force cols to have time np.float64
         df = ingest.float_col_fix(df, float_cols)
         # Loggernet data is in CET, but all influx data should be utc.
-        df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
+        df = df.set_index('date').tz_localize(timezone, ambiguous='infer').tz_convert('UTC')
 
         return df
 
@@ -71,21 +71,24 @@ def ingest_loggernet_file(file_path, file_type, clients):
             "wind_direction_digital"
         ]
         float_cols = data_cols
-
         df_all = load_data(file_path, data_cols, float_cols)
+
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'gill_weatherstation',
+            'tag_edge_device': 'cr6',
+            'tag_platform': 'munkholmen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_position_munkholmen'
         field_keys = {"Latitude_decimal": 'latitude',
                       "Longitude_decimal": 'longitude'}
-        tag_values = {'tag_sensor': 'gps',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees'}
+        tag_values['tag_sensor'] = 'gps'
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'latitude', lower=62.5, upper=64)
         df = processing.constant_val_filter(df, 'longitude', lower=10, upper=11)
         ingest.ingest_df(measurement_name, df, clients)
@@ -93,98 +96,57 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_position_displacement_munkholmen'
         field_keys = {"distance": 'position_displacement'}
-        tag_values = {'tag_sensor': 'gps',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'metres'}
+        tag_values['tag_sensor'] = 'gps'
+        tag_values['tag_unit'] = 'metres'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         # df = processing.constant_val_filter(df, 'displacement', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_temperature_munkholmen'
         field_keys = {"temperature_digital": 'temperature'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees_celsius'}
+        tag_values['tag_unit'] = 'degrees_celsius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'temperature', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_munkholmen'
         field_keys = {"pressure_digital": 'atmospheric_pressure'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'hecto_pascal'}
+        tag_values['tag_unit'] = 'hecto_pascal'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'atmospheric_pressure', lower=500, upper=1500)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_munkholmen'
         field_keys = {"humidity_digital": 'humidity'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'percent'}
+        tag_values['tag_unit'] = 'percent'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'humidity', lower=0, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_dew_point_munkholmen'
         field_keys = {"dew_point": 'dew_point'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees_celsius'}
+        tag_values['tag_unit'] = 'degrees_celsius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         # df = processing.constant_val_filter(df, 'dew_point', lower=-50, upper=100)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_munkholmen'
         field_keys = {"wind_speed_digital": 'wind_speed'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'metres_per_second'}
+        tag_values['tag_unit'] = 'metres_per_second'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'wind_speed', lower=0, upper=140)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_munkholmen'
         field_keys = {"wind_direction_digital": 'wind_direction'}
-        tag_values = {'tag_sensor': 'gill_weatherstation',
-                      'tag_edge_device': 'cr6',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'raw',
-                      'tag_approved': 'none',
-                      'tag_unit': 'degrees'}
+        tag_values['tag_unit'] = 'degrees'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # Data processing:
         df = processing.constant_val_filter(df, 'wind_direction', lower=1, upper=360)
         ingest.ingest_df(measurement_name, df, clients)
 

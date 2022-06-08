@@ -575,12 +575,6 @@ def ingest_loggernet_file(file_path, file_type, clients):
             'tag_approved': 'none',
             'tag_unit': 'none'}
 
-        # # ---------------------------------------------------------------- #
-        # measurement_name = 'suna_serial_ingdalen'
-        # field_keys = {"sunaSerial": 'serial'}
-        # df = filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
-
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_nitrate_micromol_ingdalen'
         field_keys = {"sunaSerial": 'tag_serial',
@@ -640,7 +634,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'signature_100_meta_data_ingdalen'
         field_keys = {"signatureDataType": 'data_type',
                       "signatureDataTypeString": 'data_type_string',
-                      "signatureSerialNumber": 'serial_number',
+                      "signatureSerialNumber": 'tag_serial_number',
                       "signatureConfiguration": 'configuration'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
@@ -791,73 +785,89 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # Set a 'default' set of tags for this file:
         tag_values = {
-            'tag_sensor': 'seabird',
+            # 'tag_sensor': 'seabird',  # this will be the 'seabirdDevice'
             'tag_edge_device': 'cr6_ingdalen',
             'tag_platform': 'ingdalen',
             'tag_data_level': 'raw',
             'tag_approved': 'none',
             'tag_unit': 'none'}
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'seabird_meta_data_ingdalen'
-        field_keys = {"seabirdDevice": 'device',
-                      "seabirdSerial": 'serial'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'seabird_meta_data_ingdalen'
+        # field_keys = {"seabirdDevice": 'tag_sensor',
+        #               "seabirdSerial": 'tag_serial'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_battery_ingdalen'
-        field_keys = {"seabirdBattery": 'battery'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdBattery": 'battery'}
         tag_values['tag_unit'] = 'none'  # volts 13.63
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_temperature_ingdalen'
-        field_keys = {"seabirdTemperature": 'temperature'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdTemperature": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'  # 8.5882
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_conductivity_ingdalen'
-        field_keys = {"seabirdConductivity": 'conductivity'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdConductivity": 'conductivity'}
         tag_values['tag_unit'] = 'none'  # ? 31.6308
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_pressure_ingdalen'
-        field_keys = {"seabirdPressure": 'pressure'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdPressure": 'pressure'}
         tag_values['tag_unit'] = 'none'  # ? 10.431
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_dissolved_oxygen_ingdalen'
-        field_keys = {"seabirdDissOxygen": 'dissolved_oxygen'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdDissOxygen": 'dissolved_oxygen'}
         tag_values['tag_unit'] = 'none'  # ? 9.087
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_salinity_ingdalen'
-        field_keys = {"seabirdSalinity": 'salinity'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdSalinity": 'salinity'}
         tag_values['tag_unit'] = 'none'  # ? 29.6189
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_sound_velocity_ingdalen'
-        field_keys = {"seabirdSoundVel": 'sound_velocity'}
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdSoundVel": 'sound_velocity'}
         tag_values['tag_unit'] = 'metres_per_second'  # ? 1478.221
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_spec_cond_ingdalen'  # ???
-        field_keys = {"seabirdSpecCond": 'spec_cond'}
-        tag_values['tag_unit'] = 'none'  # ? 47.0862   
+        field_keys = {"seabirdDevice": 'tag_sensor',
+                      "seabirdSerial": 'tag_serial',
+                      "seabirdSpecCond": 'spec_cond'}
+        tag_values['tag_unit'] = 'none'  # ? 47.0862
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
@@ -938,52 +948,57 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # Set a 'default' set of tags for this file:
         tag_values = {
-            'tag_sensor': 'none',
+            'tag_sensor': 'par',
             'tag_edge_device': 'cr6_ingdalen',
             'tag_platform': 'ingdalen',
             'tag_data_level': 'raw',
             'tag_approved': 'none',
             'tag_unit': 'none'}
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'par_surface_serial_ingdalen'
-        field_keys = {"parSrfSerial": 'surface_serial'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'par_surface_serial_ingdalen'
+        # field_keys = {"parSrfSerial": 'surface_serial'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'par_subsea_serial_ingdalen'
-        field_keys = {"parSubSerial": 'subsea_serial'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'par_subsea_serial_ingdalen'
+        # field_keys = {"parSubSerial": 'subsea_serial'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_live_ingdalen'
-        field_keys = {"parSrfLive": 'par_surface_live'}
+        field_keys = {"parSrfSerial": 'tag_serial',
+                      "parSrfLive": 'par_surface_live'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_live_ingdalen'
-        field_keys = {"parSubLive": 'par_subsea_live'}
+        field_keys = {"parSubSerial": 'tag_serial',
+                      "parSubLive": 'par_subsea_live'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_average_ingdalen'
-        field_keys = {"parSrfAvg": 'par_surface_average'}
+        field_keys = {"parSrfSerial": 'tag_serial',
+                      "parSrfAvg": 'par_surface_average'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_average_ingdalen'
-        field_keys = {"parSubAvg": 'par_subsea_average'}
+        field_keys = {"parSubSerial": 'tag_serial',
+                      "parSubAvg": 'par_subsea_average'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_orientation_ingdalen'
-        field_keys = {"parSrfPitch": 'par_surface_pitch',
+        field_keys = {"parSrfSerial": 'tag_serial',
+                      "parSrfPitch": 'par_surface_pitch',
                       "parSrfRoll": 'par_surface_roll'}
         tag_values['tag_unit'] = 'none'  # ? 0.6
         df = filter_and_tag_df(df_all, field_keys, tag_values)
@@ -991,7 +1006,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_orientation_ingdalen'
-        field_keys = {"parSubPitch": 'par_subsea_pitch',
+        field_keys = {"parSubSerial": 'tag_serial',
+                      "parSubPitch": 'par_subsea_pitch',
                       "parSubRoll": 'par_subsea_roll'}
         tag_values['tag_unit'] = 'none'  # ? -1.5
         df = filter_and_tag_df(df_all, field_keys, tag_values)
@@ -999,14 +1015,16 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_temperature_ingdalen'
-        field_keys = {"parSrfTemp": 'par_surface_temperature'}
+        field_keys = {"parSrfSerial": 'tag_serial',
+                      "parSrfTemp": 'par_surface_temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'  # ? 15.3
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_temperature_ingdalen'
-        field_keys = {"parSubTemp": 'par_subsea_temperature'}
+        field_keys = {"parSubSerial": 'tag_serial',
+                      "parSubTemp": 'par_subsea_temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'  # ? 13.7
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
@@ -1099,90 +1117,101 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # Set a 'default' set of tags for this file:
         tag_values = {
-            'tag_sensor': 'none',
+            'tag_sensor': 'hydrocat',
             'tag_edge_device': 'cr6_ingdalen',
             'tag_platform': 'ingdalen',
             'tag_data_level': 'raw',
             'tag_approved': 'none',
             'tag_unit': 'none'}
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'hydrocat_serial_ingdalen'
-        field_keys = {"hydrocatSerial": 'serial'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'hydrocat_serial_ingdalen'
+        # field_keys = {"hydrocatSerial": 'serial'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_temperature_ingdalen'
-        field_keys = {"hydrocatTemperature": 'temperature'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatTemperature": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_conductivity_ingdalen'
-        field_keys = {"hydrocatConductivity": 'conductivity'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatConductivity": 'conductivity'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_pressure_ingdalen'
-        field_keys = {"hydrocatPressure": 'pressure'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatPressure": 'pressure'}
         tag_values['tag_unit'] = 'atmospheres'  # 0.968 ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_dissolved_oxygen_ingdalen'
-        field_keys = {"hydrocatDissOxygen": 'dissolved_oxygen'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatDissOxygen": 'dissolved_oxygen'}
         tag_values['tag_unit'] = 'none'  # ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_salinity_ingdalen'
-        field_keys = {"hydrocatSalinity": 'salinity'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatSalinity": 'salinity'}
         tag_values['tag_unit'] = 'none'  # ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_sound_velocity_ingdalen'
-        field_keys = {"hydrocatSoundVel": 'sound_velocity'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatSoundVel": 'sound_velocity'}
         tag_values['tag_unit'] = 'degrees_celcius'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_spec_cond_ingdalen'  # ?
-        field_keys = {"hydrocatSpecCond": 'spec_cond'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatSpecCond": 'spec_cond'}
         tag_values['tag_unit'] = 'none'  # ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_fluorescence_ingdalen'
-        field_keys = {"hydrocatFluorescence": 'fluorescence'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatFluorescence": 'fluorescence'}
         tag_values['tag_unit'] = 'none'  # ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_turbidity_ingdalen'
-        field_keys = {"hydrocatTurbidity": 'turbidity'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatTurbidity": 'turbidity'}
         tag_values['tag_unit'] = 'none'  # ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_ph_ingdalen'
-        field_keys = {"hydrocatPH": 'ph'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatPH": 'ph'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_oxygen_saturation_ingdalen'
-        field_keys = {"hydrocatOxygenSaturation": 'oxygen_saturation'}
+        field_keys = {"hydrocatSerial": 'tag_serial',
+                      "hydrocatOxygenSaturation": 'oxygen_saturation'}
         tag_values['tag_unit'] = 'none'  # ?
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
@@ -1269,27 +1298,29 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # Set a 'default' set of tags for this file:
         tag_values = {
-            'tag_sensor': 'none',
+            # 'tag_sensor': 'none',  # Replaced by the 'CFlour_Model' var.
             'tag_edge_device': 'cr6_ingdalen',
             'tag_platform': 'ingdalen',
             'tag_data_level': 'raw',
             'tag_approved': 'none',
             'tag_unit': 'none'}
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'cflour_model_ingdalen'
-        field_keys = {"CFluor_Model": 'cflour_model'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'cflour_model_ingdalen'
+        # field_keys = {"CFluor_Model": 'cflour_model'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'cflour_serial_ingdalen'
-        field_keys = {"CFluor_Serial": 'cflour_serial'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'cflour_serial_ingdalen'
+        # field_keys = {"CFluor_Serial": 'cflour_serial'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'cflour_cdom_ingdalen'
-        field_keys = {"CFluor_CDOM": 'cflour_cdom'}
+        field_keys = {"CFluor_Model": 'tag_sensor',
+                      "CFluor_Serial": 'tag_serial',
+                      "CFluor_CDOM": 'cflour_cdom'}
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)

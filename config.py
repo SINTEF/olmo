@@ -38,16 +38,16 @@ loggernet_files_basenames = [
     # "CR6_EOL2p0_Winch_log_",  # none
     "IngdalenCR6_SUNA_",
     "IngdalenCR6_System_",
-    "IngdalenCR6_signatureRecord_",
-    # "IngdalenCR6_signatureCurrentProf_",
-    "IngdalenCR6_Seabird_",
-    "IngdalenCR6_Power_",
-    "IngdalenCR6_PAR_",
-    "IngdalenCR6_MetData_",
-    "IngdalenCR6_Hydrocat_",
-    "IngdalenCR6_GPSData_",
-    "IngdalenCR6_Debug_",
-    "IngdalenCR6_CFluor_",
+    # "IngdalenCR6_signatureRecord_",
+    # # "IngdalenCR6_signatureCurrentProf_",
+    # "IngdalenCR6_Seabird_",
+    # "IngdalenCR6_Power_",
+    # "IngdalenCR6_PAR_",
+    # "IngdalenCR6_MetData_",
+    # "IngdalenCR6_Hydrocat_",
+    # "IngdalenCR6_GPSData_",
+    # "IngdalenCR6_Debug_",
+    # "IngdalenCR6_CFluor_",
 ]
 loggernet_logfile = "log_loggernet_ingest_"
 logpc_ssh_max_attempts = 3

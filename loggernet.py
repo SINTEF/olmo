@@ -575,36 +575,40 @@ def ingest_loggernet_file(file_path, file_type, clients):
             'tag_approved': 'none',
             'tag_unit': 'none'}
 
-        # ---------------------------------------------------------------- #
-        measurement_name = 'suna_serial_ingdalen'
-        field_keys = {"sunaSerial": 'serial'}
-        df = filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'suna_serial_ingdalen'
+        # field_keys = {"sunaSerial": 'serial'}
+        # df = filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_nitrate_micromol_ingdalen'
-        field_keys = {"sunaNitrateMicroMol": 'nitrate_micromol'}
+        field_keys = {"sunaSerial": 'tag_serial',
+                      "sunaNitrateMicroMol": 'nitrate_micromol'}
         tag_values['tag_unit'] = 'none'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_nitrate_milligram_ingdalen'
-        field_keys = {"sunaNitrateMilliGrams": 'nitrate_milligram'}
+        field_keys = {"sunaSerial": 'tag_serial',
+                      "sunaNitrateMilliGrams": 'nitrate_milligram'}
         tag_values['tag_unit'] = 'none'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_internal_humidity_ingdalen'
-        field_keys = {"sunaInternalHumidity": 'humidity'}
+        field_keys = {"sunaSerial": 'tag_serial',
+                      "sunaInternalHumidity": 'humidity'}
         tag_values['tag_unit'] = 'none'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_housing_temperature_ingdalen'
-        field_keys = {"sunaTemperatureHousing": 'temperature'}
+        field_keys = {"sunaSerial": 'tag_serial',
+                      "sunaTemperatureHousing": 'temperature'}
         tag_values['tag_unit'] = 'none'
         df = filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)

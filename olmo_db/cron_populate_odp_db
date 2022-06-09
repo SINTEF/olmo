@@ -1,2 +1,0 @@
-*/10 * * * * root bash /home/olmo/olmo_db/populate_odp_db.sh >> /var/log/cron.log 2>&1
-#

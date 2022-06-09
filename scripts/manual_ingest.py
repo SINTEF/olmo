@@ -23,19 +23,21 @@ clients = [
 ]
 
 # Data:
-measurement_name = 'position_brattora01'
+measurement_name = 'position_munkholmen_supportbuoy01'
 field_values = {
-    'latitude': ['123.123'],
-    'longitude': ['234.123'],
+    'latitude': ['0.'],
+    'longitude': ['0.'],
 }  # Must only be a single value for now
 tag_values = {
     'tag_sensor': 'none',
     'tag_edge_device': 'none',
-    'tag_platform': 'brattora01',
+    'tag_platform': 'supportbuoy01',
     'tag_data_level': 'raw',
     'tag_approved': 'none',
     'tag_unit': 'degrees',
 }
+# timestamp = None
+timestamp = datetime.datetime(2022, 5, 24, 17, 00)  # Code assumes UTC
 
 
 def main():
@@ -47,11 +49,16 @@ def main():
         assert len(v) == 1, "Due to setting of data, must only input a single data value."
 
     df = pd.DataFrame.from_dict(field_values)
-    df['date'] = datetime.datetime.now(datetime.timezone.utc)
-    df = df.set_index('date').tz_convert('UTC')
+    if timestamp is None:
+        df['date'] = datetime.datetime.now(datetime.timezone.utc)
+        df = df.set_index('date').tz_convert('UTC')
+    else:
+        df['date'] = timestamp
+        df = df.set_index('date').tz_localize('UTC').tz_convert('UTC')
     for (k, v) in tag_values.items():
         df[k] = v
     print(measurement_name, df)
+    print(datetime.datetime.now(datetime.timezone.utc))
     ingest.ingest_df(measurement_name, df, clients)
 
     print("All data ingested successfully, exiting.")

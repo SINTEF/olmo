@@ -36,6 +36,7 @@ loggernet_files_basenames = [
     "CR6_EOL2p0_Current_",  # intr.: signature_100
     "CR6_EOL2p0_Wave_sensor_",  # instr.: seaview
     # "CR6_EOL2p0_Winch_log_",  # none
+    "IngdalenCR6_System_",
 ]
 loggernet_logfile = "log_loggernet_ingest_"
 logpc_ssh_max_attempts = 3
@@ -44,8 +45,8 @@ logpc_ssh_max_attempts = 3
 # Backup files:
 backup_dir = os.path.join(base_dir, 'backups')
 bu_logfile_basename = "log_influx_backup_"
-backup_basename = 'influxbackup_test_'
-az_backups_folder = 'influx_backups_test'
+backup_basename = 'influxbackup_'
+az_backups_folder = 'influx_backups'
 
 
 # Website figures

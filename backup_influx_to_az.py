@@ -32,7 +32,7 @@ def main():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
     stdout, stderr = process.communicate(timeout=600)
-    logger.info("STDOUT from 'influxd backup':\n" + stdout.decode(errors="ignore"))
+    # logger.info("STDOUT from 'influxd backup':\n" + stdout.decode(errors="ignore"))
     if process.returncode != 0:
         logger.error("Backup of influxdb failed at backup step. stderr:\n" + stderr.decode(errors="ignore"))
         raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
@@ -40,7 +40,7 @@ def main():
     shutil.make_archive(backup_folder, 'zip', backup_folder)
     logger.info("Backup directory archived into zip file.")
 
-    # Upload that folder to the azure datalake
+    # ---- Upload that folder to the azure datalake
     with open(os.path.join(config.secrets_dir, 'azure_token_datalake')) as f:
         aztoken = f.read()
     az_filename = config.az_backups_folder + '/' + config.backup_basename + timestamp + '.zip'
@@ -57,6 +57,12 @@ def main():
         logger.error("az file upload failed. stderr:\n" + stderr.decode(errors="ignore"))
         raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
     logger.info('Backup, archive and transfer to azure completed successfully.')
+
+    # ---- Clean up the backup folder and the .zip file in the container:
+    shutil.rmtree(backup_folder)
+    os.remove(backup_folder + '.zip')
+    logger.info('Local files removed.')
+    logger.info("Backup complete, exiting.")
 
 
 if __name__ == "__main__":

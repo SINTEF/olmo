@@ -30,7 +30,7 @@ for r in result:
     measurements.append(r['name'])
 # print(measurements)
 
-f = open(os.path.join(config.output_dir, 'Database_overview.txt'), 'w')
+f = open(os.path.join(config.base_dir, 'olmo', 'documentation', 'Database_list_of_tables.txt'), 'w')
 
 f.write("ALL TABLES (MEASUREMENTS) IN DATABASE:\n")
 for m in measurements:

@@ -147,6 +147,14 @@ def add_tags(df, tag_values):
         df[k] = v
     return df
 
+
+def filter_and_tag_df(df_all, field_keys, tag_values):
+    '''Returns a df with tag_values and field_key values'''
+    df = df_all.loc[:, [k for k in field_keys.keys()]]
+    df = df.rename(columns=field_keys)
+    df = add_tags(df, tag_values)
+    return df
+
 # Currently not sure if I need this, so ignoring for now.
 # def execute_subprocess(command, communicate=True, timeout=600):
 #     '''Executes a terminal command using subrpocess.Popen.

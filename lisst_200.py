@@ -2,7 +2,7 @@ import os
 import subprocess
 import datetime
 import pandas as pd
-from influxdb import DataFrameClient
+# from influxdb import DataFrameClient
 
 import sensor
 import config
@@ -95,8 +95,6 @@ class Lisst_200(sensor.Sensor):
 
     def ingest_l0(self, files):
 
-        influx_client = DataFrameClient('sintefpc6201', 8086, 'root', self.get_influx_pwd(), self.db_name)
-
         for f in files:
             storage_location = f"{self.measurement_name_l0}/{os.path.split(f)[1]}"
             process = subprocess.run([
@@ -119,9 +117,6 @@ class Lisst_200(sensor.Sensor):
             influx_client.write_points(df, self.measurement_name_l0)
 
     def ingest_l1(self, files):
-
-        # influx_client = DataFrameClient(
-        #     config.sintef_influx_pc, 8086, self.get_influx_user(), self.get_influx_pwd(), self.db_name)
 
         for f in files:
             df = self.lisst200_csv_to_df(f)

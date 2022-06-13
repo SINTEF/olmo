@@ -40,10 +40,13 @@ def ingest_loggernet_file(file_path, file_type, clients):
         The 'basename' of the file, should correspond to one of those in the config.
     '''
 
-    def load_data(file_path, data_cols, float_cols, timezone='CET', rows_to_skip=None, time_col="TMSTAMP"):
+    def load_data(
+            file_path, data_cols, float_cols, str_cols=[],
+            timezone='CET', rows_to_skip=None, time_col="TMSTAMP"):
 
         pd.set_option('precision', 6)
-        df = pd.read_csv(file_path, sep=',', skiprows=0, header=1)
+        str_cols_dict = {c: str for c in str_cols} if str_cols else None
+        df = pd.read_csv(file_path, sep=',', skiprows=0, header=1, dtype=str_cols_dict)
         if rows_to_skip is not None:
             df = df.iloc[rows_to_skip:]
 
@@ -52,8 +55,9 @@ def ingest_loggernet_file(file_path, file_type, clients):
 
         # There can be strings inserted as "NAN", set these to the -7999 nan.
         for col in df.columns:
-            if df[col].dtypes == 'object':
-                df.loc[df[col].str.match('NAN'), col] = -7999
+            if col in float_cols:
+                if df[col].dtypes == 'object':
+                    df.loc[df[col].str.match('NAN'), col] = -7999
 
         # Force cols to have time np.float64
         df = ingest.float_col_fix(df, float_cols)
@@ -1293,8 +1297,12 @@ def ingest_loggernet_file(file_path, file_type, clients):
         data_cols = [
             "CFluor_Model", "CFluor_Serial", "CFluor_CDOM"
         ]
-        float_cols = [c for c in data_cols if c not in ["CFluor_Model", "CFluor_Serial"]]
-        df_all = load_data(file_path, data_cols, float_cols, timezone='UTC')
+        # Needed to explicitly state that the str cols listed were such as they
+        # can be empty, and then they are read as floats by pandas and this causes
+        # as error (as they are np.nans then).
+        df_all = load_data(
+            file_path, data_cols, ["CFluor_CDOM"],
+            str_cols=["CFluor_Model", "CFluor_Serial"], timezone='UTC')
 
         # Set a 'default' set of tags for this file:
         tag_values = {

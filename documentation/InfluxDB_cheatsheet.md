@@ -31,12 +31,12 @@ List measurements:
 
 Add a data point:
 
-    insert meaurement_name,key=5 value=12
+    INSERT meaurement_name,key=5 value=12
 
 
 Show measurements for name: meaurement_name:
 
-    SELECT * FROM meaurement_name
+    SELECT * FROM meaurement_name LIMIT 3
 
 Drop meaurement_name measurements:
 
@@ -57,3 +57,7 @@ Show series:
 Drop all series for tag:
 
     DROP SERIES FROM "drilling" WHERE ("module_id" = 'oppy')
+
+Drop a datapoint need to happen by filtering on time:
+
+    DELETE FROM "drilling" WHERE time > '2022-06-05 15:10:42' and time < '2022-06-07 03:20:42'

@@ -121,7 +121,7 @@ def main():
         # print(f"Number of files: {len(files)}")
 
         # ---- scp the files over, then delete
-        for f in files[:-1]:  # files[:-1]:  # Don't copy the latest file - it might be being written to.
+        for f in files[:-1]:  # Don't copy the latest file - it might be being written to.
 
             # print(f"Ingesting file: {f}")
 

@@ -6,57 +6,27 @@ import numpy as np
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 from influxdb import InfluxDBClient
+import matplotlib.pyplot as plt
 
 import config
 import util
 
+
 def adcp_from_influx(client, timeslice):
-    q = f'''SELECT * FROM signature_100_current_speed_munkholmen WHERE {timeslice}'''
-    result = client.query(q)
+    sig_tables = ['signature_100_amplitude_munkholmen','signature_100_battery_voltage_munkholmen','signature_100_correlation_munkholmen','signature_100_current_direction_munkholmen','signature_100_current_speed_munkholmen','signature_100_error_code_munkholmen',
+                  'signature_100_heading_munkholmen','signature_100_pitch_munkholmen','signature_100_pressure_munkholmen','signature_100_roll_munkholmen','signature_100_sound_speed_munkholmen','signature_100_temperature_munkholmen','signature_100_velocity_munkholmen']
 
-    columns = []
-    for table in result:
-        for k in table[0].keys():
-            columns.append(k)
+    df = pd.DataFrame(columns=['time'])
+    for i, tab in enumerate(sig_tables):
+        print('loading:', tab)
+        df_new = util.query_influxdb(client, tab, '*', timeslice, False, approved='all')
+        df_new = df_new.drop(columns=['approved', 'data_level', 'edge_device', 'platform', 'sensor', 'unit'])
+        df = pd.merge(df, df_new, on='time', how='outer')
 
-    df = pd.DataFrame(columns=columns)
-    for table in result:
-        for pt in table:
-            df = df.append(pt, ignore_index=True)
-
-    q = f'''SELECT * FROM signature_100_current_direction_munkholmen WHERE {timeslice}'''
-    result = client.query(q)
-
-    columns = []
-    for table in result:
-        for k in table[0].keys():
-            columns.append(k)
-
-    for table in result:
-        for pt in table:
-            df = df.append(pt, ignore_index=True)
-
-    q = f'''SELECT * FROM signature_100_pressure_munkholmen WHERE {timeslice}'''
-    result = client.query(q)
-
-    columns = []
-    for table in result:
-        for k in table[0].keys():
-            columns.append(k)
-
-    for table in result:
-        for pt in table:
-            df = df.append(pt, ignore_index=True)
-
-
-    # Assuming that influx reports times in UTC:
-    df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
-    df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
     return df
 
 
 def adcp_speed_from_influx(client, timeslice):
-    
     q = f'''SELECT * FROM signature_100_current_speed_munkholmen WHERE {timeslice}'''
     result = client.query(q)
 
@@ -73,6 +43,7 @@ def adcp_speed_from_influx(client, timeslice):
     df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
     df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
     return df
+
 
 def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
 
@@ -118,7 +89,8 @@ def upload_figure(local_file, az_file):
     # logger.info('Backup, archive and transfer to azure completed successfully.')
 
 
-standard_timeslice = 'time > now() - 1d'
+#standard_timeslice = 'time > now() - 5d'
+standard_timeslice = 'time > now() - 60d'
 standard_downsample = 'time(1m)'  # To turn off use: False
 plot = {
     'title': 'Munkholmen ADCP Speed',
@@ -127,17 +99,13 @@ plot = {
     'lower_filter': -3000,
     'upper_filter': 5000,
     'downsample': False,
-    'approved': 'none',
+    'approved': 'all',
     }
 
 
 def main():
-    print("Starting running generate_adco_plots.py at "
+    print("Starting running generate_adcp_plots.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
-    # some setup constants that should be read from the CR6 once mobilis does an update
-    blanking = 2.0 #m
-    cell_size = 5.0 #m
 
     # Below is the Azure DB client:
     admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
@@ -150,6 +118,92 @@ def main():
     fig.update_layout(template='plotly_white')
     # df = query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'], approved=p['approved'])
     df = adcp_from_influx(client, plot['timeslice'])
+
+    return df
+
+    data_cols = list(df.columns)
+
+    current_speed_cols = [d for d in data_cols if d.startswith('current_speed')]
+    current_speed = df[current_speed_cols].values.T
+
+    for name in ['velocity', 'amplitude', 'correlation']:
+        for i in range(1,5):
+            exec(f'{name}{i}_cols = [d for d in data_cols if d.startswith("{name}{i}")]')
+            exec(f'{name}{i} = df[{name}{i}_cols].values.T')
+            exec(f'{name}{i}[{name}{i} == -32.77] = np.nan')
+
+    # some setup constants that should be read from the CR6 once mobilis does an update
+    blanking = 2.0 #m
+    cell_size = 3.0 #m
+
+    number_of_timstamps = df.shape[0]
+
+    number_of_depths = 0
+    for i, c in enumerate(velocity1_cols):
+        cell_number = int(c.split('(')[1].rstrip(')'))
+        number_of_depths = np.max((number_of_depths, cell_number))
+
+    depth = np.zeros((number_of_depths, number_of_timstamps), dtype=np.float64)
+    for d in range(number_of_depths):
+        depth[d, :] = (df['pressure'].values + blanking + (cell_size / 2)) + ((d) * cell_size)
+
+    f, a = plt.subplots(2,2, figsize=(20,20))
+
+    VMAX = 0.25
+    YLIM =(80, 0)
+
+    def set_plots():
+        plt.colorbar()
+        plt.gca().invert_yaxis()
+        plt.xticks(rotation = 45)
+        plt.ylim(YLIM)
+        plt.ylabel('Depth (m)')
+
+    plt.sca(a[0,0])
+    plt.pcolor(df.time, depth, amplitude1) #, vmin=0, vmax=VMAX)
+    plt.title('amplitude1')
+    set_plots()
+
+    plt.sca(a[0,1])
+    plt.pcolor(df.time, depth, amplitude2) #, vmin=0, vmax=VMAX)
+    plt.title('amplitude2')
+    set_plots()
+
+    plt.sca(a[1,0])
+    plt.pcolor(df.time, depth, amplitude3) #, vmin=0, vmax=VMAX)
+    plt.title('amplitude3')
+    set_plots()
+
+    plt.sca(a[1,1])
+    plt.pcolor(df.time, depth, amplitude4) #, vmin=0, vmax=VMAX)
+    plt.title('amplitude4')
+    set_plots()
+
+    f, a = plt.subplots(2,2, figsize=(20,20))
+
+    plt.sca(a[0,0])
+    plt.pcolor(df.time, depth, velocity1) #, vmin=0, vmax=VMAX)
+    plt.title('velocity1')
+    set_plots()
+
+    plt.sca(a[0,1])
+    plt.pcolor(df.time, depth, velocity2) #, vmin=0, vmax=VMAX)
+    plt.title('velocity2')
+    set_plots()
+
+    plt.sca(a[1,0])
+    plt.pcolor(df.time, depth, velocity3) #, vmin=0, vmax=VMAX)
+    plt.title('velocity3')
+    set_plots()
+
+    plt.sca(a[1,1])
+    plt.pcolor(df.time, depth, velocity4) #, vmin=0, vmax=VMAX)
+    plt.title('velocity4')
+    set_plots()
+
+    
+
+    return
     
     columns = df.columns
     print(columns)

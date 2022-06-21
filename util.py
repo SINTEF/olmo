@@ -149,19 +149,40 @@ def query_influxdb(client, measurement, variable, timeslice, downsample, approve
     else:
         approved_text = f'''AND "approved" = '{approved}' '''
 
-    if downsample:
-        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    if variable == '*':
+        variable_text = '*'
+        df = pd.DataFrame(columns=['time'])
     else:
-        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}'''
+        variable_text = f'"{variable}"'
+        df = pd.DataFrame(columns=['time', variable])
+
+    if downsample:
+        q = f'''SELECT mean({variable_text}) AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    else:
+        q = f'''SELECT {variable_text} FROM "{measurement}" WHERE {timeslice} {approved_text}'''
 
     result = client.query(q)
-    df = pd.DataFrame(columns=['time', variable])
     for table in result:
         for pt in table:
             df = df.append(pt, ignore_index=True)
     # Assuming that influx reports times in UTC:
     df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
     df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
+    return df
+
+
+def add_tags(df, tag_values):
+    '''Adds tags to a dataframe. tag_values needs be a correct dict.'''
+    for (k, v) in tag_values.items():
+        df[k] = v
+    return df
+
+
+def filter_and_tag_df(df_all, field_keys, tag_values):
+    '''Returns a df with tag_values and field_key values'''
+    df = df_all.loc[:, [k for k in field_keys.keys()]]
+    df = df.rename(columns=field_keys)
+    df = add_tags(df, tag_values)
     return df
 
 

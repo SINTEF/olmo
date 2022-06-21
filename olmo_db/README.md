@@ -3,20 +3,17 @@
 
 # Starting up docker container
 
-Log onto `Grafana-vm1` (on azure). The simplest (in the case that there is nothing "wrong" but it just stopped):
-
-  1. Go to folder for the olmo repository.
-  2. Run `docker-compose up -d`
-  3. Go into the influx docker container: `docker exec -it influxdb bash`
-  4. Start the cron deamon: `service cron start`
-  5. Finally once grafana is up and running you need to update the token (alerting->notification channels)
-
-A More complete restart would be:
+Log onto `Grafana-vm1` (on azure). Assuming that you need to restart then (if starting from nothing you can skip steps `stop` and `prune -a`).
 
   1. Check what is running: `docker ps`
   2. Stop either `influxdb` or `grafana` if they are running (`docker stop influxdb grafana`)
-  3. Clean up old images (this step can help if the image has been changed): `docker system prune -a`
-  4. You can start and run through the steps given above (Go to correct directory and start docker compose).
+  3. Clean up old images: `docker system prune -a`
+  4. Go to folder with the olmo repository (and check you are on `main`)
+  5. Run `docker-compose up -d`
+  6. Go into the influx docker container: `docker exec -it influxdb bash`
+  7. Start the cron deamon: `service cron start`
+  8. Finally once grafana is up and running you need to update the token (alerting->notification channels)
+  9. Also, if you stopped the ingestion, restart that.
 
 
 # Backup and restore

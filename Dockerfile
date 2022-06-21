@@ -18,12 +18,16 @@ RUN conda env create -f ./olmo_db/environment.yml
 RUN conda init bash
 RUN echo "source activate olmo_db" >> ~/.bashrc
 
+# Install the az cli:
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
 # RUN /root/mambaforge/envs/olmo_db/bin/python backup_influx_to_az.py
 
 # Set up cron jobs:
 RUN apt-get update && apt-get -y install cron
-COPY olmo_db/cron_populate_odp_db /etc/cron.d/cron_populate_odp_db
-RUN chmod 0644 /etc/cron.d/cron_populate_odp_db
-RUN touch /var/log/cron.log
+COPY olmo_db/cronjobs_influxmachine /etc/cron.d/cronjobs_influxmachine
+RUN chmod 0644 /etc/cron.d/cronjobs_influxmachine
+RUN touch /var/log/cron_odp.log
+RUN touch /var/log/cron_backup.log
 # This does not start the deamon, this need to be done after container startup
 # using `service cron start`

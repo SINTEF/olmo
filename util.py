@@ -4,6 +4,7 @@ import logging
 import datetime
 import paramiko
 import numpy as np
+import pandas as pd
 
 import config
 
@@ -141,6 +142,35 @@ def init_logger(logfile, name='olmo'):
     return logger
 
 
+def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
+
+    if approved == 'all':
+        approved_text = ''
+    else:
+        approved_text = f'''AND "approved" = '{approved}' '''
+
+    if variable == '*':
+        variable_text = '*'
+        df = pd.DataFrame(columns=['time'])
+    else:
+        variable_text = f'"{variable}"'
+        df = pd.DataFrame(columns=['time', variable])
+
+    if downsample:
+        q = f'''SELECT mean({variable_text}) AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    else:
+        q = f'''SELECT {variable_text} FROM "{measurement}" WHERE {timeslice} {approved_text}'''
+
+    result = client.query(q)
+    for table in result:
+        for pt in table:
+            df = df.append(pt, ignore_index=True)
+    # Assuming that influx reports times in UTC:
+    df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
+    df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
+    return df
+
+
 def add_tags(df, tag_values):
     '''Adds tags to a dataframe. tag_values needs be a correct dict.'''
     for (k, v) in tag_values.items():
@@ -154,6 +184,7 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     df = df.rename(columns=field_keys)
     df = add_tags(df, tag_values)
     return df
+
 
 # Currently not sure if I need this, so ignoring for now.
 # def execute_subprocess(command, communicate=True, timeout=600):

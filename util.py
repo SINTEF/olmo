@@ -149,13 +149,19 @@ def query_influxdb(client, measurement, variable, timeslice, downsample, approve
     else:
         approved_text = f'''AND "approved" = '{approved}' '''
 
-    if downsample:
-        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    if variable == '*':
+        variable_text = '*'
+        df = pd.DataFrame(columns=['time'])
     else:
-        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}'''
+        variable_text = f'"{variable}"'
+        df = pd.DataFrame(columns=['time', variable])
+
+    if downsample:
+        q = f'''SELECT mean({variable_text}) AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    else:
+        q = f'''SELECT {variable_text} FROM "{measurement}" WHERE {timeslice} {approved_text}'''
 
     result = client.query(q)
-    df = pd.DataFrame(columns=['time', variable])
     for table in result:
         for pt in table:
             df = df.append(pt, ignore_index=True)

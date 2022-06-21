@@ -141,6 +141,26 @@ def init_logger(logfile, name='olmo'):
     return logger
 
 
+def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
+
+    if downsample:
+        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' GROUP BY {downsample}'''
+    elif approved is not 'all':
+        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
+    else:
+        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice}'''
+
+    result = client.query(q)
+    df = pd.DataFrame(columns=['time', variable])
+    for table in result:
+        for pt in table:
+            df = df.append(pt, ignore_index=True)
+    # Assuming that influx reports times in UTC:
+    df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
+    df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
+    return df
+
+
 # Currently not sure if I need this, so ignoring for now.
 # def execute_subprocess(command, communicate=True, timeout=600):
 #     '''Executes a terminal command using subrpocess.Popen.

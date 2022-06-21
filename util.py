@@ -4,6 +4,7 @@ import logging
 import datetime
 import paramiko
 import numpy as np
+import pandas as pd
 
 import config
 
@@ -143,12 +144,15 @@ def init_logger(logfile, name='olmo'):
 
 def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
 
-    if downsample:
-        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' GROUP BY {downsample}'''
-    elif approved is not 'all':
-        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
+    if approved == 'all':
+        approved_text = ''
     else:
-        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice}'''
+        approved_text = f'''AND "approved" = '{approved}' '''
+
+    if downsample:
+        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    else:
+        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}'''
 
     result = client.query(q)
     df = pd.DataFrame(columns=['time', variable])

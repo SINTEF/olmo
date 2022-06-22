@@ -1,5 +1,4 @@
 import os
-import subprocess
 import datetime
 import pandas as pd
 import numpy as np
@@ -14,27 +13,6 @@ import util
 def make_subplot(df, key, label):
     subplot = go.Scatter(x=df['time'], y=df[key], name=label)
     return subplot
-
-
-def upload_figure(local_file, az_file):
-
-    with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
-        aztoken = f.read()
-    process = subprocess.Popen([
-        'az', 'storage', 'fs', 'file', 'upload',
-        '--source', local_file, '-p', az_file,
-        '-f', '$web', '--account-name', 'oceanlabdlstorage', '--overwrite',
-        '--content-type', 'text/html',
-        '--sas-token', aztoken[:-1]],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate(timeout=600)
-    # logger.info("STDOUT from 'az file upload':\n" + stdout.decode(errors="ignore"))
-    if process.returncode != 0:
-        # logger.error("az file upload failed. stderr:\n" + stderr.decode(errors="ignore"))
-        print("we got an error")
-        raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
-    # logger.info('Backup, archive and transfer to azure completed successfully.')
 
 
 standard_timeslice = 'time > now() - 1d'
@@ -126,7 +104,7 @@ def main():
     az_file = 'influx_data/' + filename
     fig.update_layout(height=100 + 400 * len(plots), width=1200, showlegend=False)
     fig.write_html(local_file)
-    upload_figure(local_file, az_file)
+    util.upload_file(local_file, az_file, '$web', overwrite=True)
 
 
 if __name__ == "__main__":

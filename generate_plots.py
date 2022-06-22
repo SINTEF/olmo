@@ -10,24 +10,6 @@ import config
 import util
 
 
-def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
-
-    if downsample:
-        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' GROUP BY {downsample}'''
-    else:
-        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
-
-    result = client.query(q)
-    df = pd.DataFrame(columns=['time', variable])
-    for table in result:
-        for pt in table:
-            df = df.append(pt, ignore_index=True)
-    # Assuming that influx reports times in UTC:
-    df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
-    df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
-    return df
-
-
 def make_subplot(df, key, label):
     subplot = go.Scatter(x=df['time'], y=df[key], name=label)
     return subplot
@@ -103,7 +85,7 @@ def main():
     fig = make_subplots(rows=len(plots), cols=1, subplot_titles=[p['title'] for p in plots])
     fig.update_layout(template='plotly_white')
     for i, p in enumerate(plots):
-        df = query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'])
+        df = util.query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'])
 
         # Simple simple filtering:
         df.loc[df[p['variable']] < p['lower_filter'], p['variable']] = np.nan

@@ -34,3 +34,14 @@ need to
   3. Move the unzipped folder into `./backups/` (so docker sees it)
   4. Go into the container (`docker exec -it influxdb bash`)
   5. Restore: `influxd restore -portable /backups/influxbackup_20220110/`
+
+# Some manual operations
+
+These could almost be considered 'issues' with the repo, although they may never be addressed.
+
+ * Build up of backup files in portal.azure.com (oceanlabdlcontaier/influx_backups). I just delete 'exponentially' older ones.
+ * Build up of files on torfinn2. Older ones are deleted (as the data should be in influx/azure)
+ * Build up of log files on tofrinn2 and Grafana_vm1. Occasionally put into a folder with a final date of iles in that folder.
+
+This can remove all files in a folder older then 7 days:
+`find * -mtime +7 -exec rm {} \;`

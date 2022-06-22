@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 import logging
 import datetime
 import paramiko
@@ -154,6 +155,28 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     df = df.rename(columns=field_keys)
     df = add_tags(df, tag_values)
     return df
+
+
+def upload_file(local_file, az_file, container, content_type='text/html', overwrite=True):
+
+    with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
+        aztoken = f.read()
+    process = subprocess.Popen([
+        'az', 'storage', 'fs', 'file', 'upload',
+        '--source', local_file, '-p', az_file,
+        '-f', container, '--account-name', 'oceanlabdlstorage', '--overwrite',
+        '--content-type', content_type,
+        '--sas-token', aztoken[:-1]],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate(timeout=600)
+    # logger.info("STDOUT from 'az file upload':\n" + stdout.decode(errors="ignore"))
+    if process.returncode != 0:
+        # logger.error("az file upload failed. stderr:\n" + stderr.decode(errors="ignore"))
+        print("we got an error")
+        raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
+    # logger.info('Backup, archive and transfer to azure completed successfully.')
+
 
 # Currently not sure if I need this, so ignoring for now.
 # def execute_subprocess(command, communicate=True, timeout=600):

@@ -386,11 +386,11 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'signature_100_configuration_munkholmen'
         tag_values['tag_unit'] = 'none'
         df = pd.DataFrame(columns=['identifier', 'instrument_type_id', 'num_beams', 'num_cells', 'checksum'])
-        print(df_all)
         for i in range(df_all.shape[0]):
             d = df_all.iloc[i, -1]
             indexes = [1, 2, 3, 4, 7]
             df.loc[i, :] = [d.split(',')[j] for j in indexes]
+        df.index = df_all.index
         df = util.add_tags(df, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
@@ -402,6 +402,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
             d = df_all.iloc[i, -1]
             indexes = [5, 6]
             df.loc[i, :] = [d.split(',')[j] for j in indexes]
+        df.index = df_all.index
         df = util.add_tags(df, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 

@@ -15,7 +15,7 @@ class CTD(sensor.Sensor):
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
             db_name='oceanlab',
             file_regex_l0=r"ready_ctd_(\d{14})\.csv",
-            drop_recent_files_l0=1,
+            drop_recent_files_l0=0,
             remove_remote_files_l0=True,
             max_files_l0=None,
             influx_clients=None):

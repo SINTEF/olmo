@@ -14,13 +14,16 @@ influx -execute 'SELECT wind_speed AS wind_speed_digital INTO share_odp..wind_sp
 influx -execute 'SELECT wind_direction AS wind_direction_digital INTO share_odp..wind_direction_digital FROM oceanlab..meteo_wind_direction_munkholmen WHERE time >= now() - 120m GROUP BY *'
 influx -execute 'SELECT atmospheric_pressure AS pressure_digital INTO share_odp..pressure_digital FROM oceanlab..meteo_atmospheric_pressure_munkholmen WHERE time >= now() - 120m GROUP BY *'
 influx -execute 'SELECT humidity AS humidity_digital INTO share_odp..humidity_digital FROM oceanlab..meteo_humidity_munkholmen WHERE time >= now() - 120m GROUP BY *'
-# Node 2 data:
+# Node 2 data added to share_odp:
 influx -execute 'SELECT wind_speed INTO share_odp..wind_speed_brattora01 FROM oceanlab..wind_speed_brattora01 WHERE time >= now() - 24h GROUP BY *'
 influx -execute 'SELECT wind_direction INTO share_odp..wind_direction_brattora01 FROM oceanlab..wind_direction_brattora01 WHERE time >= now() - 24h GROUP BY *'
 influx -execute 'SELECT gust_speed INTO share_odp..gust_speed_brattora01 FROM oceanlab..gust_speed_brattora01 WHERE time >= now() - 24h GROUP BY *'
 influx -execute 'SELECT wind_speed INTO share_odp..wind_speed_brattora02 FROM oceanlab..wind_speed_brattora02 WHERE time >= now() - 24h GROUP BY *'
 influx -execute 'SELECT wind_direction INTO share_odp..wind_direction_brattora02 FROM oceanlab..wind_direction_brattora02 WHERE time >= now() - 24h GROUP BY *'
 influx -execute 'SELECT gust_speed INTO share_odp..gust_speed_brattora02 FROM oceanlab..gust_speed_brattora02 WHERE time >= now() - 24h GROUP BY *'
+
+# Populate share_bistro DB:
+influx -execute 'SELECT * INTO share_bistro..ctd_conductivity_munkholmen FROM oceanlab..ctd_conductivity_munkholmen WHERE time >= now() - 120m GROUP BY *'
 
 now=$(date +"%T")
 echo "Finished at $now"

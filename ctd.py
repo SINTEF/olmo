@@ -1,4 +1,5 @@
 import pandas as pd
+import seawater
 
 import sensor
 import config
@@ -29,6 +30,7 @@ class CTD(sensor.Sensor):
         self.remove_remote_files_l0 = remove_remote_files_l0
         self.max_files_l0 = max_files_l0
         self.influx_clients = influx_clients
+        self.MUNKHOLMEN_LATITUDE = 63.456314
 
     def ingest_l0(self, files):
 
@@ -39,6 +41,9 @@ class CTD(sensor.Sensor):
             df_all = util.force_float_cols(df_all, not_float_cols=[time_col])
             df_all[time_col] = pd.to_datetime(df_all[time_col], format='%Y-%m-%d %H:%M:%S')
             df_all = df_all.set_index(time_col).tz_localize('CET', ambiguous='infer').tz_convert('UTC')
+
+            df_all['density'] = seawater.eos80.dens0(df_all['Salinity'], df_all['Temperature'])
+            df_all['depth'] = seawater.eos80.dpth(df_all['Pressure'], self.MUNKHOLMEN_LATITUDE)
 
             tag_values = {'tag_sensor': 'ctd',
                           'tag_edge_device': 'munkholmen_topside_pi',
@@ -53,6 +58,7 @@ class CTD(sensor.Sensor):
             tag_values['tag_unit'] = 'degrees_celcius'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
+
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_conductivity_munkholmen'
             field_keys = {"Conductivity": 'conductivity'}
@@ -90,6 +96,22 @@ class CTD(sensor.Sensor):
                           "Volt4": 'volt4',
                           "Volt5": 'volt5'}
             tag_values['tag_unit'] = 'none'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_depth_munkholmen'
+            field_keys = {"depth": 'depth'}
+            tag_values['tag_unit'] = 'metres'
+            tag_values['tag_data_level'] = 'processed'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_density_munkholmen'
+            field_keys = {"density": 'density'}
+            tag_values['tag_unit'] = 'kilograms_per_cubic_metre'
+            tag_values['tag_data_level'] = 'processed'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
 

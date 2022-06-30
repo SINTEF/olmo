@@ -153,6 +153,9 @@ def query_influxdb(client, measurement, variable, timeslice, downsample, approve
     if variable == '*':
         variable_text = '*'
         df = pd.DataFrame(columns=['time'])
+    elif isinstance(variable, list):
+        variable_text = ", ".join(variable)
+        df = pd.DataFrame(columns=variable.insert(0, 'time'))
     else:
         variable_text = f'"{variable}"'
         df = pd.DataFrame(columns=['time', variable])
@@ -164,10 +167,17 @@ def query_influxdb(client, measurement, variable, timeslice, downsample, approve
 
     result = client.query(q)
     for table in result:
+        # Not sure this works if there are multiple tables.
+        col_names = [k for k in table[0].keys()]
+        col_vals = [[] for _ in col_names]
         for pt in table:
-            df = df.append(pt, ignore_index=True)
-    # Assuming that influx reports times in UTC:
-    df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
+            for i, v in enumerate(pt.values()):
+                col_vals[i].append(v)
+        df = pd.DataFrame.from_dict({col_names[i]: col_vals[i] for i in range(len(col_names))})
+    try:
+        df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
+    except ValueError:
+        df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%S.%fZ')
     df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
     return df
 

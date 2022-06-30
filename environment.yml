@@ -2,6 +2,7 @@ name: olmo
 channels:
     - conda-forge
 dependencies:
+    - cryptography=36.0.2  # Requirement of paramiko, bugged at higher versions
     - flake8
     - python=3.9
     - jupyter=1.0

@@ -1,9 +1,7 @@
 import os
 import time
-import pandas as pd
 import datetime
 from influxdb import InfluxDBClient
-import seawater
 
 import config
 import ingest
@@ -14,23 +12,17 @@ import util
 
 # Databases:
 admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-read_client = InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
-write_clients = [
-    InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
-    InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+clients = [
+    InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example'),
+    # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
 ]
 
 # List of measurements and variables which will be retrieved from
 # influx from which the processed data should be collected.
-measurement = ''
-input_data = [
-    ['ctd_salinity_munkholmen', 'salinity'],
-    ['ctd_temperature_munkholmen', 'temperature'],
-    ['ctd_pressure_munkholmen', 'pressure'],
-]
+measurement = 'ctd_conductivity_munkholmen'
 # Time period:
-start_time = '2022-06-01T00:00:00Z'
-end_time = '2022-06-30T15:00:00Z'
+start_time = '2022-06-02T12:09:54Z'
+end_time = '2022-06-02T12:09:56Z'
 
 
 def main():
@@ -44,60 +36,43 @@ def main():
     total_time_delta = end_time_ - start_time_
     periods = []
     # Assuming breaking down into days:
-    for d in range(total_time_delta.days):
+    d = 0
+    while d < total_time_delta.days:
         periods.append((
             (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ')))
+        d += 1
     if total_time_delta.seconds > 0:
         periods.append((
-            (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
 
     for p in periods:
         timeslice = f"time > '{p[0]}' AND time < '{p[1]}'"
+        print("Doing timeslice:", timeslice)
 
-        # =================== Get the data:
-        dfs = []
-        for d in input_data:
-            dfs.append(util.query_influxdb(read_client, d[0], d[1], timeslice, False, approved='all'))
-        df_all = dfs[0]
-        for t in dfs[1:]:
-            df_all = pd.merge(df_all, t, how='left', on='time')
-        df_all = df_all.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB
+        for client in clients:
+            # =================== Get the data:
+            df = util.query_influxdb(client, measurement, '*', timeslice, False, approved='all')
+            df = df.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB
+            # print(df)
 
-        # =================== Processing to create the new data to be ingested:
-        MUNKHOLMEN_LATITUDE = 63.456314
-        df_all['density'] = seawater.eos80.dens0(df_all['salinity'], df_all['temperature'])
-        df_all['depth'] = seawater.eos80.dpth(df_all['pressure'], MUNKHOLMEN_LATITUDE)
-        print(df_all.head(1))
+            # =================== Change approval tags:
+            # You can of course write your custom logic here
+            df['approved'] = 'yes'
+            # print(df)
 
-        # =================== Now actually ingest the data:
-        tag_values = {'tag_sensor': 'ctd',
-                      'tag_edge_device': 'munkholmen_topside_pi',
-                      'tag_platform': 'munkholmen',
-                      'tag_data_level': 'processed',
-                      'tag_approved': 'no',
-                      'tag_unit': 'none'}
+            # =================== Delete the data and reupload:
+            df = util.retag_tag_cols(df, util.query_show_tag_keys(client, measurement))
+            df.to_csv(os.path.join(config.output_dir, 'df_backup.csv'), index=True)
+            # Deleting:
+            _ = client.query(f"DELETE FROM {measurement} WHERE {timeslice}")
+            print('Deleted data...')
+            ingest.ingest_df(measurement, df, [client])
+            print('Data written :)')
 
-        # ------------------------------------------------------------ #
-        measurement_name = 'ctd_depth_munkholmen'
-        field_keys = {"depth": 'depth'}
-        tag_values['tag_unit'] = 'metres'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
-
-        # ------------------------------------------------------------ #
-        measurement_name = 'ctd_density_munkholmen'
-        field_keys = {"density": 'density'}
-        tag_values['tag_unit'] = 'kilograms_per_cubic_metre'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
-
-        print(f"Finished ingesting timeslice {timeslice} at "
+        print("Finished all at "
               + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
-    print("Finished all at "
-          + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 
 if __name__ == "__main__":

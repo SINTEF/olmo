@@ -43,13 +43,15 @@ def main():
     total_time_delta = end_time_ - start_time_
     periods = []
     # Assuming breaking down into days:
-    for d in range(total_time_delta.days):
+    d = 0
+    while d < total_time_delta.days:
         periods.append((
             (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ')))
+        d += 1
     if total_time_delta.seconds > 0:
         periods.append((
-            (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
 
     for p in periods:

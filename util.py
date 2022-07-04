@@ -100,7 +100,7 @@ def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=Fals
         for col in df.columns:
             if col in float_cols:
                 if error_to_nan:
-                    df[col] = df[col].apply(pd.to_numeric, errors='coerce')
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
                 else:
                     df[col] = df[col].astype(np.float64)
         return df
@@ -109,7 +109,7 @@ def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=Fals
         for col in df.columns:
             if col not in not_float_cols:
                 if error_to_nan:
-                    df[col] = df[col].apply(pd.to_numeric, errors='coerce')
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
                 else:
                     df[col] = df[col].astype(np.float64)
         return df

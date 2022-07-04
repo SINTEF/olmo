@@ -38,7 +38,7 @@ class CTD(sensor.Sensor):
             df_all = pd.read_csv(f, sep=',')
 
             time_col = 'Timestamp'
-            df_all = util.force_float_cols(df_all, not_float_cols=[time_col])
+            df_all = util.force_float_cols(df_all, not_float_cols=[time_col], error_to_nan=True)
             df_all[time_col] = pd.to_datetime(df_all[time_col], format='%Y-%m-%d %H:%M:%S')
             df_all = df_all.set_index(time_col).tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 

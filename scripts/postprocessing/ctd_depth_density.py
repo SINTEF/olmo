@@ -12,9 +12,6 @@ import util
 # File to take data from some tables, process it and put that
 # processed data into a new table.
 
-
-# ---- Get input data:
-
 # Databases:
 admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 read_client = InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
@@ -23,21 +20,16 @@ write_clients = [
     InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
 ]
 
-# Input data:
+# List of measurements and variables which will be retrieved from
+# influx from which the processed data should be collected.
 input_data = [
     ['ctd_salinity_munkholmen', 'salinity'],
     ['ctd_temperature_munkholmen', 'temperature'],
     ['ctd_pressure_munkholmen', 'pressure'],
 ]
-# Time period - can be problematic if defined using a 'now()':
-# now = datetime.datetime.now()
-# timeslice = "time > now() - 4h"
-# timeslice = "time > '2022-06-27T10:00:00Z' AND time < '2022-06-30T15:00:00Z'"
+# Time period:
 start_time = '2022-06-01T00:00:00Z'
 end_time = '2022-06-30T15:00:00Z'
-
-# result = read_client.query(f'''SELECT pressure, sensor FROM "ctd_pressure_munkholmen" WHERE {timeslice} LIMIT 4''')
-# print(result)
 
 
 def main():
@@ -51,13 +43,15 @@ def main():
     total_time_delta = end_time_ - start_time_
     periods = []
     # Assuming breaking down into days:
-    for d in range(total_time_delta.days):
+    d = 0
+    while d < total_time_delta.days:
         periods.append((
             (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ')))
+        d += 1
     if total_time_delta.seconds > 0:
         periods.append((
-            (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
 
     for p in periods:

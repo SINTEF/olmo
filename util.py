@@ -188,6 +188,37 @@ def query_influxdb(client, measurement, variable, timeslice, downsample, approve
     return df
 
 
+def query_show_field_keys(client, measurement):
+    result = client.query(f"SHOW FIELD KEYS FROM {measurement}")
+    results = []
+    for r in result:
+        results.append(r)
+    assert len(results) == 1, "I believe this result should should always have len 1."
+    field_keys = []
+    field_key_types = []
+    for dictionary in results[0]:
+        field_keys.append(dictionary['fieldKey'])
+        field_key_types.append(dictionary['fieldType'])
+    return field_keys, field_key_types
+
+
+def query_show_tag_keys(client, measurement):
+    result = client.query(f"SHOW TAG KEYS FROM {measurement}")
+    results = []
+    for r in result:
+        results.append(r)
+    assert len(results) == 1, "I believe this result should should always have len 1."
+    tag_keys = []
+    for dictionary in results[0]:
+        tag_keys.append(dictionary['tagKey'])
+    return tag_keys
+
+
+def retag_tag_cols(df, tag_cols):
+    rename = {c: f"tag_{c}" for c in tag_cols}
+    return df.rename(columns=rename)
+
+
 def add_tags(df, tag_values):
     '''Adds tags to a dataframe. tag_values needs be a correct dict.'''
     for (k, v) in tag_values.items():

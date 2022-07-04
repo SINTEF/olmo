@@ -93,19 +93,25 @@ def get_files_list(ls_string, pattern, drop_recent=1):
         return files[:-drop_recent]
 
 
-def force_float_cols(df, float_cols=None, not_float_cols=None):
+def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=False):
     '''Avoid problem where float cols give error if they "round to zero"'''
     if float_cols is not None:
         assert not_float_cols is None, "Only one col list should be given"
         for col in df.columns:
             if col in float_cols:
-                df[col] = df[col].astype(np.float64)
+                if error_to_nan:
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
+                else:
+                    df[col] = df[col].astype(np.float64)
         return df
     elif not_float_cols is not None:
         assert float_cols is None, "Only one col list should be given"
         for col in df.columns:
             if col not in not_float_cols:
-                df[col] = df[col].astype(np.float64)
+                if error_to_nan:
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
+                else:
+                    df[col] = df[col].astype(np.float64)
         return df
     else:
         raise ValueError("'float_cols', or 'not_float_cols' should be a list of cols.")

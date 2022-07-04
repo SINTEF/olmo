@@ -38,7 +38,7 @@ class CTD(sensor.Sensor):
             df_all = pd.read_csv(f, sep=',')
 
             time_col = 'Timestamp'
-            df_all = util.force_float_cols(df_all, not_float_cols=[time_col])
+            df_all = util.force_float_cols(df_all, not_float_cols=[time_col], error_to_nan=True)
             df_all[time_col] = pd.to_datetime(df_all[time_col], format='%Y-%m-%d %H:%M:%S')
             df_all = df_all.set_index(time_col).tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
@@ -114,6 +114,8 @@ class CTD(sensor.Sensor):
             tag_values['tag_data_level'] = 'processed'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            logger.info(f'File {f} ingested.')
 
     def rsync_and_ingest(self):
 

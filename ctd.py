@@ -115,6 +115,8 @@ class CTD(sensor.Sensor):
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
 
+            logger.info(f'File {f} ingested.')
+
     def rsync_and_ingest(self):
 
         files = self.rsync()

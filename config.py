@@ -36,6 +36,7 @@ loggernet_files_basenames = [
     "CR6_EOL2p0_Current_",  # intr.: signature_100
     "CR6_EOL2p0_Wave_sensor_",  # instr.: seaview
     # "CR6_EOL2p0_Winch_log_",  # none
+    "IngdalenCR6_victron_",
     "IngdalenCR6_SUNA_",
     "IngdalenCR6_System_",
     "IngdalenCR6_signatureRecord_",

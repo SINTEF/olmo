@@ -540,36 +540,75 @@ def ingest_loggernet_file(file_path, file_type, clients):
         df = util.filter_and_tag_df(df_all, field_keys, tag_values)
         ingest.ingest_df(measurement_name, df, clients)
 
-    # # ==================================================================== #
-    # if file_type == 'IngdalenCR6_victron_':
+    # ==================================================================== #
+    if file_type == 'IngdalenCR6_victron_':
 
-    #     # I believe we shouldn't ingest this file. Here is sample data:
-    #     # "TMSTAMP","RECNBR","victron_Device","victron_SER","victron_FW","victron_BattVolts","victron_ChargeCurr","victron_PanelVolts","victron_PanelPower","victron_State","victron_ERR"
-    #     # "2022-05-31 06:30:00",346,"BlueSolar MPPT 100|30 rev2","HQ2102P4VGZ ",147,12.53,7.4,19.84,96,"Bulk Charging","Device OK"
+        # "TMSTAMP","RECNBR","victron_Device","victron_SER","victron_FW","victron_BattVolts","victron_ChargeCurr","victron_PanelVolts","victron_PanelPower","victron_State","victron_ERR"
+        # "2022-05-31 06:30:00",346,"BlueSolar MPPT 100|30 rev2","HQ2102P4VGZ ",147,12.53,7.4,19.84,96,"Bulk Charging","Device OK"
 
-    #     data_cols = [
-    #         "victron_Device", "victron_SER", "victron_FW", "victron_BattVolts",
-    #         "victron_ChargeCurr", "victron_PanelVolts", "victron_PanelPower",
-    #         "victron_State", "victron_ERR"
-    #     ]
-    #     float_cols = [c for c in data_cols if c not in ['victron_Device', 'victron_SER', "victron_State", "victron_ERR"]]
-    #     df_all = load_data(file_path, data_cols, float_cols, timezone='UTC')
+        data_cols = [
+            "victron_Device", "victron_SER", "victron_FW", "victron_BattVolts",
+            "victron_ChargeCurr", "victron_PanelVolts", "victron_PanelPower",
+            "victron_State", "victron_ERR"
+        ]
+        float_cols = [c for c in data_cols if c not in ['victron_Device', 'victron_SER', "victron_State", "victron_ERR"]]
+        df_all = load_data(file_path, data_cols, float_cols, timezone='UTC')
 
-    #     # Set a 'default' set of tags for this file:
-    #     tag_values = {
-    #         'tag_sensor': 'none',
-    #         'tag_edge_device': 'cr6_ingdalen',
-    #         'tag_platform': 'ingdalen',
-    #         'tag_data_level': 'raw',
-    #         'tag_approved': 'none',
-    #         'tag_unit': 'none'}
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_edge_device': 'cr6_ingdalen',
+            'tag_platform': 'ingdalen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
 
-    #     # ---------------------------------------------------------------- #
-    #     measurement_name = 'victron_device'
-    #     field_keys = {"systemTemperature": 'system_temperature'}
-    #     tag_values['tag_unit'] = 'degrees'
-    #     df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-    #     ingest.ingest_df(measurement_name, df, clients)
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_fw_ingdalen'
+        field_keys = {"victron_Device": 'tag_sensor',
+                      "victron_SER": 'tag_serial',
+                      "victron_FW": 'fw'}
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # The below three vars (victron_BattVolts, victron_PanelVolts, victron_ChargeCurr)
+        # are also included in the system table.
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'victron_voltages_ingdalen'
+        # field_keys = {"victron_Device": 'tag_sensor',
+        #               "victron_SER": 'tag_serial',
+        #               "victron_BattVolts": 'battery_voltage',
+        #               "victron_PanelVolts": 'panel_voltage'}
+        # tag_values['tag_unit'] = 'volts'
+        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
+
+        # # ---------------------------------------------------------------- #
+        # measurement_name = 'victron_charge_current_ingdalen'
+        # field_keys = {"victron_Device": 'tag_sensor',
+        #               "victron_SER": 'tag_serial',
+        #               "victron_ChargeCurr": 'charge_current'}
+        # tag_values['tag_unit'] = 'amperes'
+        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        # ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_panel_power_ingdalen'
+        field_keys = {"victron_Device": 'tag_sensor',
+                      "victron_SER": 'tag_serial',
+                      "victron_PanelPower": 'panel_power'}
+        tag_values['tag_unit'] = 'none'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'victron_messages_ingdalen'
+        field_keys = {"victron_Device": 'tag_sensor',
+                      "victron_SER": 'tag_serial',
+                      "victron_State": 'state',
+                      "victron_ERR": 'error'}
+        tag_values['tag_unit'] = 'none'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_SUNA_':
@@ -806,13 +845,6 @@ def ingest_loggernet_file(file_path, file_type, clients):
             'tag_data_level': 'raw',
             'tag_approved': 'none',
             'tag_unit': 'none'}
-
-        # # ---------------------------------------------------------------- #
-        # measurement_name = 'seabird_meta_data_ingdalen'
-        # field_keys = {"seabirdDevice": 'tag_sensor',
-        #               "seabirdSerial": 'tag_serial'}
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_battery_ingdalen'

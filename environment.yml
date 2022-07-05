@@ -2,6 +2,7 @@ name: olmo
 channels:
     - conda-forge
 dependencies:
+    - cryptography=36.0.2  # Requirement of paramiko, bugged at higher versions
     - flake8
     - python=3.9
     - jupyter=1.0
@@ -15,6 +16,7 @@ dependencies:
     - psycopg2-binary=2.9.3  # Node2. They use 2.8.6
     - pytest=6.2.4
     - scipy=1.6.3
+    - seawater=3.3.4
     - sqlalchemy=1.4.27  # Node2
     - xarray=0.18.2
     - pip:

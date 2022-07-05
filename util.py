@@ -1,9 +1,11 @@
 import os
 import re
+import subprocess
 import logging
 import datetime
 import paramiko
 import numpy as np
+import pandas as pd
 
 import config
 
@@ -91,19 +93,25 @@ def get_files_list(ls_string, pattern, drop_recent=1):
         return files[:-drop_recent]
 
 
-def force_float_cols(df, float_cols=None, not_float_cols=None):
+def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=False):
     '''Avoid problem where float cols give error if they "round to zero"'''
     if float_cols is not None:
         assert not_float_cols is None, "Only one col list should be given"
         for col in df.columns:
             if col in float_cols:
-                df[col] = df[col].astype(np.float64)
+                if error_to_nan:
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
+                else:
+                    df[col] = df[col].astype(np.float64)
         return df
     elif not_float_cols is not None:
         assert float_cols is None, "Only one col list should be given"
         for col in df.columns:
             if col not in not_float_cols:
-                df[col] = df[col].astype(np.float64)
+                if error_to_nan:
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
+                else:
+                    df[col] = df[col].astype(np.float64)
         return df
     else:
         raise ValueError("'float_cols', or 'not_float_cols' should be a list of cols.")
@@ -139,6 +147,112 @@ def init_logger(logfile, name='olmo'):
     logger.addHandler(fh)
 
     return logger
+
+
+def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
+
+    if approved == 'all':
+        approved_text = ''
+    else:
+        approved_text = f'''AND "approved" = '{approved}' '''
+
+    if variable == '*':
+        variable_text = '*'
+        df = pd.DataFrame(columns=['time'])
+    elif isinstance(variable, list):
+        variable_text = ", ".join(variable)
+        df = pd.DataFrame(columns=variable.insert(0, 'time'))
+    else:
+        variable_text = f'"{variable}"'
+        df = pd.DataFrame(columns=['time', variable])
+
+    if downsample:
+        q = f'''SELECT mean({variable_text}) AS "{variable}" FROM "{measurement}" WHERE {timeslice} {approved_text}GROUP BY {downsample}'''
+    else:
+        q = f'''SELECT {variable_text} FROM "{measurement}" WHERE {timeslice} {approved_text}'''
+
+    result = client.query(q)
+    for table in result:
+        # Not sure this works if there are multiple tables.
+        col_names = [k for k in table[0].keys()]
+        col_vals = [[] for _ in col_names]
+        for pt in table:
+            for i, v in enumerate(pt.values()):
+                col_vals[i].append(v)
+        df = pd.DataFrame.from_dict({col_names[i]: col_vals[i] for i in range(len(col_names))})
+    try:
+        df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
+    except ValueError:
+        df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%S.%fZ')
+    df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
+    return df
+
+
+def query_show_field_keys(client, measurement):
+    result = client.query(f"SHOW FIELD KEYS FROM {measurement}")
+    results = []
+    for r in result:
+        results.append(r)
+    assert len(results) == 1, "I believe this result should should always have len 1."
+    field_keys = []
+    field_key_types = []
+    for dictionary in results[0]:
+        field_keys.append(dictionary['fieldKey'])
+        field_key_types.append(dictionary['fieldType'])
+    return field_keys, field_key_types
+
+
+def query_show_tag_keys(client, measurement):
+    result = client.query(f"SHOW TAG KEYS FROM {measurement}")
+    results = []
+    for r in result:
+        results.append(r)
+    assert len(results) == 1, "I believe this result should should always have len 1."
+    tag_keys = []
+    for dictionary in results[0]:
+        tag_keys.append(dictionary['tagKey'])
+    return tag_keys
+
+
+def retag_tag_cols(df, tag_cols):
+    rename = {c: f"tag_{c}" for c in tag_cols}
+    return df.rename(columns=rename)
+
+
+def add_tags(df, tag_values):
+    '''Adds tags to a dataframe. tag_values needs be a correct dict.'''
+    for (k, v) in tag_values.items():
+        df[k] = v
+    return df
+
+
+def filter_and_tag_df(df_all, field_keys, tag_values):
+    '''Returns a df with tag_values and field_key values'''
+    df = df_all.loc[:, [k for k in field_keys.keys()]]
+    df = df.rename(columns=field_keys)
+    df = add_tags(df, tag_values)
+    return df
+
+
+def upload_file(local_file, az_file, container, content_type='text/html', overwrite=True):
+
+    with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
+        aztoken = f.read()
+    process = subprocess.Popen([
+        'az', 'storage', 'fs', 'file', 'upload',
+        '--source', local_file, '-p', az_file,
+        '-f', container, '--account-name', 'oceanlabdlstorage', '--overwrite',
+        '--content-type', content_type,
+        '--sas-token', aztoken[:-1]],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate(timeout=600)
+    # logger.info("STDOUT from 'az file upload':\n" + stdout.decode(errors="ignore"))
+    if process.returncode != 0:
+        # logger.error("az file upload failed. stderr:\n" + stderr.decode(errors="ignore"))
+        print("we got an error")
+        raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
+    # logger.info('Backup, archive and transfer to azure completed successfully.')
 
 
 # Currently not sure if I need this, so ignoring for now.

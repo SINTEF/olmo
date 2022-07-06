@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 import pandas as pd
 
 import util
@@ -1374,4 +1375,82 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "CFluor_Serial": 'tag_serial',
                       "CFluor_CDOM": 'cflour_cdom'}
         df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+    # ==================================================================== #
+    if file_type == 'IngdalenCR6_signatureCurrentProf_':
+
+        data_cols = [
+            "signatureCellDistProfile",
+            "signatureVelocityProfile(1)", "signatureVelocityProfile(2)", "signatureVelocityProfile(3)", "signatureVelocityProfile(4)",
+            "signatureAmplitudeProfile(1)", "signatureAmplitudeProfile(2)", "signatureAmplitudeProfile(3)", "signatureAmplitudeProfile(4)",
+            "signatureCorrelationProfile(1)", "signatureCorrelationProfile(2)", "signatureCorrelationProfile(3)", "signatureCorrelationProfile(4)"
+        ]
+        float_cols = data_cols
+        # This file will now be "2D" with many rows, each being a different depth. Note also
+        # this can't ever contain more than one time point.
+        df_all = load_data(file_path, data_cols, float_cols, timezone='UTC')
+        n_bins = df_all.shape[0]
+        idx = df_all.index[0]  # All vals assumed to be the same.
+
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'signature_100',
+            'tag_edge_device': 'cr6_ingdalen',
+            'tag_platform': 'ingdalen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_depth_ingdalen'
+        cols = []
+        for i in range(n_bins):
+            cols.append('depth_' + str(i).zfill(3))
+        data = df_all.loc[:, 'signatureCellDistProfile'].values.reshape((1, n_bins))
+        df = pd.DataFrame(data=data, index=[idx], columns=cols)
+        tag_values['tag_unit'] = 'metres'
+        df = util.add_tags(df, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_velocity_ingdalen'
+        cols = []
+        data = np.zeros((1, n_bins * 4))
+        for i in range(4):
+            for j in range(n_bins):
+                cols.append(f'velocity{i + 1}_' + str(j).zfill(3))
+        for i in range(4):
+            data[0, i * n_bins: (i + 1) * n_bins] = df_all.loc[:, f'signatureVelocityProfile({i + 1})'].values.reshape((1, n_bins))
+        df = pd.DataFrame(data=data, index=[idx], columns=cols)
+        tag_values['tag_unit'] = 'metres_per_second'
+        df = util.add_tags(df, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_amplitude_ingdalen'
+        cols = []
+        data = np.zeros((1, n_bins * 4))
+        for i in range(4):
+            for j in range(n_bins):
+                cols.append(f'amplitude{i + 1}_' + str(j).zfill(3))
+        for i in range(4):
+            data[0, i * n_bins: (i + 1) * n_bins] = df_all.loc[:, f'signatureAmplitudeProfile({i + 1})'].values.reshape((1, n_bins))
+        df = pd.DataFrame(data=data, index=[idx], columns=cols)
+        tag_values['tag_unit'] = 'none'
+        df = util.add_tags(df, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'signature_100_correlation_ingdalen'
+        cols = []
+        data = np.zeros((1, n_bins * 4))
+        for i in range(4):
+            for j in range(n_bins):
+                cols.append(f'correlation{i + 1}_' + str(j).zfill(3))
+        for i in range(4):
+            data[0, i * n_bins: (i + 1) * n_bins] = df_all.loc[:, f'signatureCorrelationProfile({i + 1})'].values.reshape((1, n_bins))
+        df = pd.DataFrame(data=data, index=[idx], columns=cols)
+        tag_values['tag_unit'] = 'none'
+        df = util.add_tags(df, tag_values)
         ingest.ingest_df(measurement_name, df, clients)

@@ -75,7 +75,8 @@ class CTD(sensor.Sensor):
 
             # -------------drop----------------------------------------------- #
             measurement_name = 'ctd_sbe63_munkholmen'
-            field_keys = {"SBE63": 'sbe63'}
+            field_keys = {"SBE63": 'sbe63',
+                          "SBE63Temperature": 'sbe63_temperature_voltage'}
             tag_values['tag_unit'] = 'none'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
@@ -92,7 +93,6 @@ class CTD(sensor.Sensor):
             field_keys = {"Volt0": 'volt0',
                           "Volt1": 'volt1',
                           "Volt2": 'volt2',
-                          "Volt3": 'volt3',
                           "Volt4": 'volt4',
                           "Volt5": 'volt5'}
             tag_values['tag_unit'] = 'none'

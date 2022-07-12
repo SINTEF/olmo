@@ -333,17 +333,18 @@ def make_velocity_plots(days=2, upload_to_az=True):
             plt.title(f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
         set_plots()
 
-    plt.savefig(
-        os.path.join(config.output_dir, 'ADCP_Velocity_' + str(days) + '.png'),
-        dpi=300, bbox_inches='tight', transparent=False)
+    fig_filename = os.path.join(config.output_dir, 'ADCP_Velocity_' + str(days) + '.png')
+    plt.savefig(fig_filename, dpi=300, bbox_inches='tight', transparent=False)
+    az_file = 'adcp/' + os.path.split(fig_filename)[-1]
+    util.upload_file(fig_filename, az_file, '$web', content_type='image/png', overwrite=True)
     warnings.filterwarnings('always')
 
-    if upload_to_az:
-        for f in ['ADCP_Velocity.png']:
-            az_file = 'adcp/' + f
-            if upload_to_az:
-                util.upload_file(os.path.join(config.output_dir, f), az_file, '$web',
-                                 content_type='image/png', overwrite=True)
+    #if upload_to_az:
+    #   for f in ['ADCP_Velocity.png']:
+    #       az_file = 'adcp/' + f
+    #       if upload_to_az:
+    #           util.upload_file(os.path.join(config.output_dir, f), az_file, '$web',
+    #                            content_type='image/png', overwrite=True)
 
 
 def main():

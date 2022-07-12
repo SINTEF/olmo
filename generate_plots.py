@@ -146,7 +146,7 @@ def query_influx_table(measurement, timespan):
     return pd.DataFrame(data=vals, index=times, columns=var_names)
 
 
-def make_adcp_plots(upload_to_az=True):
+def make_adcp_plots_all(upload_to_az=True):
 
     n_bins = 28
     n_beams = 4
@@ -250,6 +250,82 @@ def make_adcp_plots(upload_to_az=True):
         plt.sca(a[i])
         plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest", vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
         
+        plt.title(f'Velocity {i + 1}' + titlestr[i])
+        set_plots()
+
+    plt.savefig(
+        os.path.join(config.output_dir, 'ADCP_Velocity.png'),
+        dpi=300, bbox_inches='tight', transparent=False)
+    warnings.filterwarnings('always')
+
+    if upload_to_az:
+        for f in ['ADCP_Amplitude.png', 'ADCP_Correlation.png', 'ADCP_Velocity.png']:
+            az_file = 'adcp/' + f
+            if upload_to_az:
+                util.upload_file(os.path.join(config.output_dir, f), az_file, '$web', overwrite=True)
+
+
+def make_adcp_plots(upload_to_az=True):
+
+    n_bins = 28
+    n_beams = 4
+    blanking = 2
+    cell_size = 3
+    start_time = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    stop_time = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    time_range = f'start: {start_time}, stop: {stop_time}'
+    # print(time_range)
+
+    # Get the data and put into arrays:
+    # data arrays have shape: [time, bins, beams]
+    df = query_influx_table('signature_100_velocity_munkholmen', time_range)
+    times, velocity = adcp_raw_data_to_array(df, n_bins, n_beams)
+
+    # for a in [velocity]:
+    #    a[a == -7999] = np.nan
+    velocity[velocity == -32.77] = np.nan
+
+    def add_remove_by_index(idx, df):
+        '''Sets nans, or removes values such that df.index is the same as idx'''
+        for i in np.setdiff1d(idx, df.index):
+            df.loc[i, :] = np.nan
+        df.drop(np.setdiff1d(df.index, idx), axis=0, inplace=True)
+        return df
+    df_pressure = query_influx_table('signature_100_pressure_munkholmen', time_range)
+    # Make sure that the pressure values are present at ever point where we have data values.
+    df_pressure = add_remove_by_index(df.index, df_pressure)
+
+    offset = np.outer(df_pressure['pressure'].values, np.ones(n_bins))
+    bin_num_matrix = np.outer(np.ones(times.shape[0]), np.arange(0, velocity.shape[1]))
+    # depths is of shape [times, bin_number]
+    depths = offset + blanking + (cell_size / 2) + bin_num_matrix * cell_size
+
+    f, a = plt.subplots(2, 2, figsize=(20, 20), facecolor='white')
+    a = a.flatten()
+
+    VMAX = 0.2
+    YLIM = (86, 0)
+
+    times_mat = np.tile(times, [n_bins, 1]).T
+
+    # Turn off warnings for plotting becaeuse...
+    warnings.filterwarnings('ignore')
+
+    f, a = plt.subplots(2, 2, figsize=(20, 20), facecolor='white')
+    a = a.flatten()
+
+    def set_plots():
+        plt.colorbar()
+        plt.gca().invert_yaxis()
+        plt.xticks(rotation=90)
+        plt.ylim(YLIM)
+        plt.ylabel('Depth (m)')
+        plt.plot(times_mat, offset, 'k', linewidth=1)
+
+    titlestr = ['North', 'East', 'Up', 'Up']
+    for i in range(4):
+        plt.sca(a[i])
+        plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest", vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
         plt.title(f'Velocity {i + 1}' + titlestr[i])
         set_plots()
 

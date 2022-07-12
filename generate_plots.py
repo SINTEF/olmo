@@ -265,13 +265,13 @@ def make_adcp_plots_all(upload_to_az=True):
                 util.upload_file(os.path.join(config.output_dir, f), az_file, '$web', overwrite=True)
 
 
-def make_adcp_plots(upload_to_az=True):
+def make_velocity_plots(days=2, upload_to_az=True):
 
     n_bins = 28
     n_beams = 4
     blanking = 2
     cell_size = 3
-    start_time = (datetime.datetime.now() - datetime.timedelta(days=5)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    start_time = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime('%Y-%m-%dT%H:%M:%SZ')
     stop_time = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
     time_range = f'start: {start_time}, stop: {stop_time}'
     # print(time_range)
@@ -334,7 +334,7 @@ def make_adcp_plots(upload_to_az=True):
         set_plots()
 
     plt.savefig(
-        os.path.join(config.output_dir, 'ADCP_Velocity.png'),
+        os.path.join(config.output_dir, 'ADCP_Velocity_' + str(days) + '.png'),
         dpi=300, bbox_inches='tight', transparent=False)
     warnings.filterwarnings('always')
 
@@ -352,7 +352,8 @@ def main():
 
     make_weather_plots()
 
-    make_adcp_plots()
+    make_velocity_plots(days=2)
+    make_velocity_plots(days=7)
 
 
 if __name__ == "__main__":

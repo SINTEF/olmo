@@ -146,7 +146,7 @@ def query_influx_table(measurement, timespan):
     return pd.DataFrame(data=vals, index=times, columns=var_names)
 
 
-def make_adcp_plots(upload_to_az=True):
+def make_adcp_plots_all(upload_to_az=True):
 
     n_bins = 28
     n_beams = 4
@@ -265,13 +265,87 @@ def make_adcp_plots(upload_to_az=True):
                 util.upload_file(os.path.join(config.output_dir, f), az_file, '$web', overwrite=True)
 
 
+def make_velocity_plots(days=2, upload_to_az=True):
+
+    n_bins = 28
+    n_beams = 4
+    blanking = 2
+    cell_size = 3
+    start_time = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    stop_time = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+    time_range = f'start: {start_time}, stop: {stop_time}'
+    # print(time_range)
+
+    # Get the data and put into arrays:
+    # data arrays have shape: [time, bins, beams]
+    df = query_influx_table('signature_100_velocity_munkholmen', time_range)
+    times, velocity = adcp_raw_data_to_array(df, n_bins, n_beams)
+
+    velocity[velocity == -32.77] = np.nan
+
+    def add_remove_by_index(idx, df):
+        '''Sets nans, or removes values such that df.index is the same as idx'''
+        for i in np.setdiff1d(idx, df.index):
+            df.loc[i, :] = np.nan
+        df.drop(np.setdiff1d(df.index, idx), axis=0, inplace=True)
+        return df
+    df_pressure = query_influx_table('signature_100_pressure_munkholmen', time_range)
+    # Make sure that the pressure values are present at ever point where we have data values.
+    df_pressure = add_remove_by_index(df.index, df_pressure)
+
+    offset = np.outer(df_pressure['pressure'].values, np.ones(n_bins))
+    bin_num_matrix = np.outer(np.ones(times.shape[0]), np.arange(0, velocity.shape[1]))
+    # depths is of shape [times, bin_number]
+    depths = offset + blanking + (cell_size / 2) + bin_num_matrix * cell_size
+
+    VMAX = 0.2
+    YLIM = (86, 0)
+
+    times_mat = np.tile(times, [n_bins, 1]).T
+
+    plt.style.use('dark_background')
+
+    # Turn off warnings for plotting becaeuse...
+    warnings.filterwarnings('ignore')
+
+    f, a = plt.subplots(2, 2, figsize=(20, 20), facecolor='white')
+    a = a.flatten()
+
+    def set_plots():
+        cb = plt.colorbar()
+        cb.ax.set_ylabel('Velocity (m/s)')
+        plt.gca().invert_yaxis()
+        plt.xticks(rotation=90)
+        plt.ylim(YLIM)
+        plt.ylabel('Depth (m)')
+        plt.plot(times_mat, offset, 'w', linewidth=1)
+
+    titlestr = ['Northward', 'Eastward', 'Upward', 'Upward']
+    for i in range(4):
+        plt.sca(a[i])
+        plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest",
+                   vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
+        if i == 0:
+            plt.title(str(days) + ' days\n' + 'Figure updated at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' (local time, Trondheim)\n' + f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
+        else:
+            plt.title(f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
+        set_plots()
+
+    fig_filename = os.path.join(config.output_dir, 'ADCP_Velocity_' + str(days) + '.png')
+    plt.savefig(fig_filename, dpi=300, bbox_inches='tight', transparent=False)
+    az_file = 'adcp/' + os.path.split(fig_filename)[-1]
+    util.upload_file(fig_filename, az_file, '$web', content_type='image/png', overwrite=True)
+    warnings.filterwarnings('always')
+
+
 def main():
     print("Starting running generate_plots.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     make_weather_plots()
 
-    make_adcp_plots()
+    make_velocity_plots(days=2)
+    make_velocity_plots(days=7)
 
 
 if __name__ == "__main__":

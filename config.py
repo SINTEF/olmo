@@ -49,6 +49,7 @@ loggernet_files_basenames = [
     "IngdalenCR6_GPSData_",
     "IngdalenCR6_Debug_",
     "IngdalenCR6_CFluor_",
+    "IngdalenCR6_Wave_",
 ]
 loggernet_logfile = "log_loggernet_ingest_"
 logpc_ssh_max_attempts = 3

@@ -1378,6 +1378,64 @@ def ingest_loggernet_file(file_path, file_type, clients):
         ingest.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
+    if file_type == 'IngdalenCR6_Wave_':
+
+        data_cols = [
+            "Hs", "DominantPeriodFW", "WaveDirectionFW", "MeanWaveDirection", "Hmax", "PavgTE", "maxAccX", "maxAccY", "maxAccZ"
+        ]
+        float_cols = data_cols
+        df_all = load_data(
+            file_path, data_cols, float_cols, timezone='UTC')
+
+        # Set a 'default' set of tags for this file:
+        tag_values = {
+            'tag_sensor': 'ingdalen_wave_sensor',
+            'tag_edge_device': 'cr6_ingdalen',
+            'tag_platform': 'ingdalen',
+            'tag_data_level': 'raw',
+            'tag_approved': 'none',
+            'tag_unit': 'none'}
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_hs_ingdalen'
+        field_keys = {"Hs": 'hs'}
+        tag_values['tag_unit'] = 'metres'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_hmax_ingdalen'
+        field_keys = {"Hmax": 'hmax'}
+        tag_values['tag_unit'] = 'metres'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_period_ingdalen'
+        field_keys = {"DominantPeriodFW": 'dominant_period_fw',
+                      "PavgTE": 'p_avg_te'}
+        tag_values['tag_unit'] = 'seconds'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_direction_ingdalen'
+        field_keys = {"WaveDirectionFW": 'wave_direction_fw',
+                      "MeanWaveDirection": 'mean_wave_direction'}
+        tag_values['tag_unit'] = 'degrees'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+        # ---------------------------------------------------------------- #
+        measurement_name = 'wave_acceleration_ingdalen'
+        field_keys = {"maxAccX": 'max_acc_x',
+                      "maxAccY": 'max_acc_y',
+                      "maxAccZ": 'max_acc_z'}
+        tag_values['tag_unit'] = 'none'
+        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, clients)
+
+    # ==================================================================== #
     if file_type == 'IngdalenCR6_signatureCurrentProf_':
 
         data_cols = [

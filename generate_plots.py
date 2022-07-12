@@ -281,8 +281,6 @@ def make_velocity_plots(days=2, upload_to_az=True):
     df = query_influx_table('signature_100_velocity_munkholmen', time_range)
     times, velocity = adcp_raw_data_to_array(df, n_bins, n_beams)
 
-    # for a in [velocity]:
-    #    a[a == -7999] = np.nan
     velocity[velocity == -32.77] = np.nan
 
     def add_remove_by_index(idx, df):
@@ -328,7 +326,7 @@ def make_velocity_plots(days=2, upload_to_az=True):
         plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest",
                    vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
         if i == 0:
-            plt.title('Figure updated at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' (local time, Trondheim)\n' + f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
+            plt.title(str(days) + ' days\n' + 'Figure updated at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' (local time, Trondheim)\n' + f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
         else:
             plt.title(f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
         set_plots()
@@ -338,13 +336,6 @@ def make_velocity_plots(days=2, upload_to_az=True):
     az_file = 'adcp/' + os.path.split(fig_filename)[-1]
     util.upload_file(fig_filename, az_file, '$web', content_type='image/png', overwrite=True)
     warnings.filterwarnings('always')
-
-    #if upload_to_az:
-    #   for f in ['ADCP_Velocity.png']:
-    #       az_file = 'adcp/' + f
-    #       if upload_to_az:
-    #           util.upload_file(os.path.join(config.output_dir, f), az_file, '$web',
-    #                            content_type='image/png', overwrite=True)
 
 
 def main():

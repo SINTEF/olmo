@@ -245,10 +245,12 @@ def make_adcp_plots(upload_to_az=True):
         # plt.vlines(pd.to_datetime('2022-06-24 11:10:00'), 100, 0, 'g', linewidth=2)
         # plt.vlines(pd.to_datetime('2022-06-22 13:00:00'), 100, 0, 'g', linewidth=2)
 
+    titlestr = ['North', 'East', 'Up', 'Up']
     for i in range(4):
         plt.sca(a[i])
         plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest", vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
-        plt.title(f'Velocity {i + 1}')
+        
+        plt.title(f'Velocity {i + 1}' + titlestr[i])
         set_plots()
 
     plt.savefig(

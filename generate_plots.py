@@ -318,7 +318,7 @@ def make_velocity_plots(days=2, upload_to_az=True):
         plt.xticks(rotation=90)
         plt.ylim(YLIM)
         plt.ylabel('Depth (m)')
-        plt.plot(times_mat, offset, 'k', linewidth=1)
+        plt.plot(times_mat, offset, 'w', linewidth=1)
 
     titlestr = ['Northward', 'Eastward', 'Upward', 'Upward']
     for i in range(4):

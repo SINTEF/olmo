@@ -271,7 +271,7 @@ def make_adcp_plots(upload_to_az=True):
     n_beams = 4
     blanking = 2
     cell_size = 3
-    start_time = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    start_time = (datetime.datetime.now() - datetime.timedelta(days=5)).strftime('%Y-%m-%dT%H:%M:%SZ')
     stop_time = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
     time_range = f'start: {start_time}, stop: {stop_time}'
     # print(time_range)
@@ -300,13 +300,12 @@ def make_adcp_plots(upload_to_az=True):
     # depths is of shape [times, bin_number]
     depths = offset + blanking + (cell_size / 2) + bin_num_matrix * cell_size
 
-    f, a = plt.subplots(2, 2, figsize=(20, 20), facecolor='white')
-    a = a.flatten()
-
     VMAX = 0.2
     YLIM = (86, 0)
 
     times_mat = np.tile(times, [n_bins, 1]).T
+
+    plt.style.use('dark_background')
 
     # Turn off warnings for plotting becaeuse...
     warnings.filterwarnings('ignore')
@@ -315,18 +314,23 @@ def make_adcp_plots(upload_to_az=True):
     a = a.flatten()
 
     def set_plots():
-        plt.colorbar()
+        cb = plt.colorbar()
+        cb.ax.set_ylabel('Velocity (m/s)')
         plt.gca().invert_yaxis()
         plt.xticks(rotation=90)
         plt.ylim(YLIM)
         plt.ylabel('Depth (m)')
         plt.plot(times_mat, offset, 'k', linewidth=1)
 
-    titlestr = ['North', 'East', 'Up', 'Up']
+    titlestr = ['Northward', 'Eastward', 'Upward', 'Upward']
     for i in range(4):
         plt.sca(a[i])
-        plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest", vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
-        plt.title(f'Velocity {i + 1}' + titlestr[i])
+        plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest",
+                   vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
+        if i == 0:
+            plt.title('Figure updated at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' (local time, Trondheim)\n' + f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
+        else:
+            plt.title(f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
         set_plots()
 
     plt.savefig(
@@ -335,10 +339,11 @@ def make_adcp_plots(upload_to_az=True):
     warnings.filterwarnings('always')
 
     if upload_to_az:
-        for f in ['ADCP_Amplitude.png', 'ADCP_Correlation.png', 'ADCP_Velocity.png']:
+        for f in ['ADCP_Velocity.png']:
             az_file = 'adcp/' + f
             if upload_to_az:
-                util.upload_file(os.path.join(config.output_dir, f), az_file, '$web', overwrite=True)
+                util.upload_file(os.path.join(config.output_dir, f), az_file, '$web',
+                                 content_type='image/png', overwrite=True)
 
 
 def main():

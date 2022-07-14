@@ -25,7 +25,7 @@ def main():
     ]
 
     pi_status = MUNKHOLMEN_PI(influx_clients=clients)
-    pi_status.ingest_l0()
+    pi_status.rsync_and_ingest()
 
     # lisst = Lisst_200(influx_clients=clients)
     # lisst.rsync_and_ingest()

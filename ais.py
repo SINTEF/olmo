@@ -45,12 +45,10 @@ class AIS(sensor.Sensor):
     '''Class for rsyncing and ingesting the munkholmen ctd data.'''
     def __init__(
             self,
-            db_name='example',
             influx_clients=None):
 
         # Init the Sensor() class: Unused vars/levels are set to None.
         super(AIS, self).__init__()
-        self.db_name = db_name
         self.influx_clients = influx_clients
         self.mmsi_list = {'munkholmen': 992581014,
                           'ingdalen': 992581017,

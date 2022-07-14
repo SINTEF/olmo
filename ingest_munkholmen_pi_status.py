@@ -11,7 +11,7 @@ from munkholmen_pi_status import MUNKHOLMEN_PI
 
 def main():
 
-    print("Starting running ingest_ais.py at "
+    print("Starting running ingest_munkholmen_pi_status.py at "
           + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     logger = util.init_logger(config.main_logfile, name='ingest__munkholmen_pi_status')

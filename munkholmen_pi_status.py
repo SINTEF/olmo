@@ -51,7 +51,7 @@ class MUNKHOLMEN_PI(sensor.Sensor):
 
             # ------------------------------------------------------------ #
             measurement_name = 'pi_status_munkholmen'
-            field_keys = {"Temperature": 'temperature'}
+            field_keys = {"uptime_seconds": 'uptime_seconds'}
             tag_values['tag_unit'] = 'degrees_celcius'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             print(df)

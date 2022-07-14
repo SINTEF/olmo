@@ -51,8 +51,16 @@ class MUNKHOLMEN_PI(sensor.Sensor):
 
             # ------------------------------------------------------------ #
             measurement_name = 'pi_status_munkholmen'
-            field_keys = {"uptime_seconds": 'uptime_seconds'}
-            tag_values['tag_unit'] = 'degrees_celcius'
+            field_keys = {"uptime_seconds": 'uptime_seconds',
+                          "loadavg_1min": "loadavg_1min",
+                          "relay_0_1_status": "relay_0_1_status",
+                          "relay_0_2_status": "relay_0_2_status",
+                          "relay_0_3_status": "relay_0_3_status",
+                          "relay_0_4_status": "relay_0_4_status",
+                          "ready_ctd_files": "ready_ctd_files",
+                          "logging_ctd_files": "logging_ctd_files"
+                          }
+            tag_values['tag_unit'] = 'none'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             print(df)
             #ingest.ingest_df(measurement_name, df, self.influx_clients)

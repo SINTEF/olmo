@@ -25,7 +25,7 @@ def get_ais_df(mmsi):
     req = urllib.request.Request(url, None, hdr)
     with urllib.request.urlopen(req) as response:
         the_page = response.read()
-    soup = BeautifulSoup(the_page)
+    soup = BeautifulSoup(the_page, features="lxml")
 
     df = pd.DataFrame()
 

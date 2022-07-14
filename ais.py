@@ -56,28 +56,27 @@ class AIS(sensor.Sensor):
                           'ntnuflyer': 257012170
                           }
 
-    def ingest_l0(self, files):
+    def ingest_l0(self):
 
-        for f in files:
-            time_col = 'timestamp'
+        time_col = 'timestamp'
 
-            tag_values = {'tag_sensor': 'ais_web',
-                          'tag_edge_device': 'https://www.myshiptracking.com',
-                          'tag_data_level': 'raw',
-                          'tag_approved': 'no',
-                          'tag_unit': 'degrees'}
+        tag_values = {'tag_sensor': 'ais_web',
+                        'tag_edge_device': 'https://www.myshiptracking.com',
+                        'tag_data_level': 'raw',
+                        'tag_approved': 'no',
+                        'tag_unit': 'degrees'}
 
-            # ------------------------------------------------------------ #
-            df = get_ais_df(self.mmsi_list['munkholmen'])
-            measurement_name = 'ais_web_munkholmen'
-            field_keys = {"longitude": 'longitude',
-                          "latitude": 'latitude',
-                          }
-            tag_values['tag_platform'] = 'munkholmen'
-            df = util.force_float_cols(df, not_float_cols=[time_col], error_to_nan=True)
-            df[time_col] = pd.to_datetime(df[time_col], format='%Y-%m-%d %H:%M:%S')
-            df = df.set_index(time_col).tz_localize('UTC', ambiguous='infer').tz_convert('UTC')
-            df = util.filter_and_tag_df(df, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+        # ------------------------------------------------------------ #
+        df = get_ais_df(self.mmsi_list['munkholmen'])
+        measurement_name = 'ais_web_munkholmen'
+        field_keys = {"longitude": 'longitude',
+                        "latitude": 'latitude',
+                        }
+        tag_values['tag_platform'] = 'munkholmen'
+        df = util.force_float_cols(df, not_float_cols=[time_col], error_to_nan=True)
+        df[time_col] = pd.to_datetime(df[time_col], format='%Y-%m-%d %H:%M:%S')
+        df = df.set_index(time_col).tz_localize('UTC', ambiguous='infer').tz_convert('UTC')
+        df = util.filter_and_tag_df(df, field_keys, tag_values)
+        ingest.ingest_df(measurement_name, df, self.influx_clients)
 
-            logger.info('AIS web data ingested.')
+        logger.info('AIS web data ingested.')

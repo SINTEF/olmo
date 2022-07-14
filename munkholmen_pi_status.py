@@ -60,10 +60,8 @@ class MUNKHOLMEN_PI(sensor.Sensor):
                           "ready_ctd_files": "ready_ctd_files",
                           "logging_ctd_files": "logging_ctd_files"
                           }
-            tag_values['tag_unit'] = 'none'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            print(df)
-            #ingest.ingest_df(measurement_name, df, self.influx_clients)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
 
             logger.info(f'File {f} ingested.')
 

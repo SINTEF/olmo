@@ -4,6 +4,7 @@ import pandas as pd
 import datetime
 from influxdb import InfluxDBClient
 import seawater
+import xmltodict
 
 import config
 import ingest
@@ -16,7 +17,7 @@ import util
 admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 read_client = InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
 write_clients = [
-    InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
+    InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example'),
     InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
 ]
 
@@ -30,6 +31,22 @@ input_data = [
 # Time period:
 start_time = '2022-06-01T00:00:00Z'
 end_time = '2022-06-30T15:00:00Z'
+
+
+with open('19-8154.xmlcon', 'r') as f:
+    calibfile = xmltodict.parse(f.read())
+sensors = calibfile['SBE_InstrumentConfiguration']['Instrument']['SensorArray']['Sensor']
+
+
+def calcpH(temp,pHvout):
+    phslope=float(sensors[3]['pH_Sensor']['Slope'])
+    phoffset=float(sensors[3]['pH_Sensor']['Offset'])
+    
+    abszero=273.15
+    ktemp=abszero+temp
+    const=1.98416E-4
+    ph=7+(pHvout-phoffset)/(phslope*ktemp*const)
+    return(ph)
 
 
 def main():

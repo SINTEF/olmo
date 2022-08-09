@@ -20,7 +20,7 @@ class ADCP(sensor.Sensor):
             drop_recent_files_l1=1,
             remove_remote_files_l1=True,
             max_files_l1=20,
-            db_name='example',
+            db_name='example',  # This is outdated in other files, but this whole file is outdated now...
             measurement_name_l1='adcp_raw_test'):
 
         # Init the Sensor() class: Unused levels are set to None.

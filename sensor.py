@@ -9,11 +9,11 @@ logger = logging.getLogger('olmo.sensor')
 
 
 class Sensor:
+    '''Base sensor class that non-loggernet sensors should inherit from.'''
     def __init__(
             self,
             # ---- Rsync params:
             data_dir=None,
-            db_name=None,
             file_regex_l0=None,
             file_regex_l1=None,
             file_regex_l2=None,
@@ -37,7 +37,6 @@ class Sensor:
             measurement_name_l3=None,):
 
         self.data_dir = data_dir
-        self.db_name = db_name
         self.file_regex_l0 = file_regex_l0
         self.file_regex_l1 = file_regex_l1
         self.file_regex_l2 = file_regex_l2

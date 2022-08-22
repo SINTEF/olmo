@@ -17,7 +17,6 @@ class Lisst_200(sensor.Sensor):
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            db_name='example',
             file_regex_l0=r"lisst_L(\d{7})\.RBN",
             drop_recent_files_l0=0,
             remove_remote_files_l0=True,
@@ -33,7 +32,6 @@ class Lisst_200(sensor.Sensor):
         # Init the Sensor() class: Unused vars/levels are set to None.
         super(Lisst_200, self).__init__()
         self.data_dir = data_dir
-        self.db_name = db_name
         self.file_regex_l0 = file_regex_l0
         self.drop_recent_files_l0 = drop_recent_files_l0
         self.remove_remote_files_l0 = remove_remote_files_l0
@@ -94,7 +92,7 @@ class Lisst_200(sensor.Sensor):
         return df
 
     def ingest_l0(self, files):
-
+        # I don't believe we are getting these files right now.
         for f in files:
             storage_location = f"{self.measurement_name_l0}/{os.path.split(f)[1]}"
             process = subprocess.run([
@@ -114,7 +112,8 @@ class Lisst_200(sensor.Sensor):
             df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l0}.')
-            influx_client.write_points(df, self.measurement_name_l0)
+            # influx_client.write_points(df, self.measurement_name_l0)
+            ingest.ingest_df(self.measurement_name_l0, df, self.influx_clients)
 
     def ingest_l1(self, files):
 

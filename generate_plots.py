@@ -320,7 +320,7 @@ def make_velocity_plots(days=2, upload_to_az=True):
         plt.ylabel('Depth (m)')
         plt.plot(times_mat, offset, 'w', linewidth=1)
 
-    titlestr = ['Northward', 'Eastward', 'Upward', 'Upward']
+    titlestr = ['Eastward', 'Northward', 'Upward', 'Upward']
     for i in range(4):
         plt.sca(a[i])
         plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest",

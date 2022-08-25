@@ -57,6 +57,10 @@ class MUNKHOLMEN_PI(sensor.Sensor):
                           "relay_0_2_status": "relay_0_2_status",
                           "relay_0_3_status": "relay_0_3_status",
                           "relay_0_4_status": "relay_0_4_status",
+                          "relay_1_1_status": "relay_1_1_status",
+                          "relay_1_2_status": "relay_1_2_status",
+                          "relay_1_3_status": "relay_1_3_status",
+                          "relay_1_4_status": "relay_1_4_status",
                           "ready_ctd_files": "ready_ctd_files",
                           "logging_ctd_files": "logging_ctd_files"
                           }

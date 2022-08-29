@@ -18,7 +18,7 @@ import util
 
 # Full file paths:
 files = [
-    '/home/william/OceanLab/CC1821002_20220823_115725.csv'
+    '/home/exampleuser/path/CC1821002_20220823_115725.csv'
 ]
 
 # Databases:

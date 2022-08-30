@@ -29,7 +29,7 @@ clients = [
 ]
 
 # Data:
-measurement_names = 'castawayctd_VARIABLE_portable'  # VARIABLE will be replaced with the variables
+measurement_names = 'castawayctd_VARIABLE_portable'  # VARIABLE will be replaced with the variable name
 tag_values = {
     'tag_sensor': 'castawayctd',
     'tag_serial': None,  # Will be read from the file
@@ -39,7 +39,6 @@ tag_values = {
     'tag_approved': 'none',
     'tag_unit': None,  # Added via the 'variables' dict below
 }
-timestamp = datetime.datetime(2022, 5, 24, 17, 00)  # Code assumes UTC
 variables = {
     'Pressure (Decibar)': ['pressure', 'dbar'],
     'Depth (Meter)': ['depth', 'metres'],

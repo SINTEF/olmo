@@ -81,4 +81,4 @@ class AIS(sensor.Sensor):
             df = util.filter_and_tag_df(df, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
 
-            logger.info('AIS web data ingested.')
+        logger.info('AIS web data ingested.')

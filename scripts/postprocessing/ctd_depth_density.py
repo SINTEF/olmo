@@ -38,7 +38,7 @@ input_data = [
 ]
 # Time period:
 start_time = '2022-07-15T00:00:00Z'
-end_time = '2022-07-20T08:00:00Z'
+end_time = '2022-07-22T08:00:00Z'
 
 
 with open('19-8154.xmlcon', 'r') as f:

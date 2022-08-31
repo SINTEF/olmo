@@ -4,9 +4,7 @@ from influxdb import InfluxDBClient
 
 import config
 import util
-from munkholmen_pi_status import MUNKHOLMEN_PI
-# from adcp import ADCP
-# from lisst_200 import Lisst_200
+from munkholmen_pi_status import Munkholmen_Pi
 
 
 def main():
@@ -20,18 +18,12 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
         InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
     ]
 
-    pi_status = MUNKHOLMEN_PI(influx_clients=clients)
+    pi_status = Munkholmen_Pi(influx_clients=clients)
     pi_status.rsync_and_ingest()
-
-    # lisst = Lisst_200(influx_clients=clients)
-    # lisst.rsync_and_ingest()
-
-    # adcp = ADCP()
-    # adcp.rsync_and_ingest()
 
 
 if __name__ == "__main__":

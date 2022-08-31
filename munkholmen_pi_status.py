@@ -1,20 +1,18 @@
 import pandas as pd
-import seawater
 
 import sensor
 import config
 import util
 import ingest
 
-logger = util.init_logger(config.main_logfile, name='olmo.ctd')
+logger = util.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
 
 
-class MUNKHOLMEN_PI(sensor.Sensor):
-    '''Class for rsyncing and ingesting the munkholmen ctd data.'''
+class Munkholmen_Pi(sensor.Sensor):
+    '''Class for rsyncing and ingesting the munkholmen raspberry pi status data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            db_name='example',
             file_regex_l0=r"status.csv",
             drop_recent_files_l0=0,
             remove_remote_files_l0=False,
@@ -22,15 +20,13 @@ class MUNKHOLMEN_PI(sensor.Sensor):
             influx_clients=None):
 
         # Init the Sensor() class: Unused vars/levels are set to None.
-        super(MUNKHOLMEN_PI, self).__init__()
+        super(Munkholmen_Pi, self).__init__()
         self.data_dir = data_dir
-        self.db_name = db_name
         self.file_regex_l0 = file_regex_l0
         self.drop_recent_files_l0 = drop_recent_files_l0
         self.remove_remote_files_l0 = remove_remote_files_l0
         self.max_files_l0 = max_files_l0
         self.influx_clients = influx_clients
-        self.MUNKHOLMEN_LATITUDE = 63.456314
 
     def ingest_l0(self, files):
 

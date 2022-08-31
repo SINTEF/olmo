@@ -18,7 +18,7 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
         InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
     ]
 

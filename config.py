@@ -40,7 +40,7 @@ loggernet_files_basenames = [
     "IngdalenCR6_SUNA_",
     "IngdalenCR6_System_",
     "IngdalenCR6_signatureRecord_",
-    # "IngdalenCR6_signatureCurrentProf_",
+    "IngdalenCR6_signatureCurrentProf_",
     "IngdalenCR6_Seabird_",
     "IngdalenCR6_Power_",
     "IngdalenCR6_PAR_",

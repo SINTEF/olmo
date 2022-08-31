@@ -53,7 +53,8 @@ class AIS(sensor.Sensor):
         self.mmsi_list = {'munkholmen': 992581014,
                           'ingdalen': 992581017,
                           'gunnerus': 258342000,
-                          'ntnuflyer': 257012170
+                          'ntnuflyer': 257012170,
+                          'ntnu_usv_grethe': 258006650
                           }
 
     def ingest_l0(self):

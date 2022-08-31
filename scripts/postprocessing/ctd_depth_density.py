@@ -37,8 +37,8 @@ input_data = [
     ['ctd_sbe63_munkholmen', 'sbe63']
 ]
 # Time period:
-start_time = '2022-07-09T00:00:00Z'
-end_time = '2022-07-15T00:00:00Z'
+start_time = '2022-07-15T00:00:00Z'
+end_time = '2022-07-20T08:00:00Z'
 
 
 with open('19-8154.xmlcon', 'r') as f:

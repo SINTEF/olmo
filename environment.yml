@@ -29,3 +29,4 @@ dependencies:
         - mock
         - plotly
         - cufflinks
+        - xmltodict

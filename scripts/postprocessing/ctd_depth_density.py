@@ -7,6 +7,7 @@ import seawater
 import xmltodict
 import numpy as np
 
+from ctd import CTD
 import config
 import ingest
 import util
@@ -41,105 +42,6 @@ start_time = '2022-07-15T00:00:00Z'
 end_time = '2022-07-22T08:00:00Z'
 
 
-with open('19-8154.xmlcon', 'r') as f:
-    calibfile = xmltodict.parse(f.read())
-sensors = calibfile['SBE_InstrumentConfiguration']['Instrument']['SensorArray']['Sensor']
-
-
-def calcpH(temp, pHvout):
-    phslope = float(sensors[3]['pH_Sensor']['Slope'])
-    phoffset = float(sensors[3]['pH_Sensor']['Offset'])
-
-    abszero = 273.15
-    ktemp = abszero + temp
-    const = 1.98416e-4
-    ph = 7 + (pHvout - phoffset) / (phslope * ktemp * const)
-    return(ph)
-
-
-def calcCDOM(CDOMvout):
-    scalefactor = float(sensors[4]['FluoroWetlabCDOM_Sensor']['ScaleFactor'])
-    vblank = float(sensors[4]['FluoroWetlabCDOM_Sensor']['Vblank'])
-    CDOM = scalefactor * (CDOMvout - vblank)
-    return CDOM
-
-
-def calcPAR(PARvout):
-    PAR_a0 = float(sensors[5]['PARLog_SatlanticSensor']['a0'])
-    PAR_a1 = float(sensors[5]['PARLog_SatlanticSensor']['a1'])
-    Im = float(sensors[5]['PARLog_SatlanticSensor']['Im'])
-    PAR = Im * 10**((PARvout - PAR_a0) / PAR_a1)
-    return PAR
-
-
-def calcchl(chlvout):
-    scalefactor = float(sensors[6]['FluoroWetlabECO_AFL_FL_Sensor']['ScaleFactor'])
-    vblank = float(sensors[6]['FluoroWetlabECO_AFL_FL_Sensor']['Vblank'])
-    chl = scalefactor * (chlvout - vblank)
-    return chl
-
-
-def calcNTU(NTUvout):
-    scalefactor = float(sensors[7]['TurbidityMeter']['ScaleFactor'])
-    vblank = float((sensors[7]['TurbidityMeter']['DarkVoltage']))
-    NTU = scalefactor * (NTUvout - vblank)
-    return NTU
-
-
-def calcDO_T(V):
-    TA0 = float(sensors[8]['OxygenSensor']['TA0'])
-    TA1 = float(sensors[8]['OxygenSensor']['TA1'])
-    TA2 = float(sensors[8]['OxygenSensor']['TA2'])
-    TA3 = float(sensors[8]['OxygenSensor']['TA3'])
-
-    def calcL(V):
-        L = np.log((100000 * V) / (3.3 - V))
-        return L
-
-    L = calcL(V)
-    T = 1 / (TA0 + (TA1 * L) + (TA2 * L**2) + (TA3 * L**3)) - 273.15
-    return T
-
-
-def calcDO(DOphase, T, S, P):
-    # manual-53_011 p47
-    A0 = float(sensors[8]['OxygenSensor']['A0'])
-    A1 = float(sensors[8]['OxygenSensor']['A1'])
-    A2 = float(sensors[8]['OxygenSensor']['A2'])
-    B0 = float(sensors[8]['OxygenSensor']['B0'])
-    B1 = float(sensors[8]['OxygenSensor']['B1'])
-    C0 = float(sensors[8]['OxygenSensor']['C0'])
-    C1 = float(sensors[8]['OxygenSensor']['C1'])
-    C2 = float(sensors[8]['OxygenSensor']['C2'])
-
-    def calcSalcorr(T, S):
-        Ts = np.log((298.15 - T) / (273.15 + T))
-        SolB0 = -6.24523e-3
-        SolB1 = -7.37614e-3
-        SolB2 = -1.03410e-2
-        SolB3 = -8.17083e-3
-        SolC0 = -4.88682e-7
-        Scorr = np.exp(S * (SolB0 + SolB1 * Ts + SolB2 * Ts**2 + SolB3 * Ts**3) + SolC0 * S**2)
-        return Scorr
-
-    def calcPcorr(T, P):
-        E = 0.011
-        K = 273.15 + T
-        Pcorr = np.exp(E * P / K)
-        return Pcorr
-
-    # Divide the phase delay output (μsec) by 39.457071 to get output in volts, and use the output in volts in the calibration equation.
-    V = DOphase / 39.457071
-
-    Pcorr = calcPcorr(T, P)
-    Scorr = calcSalcorr(T, S)
-
-    Ksv = (C0 + C1 * T + C2 * T**2)
-
-    DO = (((A0 + A1 * T + A2 * V**2) / (B0 + B1 * V) - 1) / Ksv) * Scorr * Pcorr
-    return DO
-
-
 def main():
 
     print("Starting running add_processed_data.py at "
@@ -162,6 +64,10 @@ def main():
             (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
             end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
 
+    # Get ctd object and load the calibration file.
+    ctd = CTD()
+    ctd.load_calibration()
+
     for p in periods:
         timeslice = f"time > '{p[0]}' AND time < '{p[1]}'"
 
@@ -175,18 +81,17 @@ def main():
         df_all = df_all.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB
 
         # =================== Processing to create the new data to be ingested:
-        MUNKHOLMEN_LATITUDE = 63.456314
         df_all['density'] = seawater.eos80.dens0(df_all['salinity'], df_all['temperature'])
-        df_all['depth'] = seawater.eos80.dpth(df_all['pressure'], MUNKHOLMEN_LATITUDE)
+        df_all['depth'] = seawater.eos80.dpth(df_all['pressure'], ctd.MUNKHOLMEN_LATITUDE)
 
-        df_all['ph'] = calcpH(df_all['temperature'], df_all['volt0'])
-        df_all['cdom'] = calcCDOM(df_all['volt1'])
-        df_all['par'] = calcPAR(df_all['volt2'])
-        df_all['chl'] = calcchl(df_all['volt4'])
-        df_all['ntu'] = calcNTU(df_all['volt5'])
-        df_all['dissolved_oxygen_temperature'] = calcDO_T(df_all['sbe63_temperature_voltage'])
-        df_all['dissolved_oxygen'] = calcDO(df_all['sbe63'], df_all['dissolved_oxygen_temperature'],
-                                            df_all['salinity'], df_all['pressure'])
+        df_all['ph'] = ctd.calcpH(df_all['temperature'], df_all['volt0'])
+        df_all['cdom'] = ctd.calcCDOM(df_all['volt1'])
+        df_all['par'] = ctd.calcPAR(df_all['volt2'])
+        df_all['chl'] = ctd.calcchl(df_all['volt4'])
+        df_all['ntu'] = ctd.calcNTU(df_all['volt5'])
+        df_all['dissolved_oxygen_temperature'] = ctd.calcDO_T(df_all['sbe63_temperature_voltage'])
+        df_all['dissolved_oxygen'] = ctd.calcDO(df_all['sbe63'], df_all['dissolved_oxygen_temperature'],
+                                                df_all['salinity'], df_all['pressure'])
 
         print(df_all.head(1))
 

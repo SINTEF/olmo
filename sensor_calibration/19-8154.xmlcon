@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SBE_InstrumentConfiguration SB_ConfigCTD_FileVersion="7.26.4.0" >
+  <Instrument Type="11" >
+    <Name>SBE 19plus V2 Seacat CTD</Name>
+    <PressureSensorType>1</PressureSensorType>
+    <ExternalVoltageChannels>5</ExternalVoltageChannels>
+    <Mode>1</Mode>
+    <!-- Serial RS-232 Sensor: 11 = SBE 63 Oxygen. -->
+    <SerialRS232C_Sensor>11</SerialRS232C_Sensor>
+    <SampleIntervalSeconds>90</SampleIntervalSeconds>
+    <ScansToAverage>1</ScansToAverage>
+    <SurfaceParVoltageAdded>0</SurfaceParVoltageAdded>
+    <ScanTimeAdded>0</ScanTimeAdded>
+    <NmeaPositionDataAdded>0</NmeaPositionDataAdded>
+    <NmeaDepthDataAdded>0</NmeaDepthDataAdded>
+    <NmeaTimeAdded>0</NmeaTimeAdded>
+    <NmeaDeviceConnectedToPC>0</NmeaDeviceConnectedToPC>
+    <SensorArray Size="9" >
+      <Sensor index="0" SensorID="58" >
+        <TemperatureSensor SensorID="58" >
+          <SerialNumber>8154</SerialNumber>
+          <CalibrationDate>16-Oct-21</CalibrationDate>
+          <A0>1.29219068e-003</A0>
+          <A1>2.62180418e-004</A1>
+          <A2>9.60447411e-008</A2>
+          <A3>1.34070874e-007</A3>
+          <Slope>1.00000000</Slope>
+          <Offset>0.0000</Offset>
+        </TemperatureSensor>
+      </Sensor>
+      <Sensor index="1" SensorID="3" >
+        <ConductivitySensor SensorID="3" >
+          <SerialNumber>8154</SerialNumber>
+          <CalibrationDate>16-Oct-21</CalibrationDate>
+          <UseG_J>1</UseG_J>
+          <!-- Cell const and series R are applicable only for wide range sensors. -->
+          <SeriesR>0.0000</SeriesR>
+          <CellConst>2000.0000</CellConst>
+          <ConductivityType>0</ConductivityType>
+          <Coefficients equation="0" >
+            <A>0.00000000e+000</A>
+            <B>0.00000000e+000</B>
+            <C>0.00000000e+000</C>
+            <D>0.00000000e+000</D>
+            <M>0.0</M>
+            <CPcor>-9.57000000e-008</CPcor>
+          </Coefficients>
+          <Coefficients equation="1" >
+            <G>-1.02844377e+000</G>
+            <H>1.64587166e-001</H>
+            <I>-3.21386782e-004</I>
+            <J>5.18317284e-005</J>
+            <CPcor>-9.57000000e-008</CPcor>
+            <CTcor>3.2500e-006</CTcor>
+            <!-- WBOTC not applicable unless ConductivityType = 1. -->
+            <WBOTC>0.00000000e+000</WBOTC>
+          </Coefficients>
+          <Slope>1.00000000</Slope>
+          <Offset>0.00000</Offset>
+        </ConductivitySensor>
+      </Sensor>
+      <Sensor index="2" SensorID="46" >
+        <PressureSensor SensorID="46" >
+          <SerialNumber>8154</SerialNumber>
+          <CalibrationDate>12-Oct-21</CalibrationDate>
+          <PA0>-4.62982249e-002</PA0>
+          <PA1>4.85643056e-004</PA1>
+          <PA2>-4.24609739e-012</PA2>
+          <PTEMPA0>-5.86113435e+001</PTEMPA0>
+          <PTEMPA1>5.28873943e+001</PTEMPA1>
+          <PTEMPA2>-4.57163552e-001</PTEMPA2>
+          <PTCA0>5.25154583e+005</PTCA0>
+          <PTCA1>-5.17066252e+000</PTCA1>
+          <PTCA2>4.35271460e-002</PTCA2>
+          <PTCB0>2.52471250e+001</PTCB0>
+          <PTCB1>-1.75000000e-004</PTCB1>
+          <PTCB2>0.00000000e+000</PTCB2>
+          <Offset>0.000000</Offset>
+        </PressureSensor>
+      </Sensor>
+      <Sensor index="3" SensorID="43" >
+        <pH_Sensor SensorID="43" >
+          <SerialNumber>1625</SerialNumber>
+          <CalibrationDate>24-Sep-21</CalibrationDate>
+          <Slope>4.4861</Slope>
+          <Offset>2.5023</Offset>
+        </pH_Sensor>
+      </Sensor>
+      <Sensor index="4" SensorID="19" >
+        <FluoroWetlabCDOM_Sensor SensorID="19" >
+          <SerialNumber>FLCDS-7119</SerialNumber>
+          <CalibrationDate>9/22/21</CalibrationDate>
+          <ScaleFactor>100.000</ScaleFactor>
+          <!-- Dark output -->
+          <Vblank>0.013</Vblank>
+        </FluoroWetlabCDOM_Sensor>
+      </Sensor>
+      <Sensor index="5" SensorID="76" >
+        <PARLog_SatlanticSensor SensorID="76" >
+          <SerialNumber>PARLOGICSW-2154</SerialNumber>
+          <CalibrationDate>5/21/21</CalibrationDate>
+          <a0>1.00580000</a0>
+          <a1>0.81090000</a1>
+          <Im>1.35890000</Im>
+          <Multiplier>1.00000000</Multiplier>
+        </PARLog_SatlanticSensor>
+      </Sensor>
+      <Sensor index="6" SensorID="20" >
+        <FluoroWetlabECO_AFL_FL_Sensor SensorID="20" >
+          <SerialNumber>FLNTUS-6396</SerialNumber>
+          <CalibrationDate>8/19/21</CalibrationDate>
+          <ScaleFactor>1.00000000e+001</ScaleFactor>
+          <!-- Dark output -->
+          <Vblank>0.0680</Vblank>
+        </FluoroWetlabECO_AFL_FL_Sensor>
+      </Sensor>
+      <Sensor index="7" SensorID="67" >
+        <TurbidityMeter SensorID="67" >
+          <SerialNumber>FLNTUS-6396</SerialNumber>
+          <CalibrationDate>8/19/21</CalibrationDate>
+          <ScaleFactor>20.000000</ScaleFactor>
+          <!-- Dark output -->
+          <DarkVoltage>0.069000</DarkVoltage>
+        </TurbidityMeter>
+      </Sensor>
+      <Sensor index="8" SensorID="72" >
+        <OxygenSensor SensorID="72" >
+          <SerialNumber>2996</SerialNumber>
+          <CalibrationDate>12-Oct-21</CalibrationDate>
+          <A0>1.051300e+000</A0>
+          <A1>-1.500000e-003</A1>
+          <A2>4.010115e-001</A2>
+          <B0>-2.527905e-001</B0>
+          <B1>1.634703e+000</B1>
+          <C0>1.080255e-001</C0>
+          <C1>4.605628e-003</C1>
+          <C2>6.391147e-005</C2>
+          <TA0>7.527489e-004</TA0>
+          <TA1>2.369454e-004</TA1>
+          <TA2>2.097164e-006</TA2>
+          <TA3>5.220927e-008</TA3>
+          <pcor>1.100000e-002</pcor>
+          <Slope>1.00000000</Slope>
+          <Offset>0.00000</Offset>
+        </OxygenSensor>
+      </Sensor>
+    </SensorArray>
+  </Instrument>
+</SBE_InstrumentConfiguration>

@@ -138,17 +138,26 @@ class CTD(sensor.Sensor):
 
             df_all['density'] = seawater.eos80.dens0(df_all['Salinity'], df_all['Temperature'])
             df_all['depth'] = seawater.eos80.dpth(df_all['Pressure'], self.MUNKHOLMEN_LATITUDE)
+            df_all['ph'] = self.calcpH(df_all['temperature'], df_all['volt0'])
+            df_all['cdom'] = self.calcCDOM(df_all['volt1'])
+            df_all['par'] = self.calcPAR(df_all['volt2'])
+            df_all['chl'] = self.calcchl(df_all['volt4'])
+            df_all['ntu'] = self.calcNTU(df_all['volt5'])
+            df_all['dissolved_oxygen_temperature'] = self.calcDO_T(df_all['sbe63_temperature_voltage'])
+            df_all['dissolved_oxygen'] = self.calcDO(
+                df_all['sbe63'], df_all['dissolved_oxygen_temperature'],
+                df_all['salinity'], df_all['pressure'])
 
             tag_values = {'tag_sensor': 'ctd',
                           'tag_edge_device': 'munkholmen_topside_pi',
                           'tag_platform': 'munkholmen',
-                          'tag_data_level': 'raw',
                           'tag_approved': 'no',
                           'tag_unit': 'none'}
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_temperature_munkholmen'
             field_keys = {"Temperature": 'temperature'}
+            tag_values['tag_data_level'] = 'raw'
             tag_values['tag_unit'] = 'degrees_celcius'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
@@ -205,7 +214,55 @@ class CTD(sensor.Sensor):
             measurement_name = 'ctd_density_munkholmen'
             field_keys = {"density": 'density'}
             tag_values['tag_unit'] = 'kilograms_per_cubic_metre'
-            tag_values['tag_data_level'] = 'processed'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_ph_munkholmen'
+            field_keys = {"ph": 'ph'}
+            tag_values['tag_unit'] = 'none'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_cdom_munkholmen'
+            field_keys = {"cdom": 'cdom'}
+            tag_values['tag_unit'] = 'ppb'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_par_munkholmen'
+            field_keys = {"par": 'par'}
+            tag_values['tag_unit'] = 'micro_mol_photons_per_metre_squared_per_second'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_chl_munkholmen'
+            field_keys = {"chl": 'chl'}
+            tag_values['tag_unit'] = 'micro_grams_per_litre'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_ntu_munkholmen'
+            field_keys = {"ntu": 'ntu'}
+            tag_values['tag_unit'] = 'ntu'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_dissolved_oxygen_munkholmen'
+            field_keys = {"dissolved_oxygen": 'dissolved_oxygen'}
+            tag_values['tag_unit'] = 'millilitres_per_litre'
+            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            ingest.ingest_df(measurement_name, df, self.influx_clients)
+
+            # ------------------------------------------------------------ #
+            measurement_name = 'ctd_dissolved_oxygen_temperature_munkholmen'
+            field_keys = {"dissolved_oxygen_temperature": 'dissolved_oxygen_temperature'}
+            tag_values['tag_unit'] = 'degrees_celcius'
             df = util.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
 

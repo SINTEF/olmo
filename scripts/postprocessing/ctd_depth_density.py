@@ -4,8 +4,6 @@ import pandas as pd
 import datetime
 from influxdb import InfluxDBClient
 import seawater
-import xmltodict
-import numpy as np
 
 from ctd import CTD
 import config

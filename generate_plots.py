@@ -15,6 +15,11 @@ import util_az
 import util_db
 import util_file
 
+'''
+Makes plots of weather and ADCP data that are uploaded to azure such that
+they can be displayed in grafana/on the web.
+'''
+
 
 def make_subplot(df, key, label):
     subplot = go.Scatter(x=df['time'], y=df[key], name=label)

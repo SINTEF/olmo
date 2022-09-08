@@ -6,6 +6,12 @@ import shutil
 
 import config
 
+'''
+Backs up influxDB using the command:
+    influxd backup -portable backup_folder
+Then zips the output files and uploads them to azure.
+Expected to be run as cronjob.
+'''
 
 timestamp = datetime.datetime.now().strftime('%Y%m%d')
 

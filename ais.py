@@ -12,7 +12,6 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.ctd')
 
 
 class AIS(sensor.Sensor):
-    '''Class for rsyncing and ingesting the munkholmen ctd data.'''
     def __init__(
             self,
             influx_clients=None):

@@ -13,7 +13,6 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.lisst_200')
 
 
 class Lisst_200(sensor.Sensor):
-    '''Class for rsyncing and ingesting the Lisst_200 data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',

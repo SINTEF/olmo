@@ -352,7 +352,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'signature_100_pitch_munkholmen'
         field_keys = {'ADCP_pitch': 'pitch'}
         tag_values['tag_unit'] = 'degrees'
-        df = util_db.filter_and_tag_df_df_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #

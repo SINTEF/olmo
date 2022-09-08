@@ -643,7 +643,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         field_keys = {"sunaSerial": 'tag_serial',
                       "sunaNitrateMilliGrams": 'nitrate_milligram'}
         tag_values['tag_unit'] = 'none'
-        df = util_db.filter_and_tag_df_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -691,7 +691,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "signatureDataTypeString": 'data_type_string',
                       "signatureSerialNumber": 'tag_serial_number',
                       "signatureConfiguration": 'configuration'}
-        df = util_db.filter_and_tag_df_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -705,7 +705,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'signature_100_temperature_ingdalen'
         field_keys = {"signatureTemperature": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'
-        df = util_db.filter_and_tag_df_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -733,7 +733,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'signature_100_roll_ingdalen'
         field_keys = {"signatureRoll": 'roll'}
         tag_values['tag_unit'] = 'none'  # degrees
-        df = util_db.filter_and_tag_df_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
@@ -945,7 +945,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # ---------------------------------------------------------------- #
         measurement_name = 'power_state_ingdalen'
         field_keys = {f'powerState({i})': f'power_state_{i}' for i in range(1, 12)}
-        df = util_db.filter_and_tag_df_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #

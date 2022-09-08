@@ -2,10 +2,11 @@ import pandas as pd
 
 import sensor
 import config
-import util
+import util_db
+import util_file
 import ingest
 
-logger = util.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
+logger = util_file.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
 
 
 class Munkholmen_Pi(sensor.Sensor):
@@ -34,7 +35,7 @@ class Munkholmen_Pi(sensor.Sensor):
             df_all = pd.read_csv(f, sep=',')
 
             time_col = 'timestamp'
-            df_all = util.force_float_cols(df_all, not_float_cols=[time_col], error_to_nan=True)
+            df_all = util_db.force_float_cols(df_all, not_float_cols=[time_col], error_to_nan=True)
             df_all[time_col] = pd.to_datetime(df_all[time_col], format='%Y-%m-%d %H:%M:%S')
             df_all = df_all.set_index(time_col).tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
@@ -60,7 +61,7 @@ class Munkholmen_Pi(sensor.Sensor):
                           "ready_ctd_files": "ready_ctd_files",
                           "logging_ctd_files": "logging_ctd_files"
                           }
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
 
             logger.info(f'File {f} ingested.')

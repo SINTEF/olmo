@@ -6,10 +6,10 @@ import numpy as np
 from influxdb import InfluxDBClient
 
 import config
-import util
+import util_file
 
 
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 
 client = InfluxDBClient('localhost', 8086, admin_user, admin_pwd, 'example')
 

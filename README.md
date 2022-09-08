@@ -14,7 +14,6 @@ and ingest the data. In cases where there is an `_L#`, there can be 4 different
 versions of this variable for the 4 data quality levels.
 
  * `data_dir`: Directory on the munkholmen raspberry pi where data files are found
- * `db_name`: Name of db in influx
  * `file_regex_l#`: Regex used to match files in `data_dir` (or list of regex's). This is the main
  controller for the 'level', setting this to None will mean the level is ignored in rsync/ingest.
  * `drop_recent_files_l#`: Number of latest files to ignore (in case they are being written to)

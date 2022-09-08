@@ -6,10 +6,11 @@ import pandas as pd
 
 import sensor
 import config
-import util
+import util_db
+import util_file
 import ingest
 
-logger = util.init_logger(config.main_logfile, name='olmo.lisst_200')
+logger = util_file.init_logger(config.main_logfile, name='olmo.lisst_200')
 
 
 class Lisst_200(sensor.Sensor):
@@ -120,7 +121,7 @@ class Lisst_200(sensor.Sensor):
         for f in files:
             df = self.lisst200_csv_to_df(f)
 
-            df = util.force_float_cols(df, not_float_cols=['date'])
+            df = util_db.force_float_cols(df, not_float_cols=['date'])
             # TODO: Check this time is correct with what the instrument gives.
             df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
@@ -131,7 +132,7 @@ class Lisst_200(sensor.Sensor):
                           'tag_approved': 'no',
                           'tag_unit': 'none'}
 
-            df = util.add_tags(df, tag_values)
+            df = util_db.add_tags(df, tag_values)
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l1}.')
             ingest.ingest_df(self.measurement_name_l1, df, self.influx_clients)

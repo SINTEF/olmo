@@ -5,10 +5,11 @@ import re
 
 import sensor
 import config
-import util
+import util_db
+import util_file
 import ingest
 
-logger = util.init_logger(config.main_logfile, name='olmo.ctd')
+logger = util_file.init_logger(config.main_logfile, name='olmo.ctd')
 
 
 def get_ais_df(mmsi):
@@ -76,10 +77,10 @@ class AIS(sensor.Sensor):
                           "latitude": 'latitude',
                           }
             tag_values['tag_platform'] = m
-            df = util.force_float_cols(df, not_float_cols=[time_col], error_to_nan=True)
+            df = util_db.force_float_cols(df, not_float_cols=[time_col], error_to_nan=True)
             df[time_col] = pd.to_datetime(df[time_col], format='%Y-%m-%d %H:%M:%S')
             df = df.set_index(time_col).tz_localize('UTC', ambiguous='infer').tz_convert('UTC')
-            df = util.filter_and_tag_df(df, field_keys, tag_values)
+            df = util_db.filter_and_tag_df(df, field_keys, tag_values)
             ingest.ingest_df(measurement_name, df, self.influx_clients)
 
         logger.info('AIS web data ingested.')

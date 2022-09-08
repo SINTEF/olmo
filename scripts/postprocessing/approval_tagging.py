@@ -5,13 +5,14 @@ from influxdb import InfluxDBClient
 
 import config
 import ingest
-import util
+import util_db
+import util_file
 
 # File to change the 'approval' tag of a measurement (table)
 # in influxdb.
 
 # Databases:
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 clients = [
     InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example'),
     # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
@@ -30,7 +31,7 @@ def main():
     print("Starting running add_processed_data.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    periods = util.break_down_time_period(start_time, end_time)
+    periods = util_db.break_down_time_period(start_time, end_time)
 
     for p in periods:
         timeslice = f"time > '{p[0]}' AND time < '{p[1]}'"
@@ -38,7 +39,7 @@ def main():
 
         for client in clients:
             # =================== Get the data:
-            df = util.query_influxdb(client, measurement, '*', timeslice, False, approved='all')
+            df = util_db.query_influxdb(client, measurement, '*', timeslice, False, approved='all')
             df = df.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB
             # print(df)
 
@@ -48,7 +49,7 @@ def main():
             # print(df)
 
             # =================== Delete the data and reupload:
-            df = util.retag_tag_cols(df, util.query_show_tag_keys(client, measurement))
+            df = util_db.retag_tag_cols(df, util_db.get_tag_keys(client, measurement))
             df.to_csv(os.path.join(config.output_dir, 'df_backup.csv'), index=True)
             # Deleting:
             _ = client.query(f"DELETE FROM {measurement} WHERE {timeslice}")

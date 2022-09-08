@@ -4,7 +4,7 @@ import datetime
 from influxdb import InfluxDBClient
 
 import config
-import ingest
+import util_db
 import util_file
 
 # File to ingest a specific piece of data into a table in the database.

@@ -7,8 +7,8 @@ from urllib.parse import quote_plus as url_quote
 from influxdb import InfluxDBClient
 
 import config
+import util_db
 import util_file
-import ingest
 
 
 def db_create_engine(url: str):

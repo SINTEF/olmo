@@ -4,7 +4,6 @@ import sensor
 import config
 import util_db
 import util_file
-import ingest
 
 logger = util_file.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
 

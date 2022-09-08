@@ -4,7 +4,6 @@ import datetime
 from influxdb import InfluxDBClient
 
 import config
-import ingest
 import util_db
 import util_file
 

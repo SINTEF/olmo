@@ -7,7 +7,6 @@ import seawater
 
 from ctd import CTD
 import config
-import ingest
 import util_db
 import util_file
 

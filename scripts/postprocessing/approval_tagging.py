@@ -4,7 +4,6 @@ import datetime
 from influxdb import InfluxDBClient
 
 import config
-import ingest
 import util_db
 import util_file
 
@@ -54,7 +53,7 @@ def main():
             # Deleting:
             _ = client.query(f"DELETE FROM {measurement} WHERE {timeslice}")
             print('Deleted data...')
-            ingest.ingest_df(measurement, df, [client])
+            util_db.ingest_df(measurement, df, [client])
             print('Data written :)')
 
         print("Finished all at "

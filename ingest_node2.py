@@ -7,8 +7,8 @@ from urllib.parse import quote_plus as url_quote
 from influxdb import InfluxDBClient
 
 import config
+import util_db
 import util_file
-import ingest
 
 
 def db_create_engine(url: str):
@@ -118,7 +118,7 @@ def main():
         # date column should be the index, with utc timezone:
         df = df.set_index('date').tz_convert('UTC')
 
-        ingest.ingest_df(d[2], df, clients)
+        util_db.ingest_df(d[2], df, clients)
 
     logger.info("All data transferred and ingested successfully, exiting.")
 

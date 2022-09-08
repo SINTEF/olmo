@@ -7,7 +7,6 @@ import seawater
 
 from ctd import CTD
 import config
-import ingest
 import util_db
 import util_file
 
@@ -107,63 +106,63 @@ def main():
         field_keys = {"depth": 'depth'}
         tag_values['tag_unit'] = 'metres'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_density_munkholmen'
         field_keys = {"density": 'density'}
         tag_values['tag_unit'] = 'kilograms_per_cubic_metre'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_ph_munkholmen'
         field_keys = {"ph": 'ph'}
         tag_values['tag_unit'] = 'none'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_cdom_munkholmen'
         field_keys = {"cdom": 'cdom'}
         tag_values['tag_unit'] = 'ppb'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_par_munkholmen'
         field_keys = {"par": 'par'}
         tag_values['tag_unit'] = 'micro_mol_photons_per_metre_squared_per_second'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_chl_munkholmen'
         field_keys = {"chl": 'chl'}
         tag_values['tag_unit'] = 'micro_grams_per_litre'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_ntu_munkholmen'
         field_keys = {"ntu": 'ntu'}
         tag_values['tag_unit'] = 'ntu'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_dissolved_oxygen_munkholmen'
         field_keys = {"dissolved_oxygen": 'dissolved_oxygen'}
         tag_values['tag_unit'] = 'millilitres_per_litre'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         # ------------------------------------------------------------ #
         measurement_name = 'ctd_dissolved_oxygen_temperature_munkholmen'
         field_keys = {"dissolved_oxygen_temperature": 'dissolved_oxygen_temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'
         df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, write_clients)
+        util_db.ingest_df(measurement_name, df, write_clients)
 
         print(f"Finished ingesting timeslice {timeslice} at "
               + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))

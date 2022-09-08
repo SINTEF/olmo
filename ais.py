@@ -7,7 +7,6 @@ import sensor
 import config
 import util_db
 import util_file
-import ingest
 
 logger = util_file.init_logger(config.main_logfile, name='olmo.ctd')
 
@@ -81,6 +80,6 @@ class AIS(sensor.Sensor):
             df[time_col] = pd.to_datetime(df[time_col], format='%Y-%m-%d %H:%M:%S')
             df = df.set_index(time_col).tz_localize('UTC', ambiguous='infer').tz_convert('UTC')
             df = util_db.filter_and_tag_df(df, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
         logger.info('AIS web data ingested.')

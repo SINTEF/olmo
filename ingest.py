@@ -8,21 +8,6 @@ Functions to be directly used in ingesting data into influxdb.
 logger = logging.getLogger('olmo.ingest')
 
 
-def float_col_fix(df, float_cols):
-    '''
-    Avoid problem where float cols give error if they "round to zero"
-    float_cols can be a list of cols, or 'all', for every column.
-    '''
-    if float_cols == 'all':
-        for i, col in enumerate(df.columns):
-            df[col] = df[col].astype(np.float64)
-    else:
-        for i, col in enumerate(df.columns):
-            if col in float_cols:
-                df[col] = df[col].astype(np.float64)
-    return df
-
-
 def ingest_df(measurement, df, clients):
 
     tag_cols = [c for c in df.columns if c[:4] == 'tag_']

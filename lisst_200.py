@@ -8,7 +8,6 @@ import sensor
 import config
 import util_db
 import util_file
-import ingest
 
 logger = util_file.init_logger(config.main_logfile, name='olmo.lisst_200')
 
@@ -114,7 +113,7 @@ class Lisst_200(sensor.Sensor):
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l0}.')
             # influx_client.write_points(df, self.measurement_name_l0)
-            ingest.ingest_df(self.measurement_name_l0, df, self.influx_clients)
+            util_db.ingest_df(self.measurement_name_l0, df, self.influx_clients)
 
     def ingest_l1(self, files):
 
@@ -135,7 +134,7 @@ class Lisst_200(sensor.Sensor):
             df = util_db.add_tags(df, tag_values)
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l1}.')
-            ingest.ingest_df(self.measurement_name_l1, df, self.influx_clients)
+            util_db.ingest_df(self.measurement_name_l1, df, self.influx_clients)
 
     def rsync_and_ingest(self):
 

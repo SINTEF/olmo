@@ -152,21 +152,21 @@ class CTD(sensor.Sensor):
             field_keys = {"Temperature": 'temperature'}
             tag_values['tag_unit'] = 'degrees_celcius'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_conductivity_munkholmen'
             field_keys = {"Conductivity": 'conductivity'}
             tag_values['tag_unit'] = 'siemens_per_metre'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_pressure_munkholmen'
             field_keys = {"Pressure": 'pressure'}
             tag_values['tag_unit'] = 'none'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # -------------drop----------------------------------------------- #
             measurement_name = 'ctd_sbe63_munkholmen'
@@ -174,14 +174,14 @@ class CTD(sensor.Sensor):
                           "SBE63Temperature": 'sbe63_temperature_voltage'}
             tag_values['tag_unit'] = 'none'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_salinity_munkholmen'
             field_keys = {"Salinity": 'salinity'}
             tag_values['tag_unit'] = 'none'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_voltages_munkholmen'
@@ -192,7 +192,7 @@ class CTD(sensor.Sensor):
                           "Volt5": 'volt5'}
             tag_values['tag_unit'] = 'none'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_depth_munkholmen'
@@ -200,7 +200,7 @@ class CTD(sensor.Sensor):
             tag_values['tag_unit'] = 'metres'
             tag_values['tag_data_level'] = 'processed'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_density_munkholmen'
@@ -208,7 +208,7 @@ class CTD(sensor.Sensor):
             tag_values['tag_unit'] = 'kilograms_per_cubic_metre'
             tag_values['tag_data_level'] = 'processed'
             df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             logger.info(f'File {f} ingested.')
 

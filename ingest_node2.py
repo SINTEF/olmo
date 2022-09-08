@@ -118,7 +118,7 @@ def main():
         # date column should be the index, with utc timezone:
         df = df.set_index('date').tz_convert('UTC')
 
-        ingest.ingest_df(d[2], df, clients)
+        util_db.ingest_df(d[2], df, clients)
 
     logger.info("All data transferred and ingested successfully, exiting.")
 

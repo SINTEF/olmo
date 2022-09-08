@@ -5,7 +5,6 @@ from influxdb import InfluxDBClient
 
 import config
 import ingest
-import util
 import util_file
 
 # File to ingest a specific piece of data into a table in the database.
@@ -60,7 +59,7 @@ def main():
         df[k] = v
     print(measurement_name, df)
     print(datetime.datetime.now(datetime.timezone.utc))
-    ingest.ingest_df(measurement_name, df, clients)
+    util_db.ingest_df(measurement_name, df, clients)
 
     print("All data ingested successfully, exiting.")
 

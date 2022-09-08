@@ -6,6 +6,40 @@ import pandas as pd
 logger = logging.getLogger('olmo.util_db')
 
 
+def ingest_df(measurement, df, clients):
+    '''
+    Ingest a df to a list of influxdb clients.
+    df must have a specific form:
+        1. Index must be timestamps, in UTC.
+        2. Any cols that are 'tags' must have 'tag_' at the start of the
+           column name, for ex. tag_sensor. The 'tag_' will be removed on
+           uplaod.
+        3. field value cols are simple those WITHOUT 'tag_'.
+
+    Parameters
+    ----------
+    measurement : str
+    df : pd.DataFrame
+        See above for clarification
+    clients : list
+        Should be a list of influxdb.InfluxDBClient
+    '''
+    tag_cols = [c for c in df.columns if c[:4] == 'tag_']
+    field_cols = [c for c in df.columns if c not in tag_cols]
+
+    data = []
+    for index, row in df.iterrows():
+        data.append({
+            'measurement': measurement,
+            'time': index,
+            'tags': {t[4:]: row[t] for t in tag_cols},
+            'fields': {f: row[f] for f in field_cols},
+        })
+
+    for c in clients:
+        c.write_points(data)
+
+
 def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=False):
     '''
     Force cols of a df to be np.float64.

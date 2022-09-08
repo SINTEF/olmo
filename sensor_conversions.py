@@ -1,11 +1,10 @@
 import os
 import logging
 import pandas as pd
-import numpy as np
 from influxdb import InfluxDBClient
-from datetime import datetime, timezone
 
 import config
+import util_db
 import util_file
 
 logger = logging.getLogger('olmo.sensor_conversions')
@@ -16,14 +15,6 @@ client = InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'e
 client = InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
 # client_df = DataFrameClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'example')
 # client_az = DataFrameClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example')
-
-
-def float_col_fix(df, float_cols):
-    '''Avoid problem where float cols give error if they "round to zero"'''
-    for i, col in enumerate(df.columns):
-        if col in float_cols:
-            df[col] = df[col].astype(np.float64)
-    return df
 
 
 # def ingest_ctd(txt_filename='~/Downloads/CTD_example.txt'):
@@ -161,7 +152,7 @@ def float_col_fix(df, float_cols):
 
 #     float_cols = [col for col in df.columns if col != 'date']
 #     # print(float_cols)
-#     df = float_col_fix(df, float_cols)
+#     df = util_db.force_float_cols(df, float_cols=float_cols)
 #     df = df.set_index('date').tz_localize('CET', ambiguous='infer')
 
 #     # print(df.index)
@@ -297,7 +288,7 @@ def ingest_loggernet_file(file_path, file_type):
         df = df[['date'] + data_cols]
 
         # Force cols to have time np.float64
-        df = float_col_fix(df, float_cols)
+        df = util_db.force_float_cols(df, float_cols=float_cols)
         # Loggernet data is in CET, but all influx data will be utc.
         df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 

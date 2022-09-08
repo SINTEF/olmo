@@ -54,7 +54,7 @@ def main():
             # Deleting:
             _ = client.query(f"DELETE FROM {measurement} WHERE {timeslice}")
             print('Deleted data...')
-            ingest.ingest_df(measurement, df, [client])
+            util_db.ingest_df(measurement, df, [client])
             print('Data written :)')
 
         print("Finished all at "

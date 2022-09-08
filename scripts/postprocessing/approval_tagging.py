@@ -30,22 +30,7 @@ def main():
     print("Starting running add_processed_data.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Must break down the timeslice smaller periods:
-    start_time_ = datetime.datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
-    end_time_ = datetime.datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%SZ')
-    total_time_delta = end_time_ - start_time_
-    periods = []
-    # Assuming breaking down into days:
-    d = 0
-    while d < total_time_delta.days:
-        periods.append((
-            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
-            (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ')))
-        d += 1
-    if total_time_delta.seconds > 0:
-        periods.append((
-            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
-            end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
+    periods = util.break_down_time_period(start_time, end_time)
 
     for p in periods:
         timeslice = f"time > '{p[0]}' AND time < '{p[1]}'"

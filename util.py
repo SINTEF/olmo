@@ -255,29 +255,40 @@ def upload_file(local_file, az_file, container, content_type='text/html', overwr
     # logger.info('Backup, archive and transfer to azure completed successfully.')
 
 
-# Currently not sure if I need this, so ignoring for now.
-# def execute_subprocess(command, communicate=True, timeout=600):
-#     '''Executes a terminal command using subrpocess.Popen.
+def break_down_time_period(start_time, end_time):
+    '''
+    Breaks a time slice down into a list of time periods no longer than 1 day
+    TODO: Eventually could add option to specify the length of the sub periods.
 
-#     Parameters
-#     ----------
-#     command : list
-#         Command to be run.
-#     communicate : bool
-#         If we should return the stdout and stderr
+    Parameters
+    ----------
+    start_time : str
+        Of the form: '2022-07-15T00:00:00Z'
+    end_time : str
+        Of the form: '2022-07-22T08:00:00Z'
 
-#     Returns
-#     -------
-#     stdout, stderr
-#         Optional. Output and error from running the command.
-#     '''
-#     if communicate:
-#         proc = subprocess.Popen(
-#             command,
-#             stdout=subprocess.PIPE,
-#             stderr=subprocess.PIPE)
-#         try:
-#             stdout, stderr = proc.communicate(timeout=timeout)
-#         except TimeoutExpired:
-#             proc.kill()
-#             outs, errs = proc.communicate()
+    Returns
+    -------
+    list
+        A list of touples. Each touple is a pair of 'start/stop' times
+        in the same format as the expected input.
+    '''
+
+    start_time_ = datetime.datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
+    end_time_ = datetime.datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%SZ')
+    total_time_delta = end_time_ - start_time_
+    periods = []
+
+    # Assuming breaking down into days:
+    d = 0
+    while d < total_time_delta.days:
+        periods.append((
+            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            (start_time_ + datetime.timedelta(days=d + 1)).strftime('%Y-%m-%dT%H:%M:%SZ')))
+        d += 1
+    if total_time_delta.seconds > 0:
+        periods.append((
+            (start_time_ + datetime.timedelta(days=d)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
+
+    return periods

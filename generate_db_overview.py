@@ -6,8 +6,9 @@ import config
 import util
 
 '''
-Small file made when we wanted to check that we could access
-the influxDB instance on the Azure VM over the internet.
+File to print out two .txt files with a list of measurements in the
+'oceanlab' db, and then a sample data point from each (to give an idea
+of the db structure).
 '''
 
 

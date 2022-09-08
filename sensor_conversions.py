@@ -2,16 +2,16 @@ import os
 import logging
 import pandas as pd
 import numpy as np
-from influxdb import DataFrameClient, InfluxDBClient
+from influxdb import InfluxDBClient
 from datetime import datetime, timezone
 
 import config
-import util
+import util_file
 
 logger = logging.getLogger('olmo.sensor_conversions')
 
 
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 client = InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'example')
 client = InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab')
 # client_df = DataFrameClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'example')
@@ -62,7 +62,7 @@ def float_col_fix(df, float_cols):
 
 #     # Get time, this is for all measurements relating to this file.
 #     # Note, the filename has the transfer timestamp still appended
-#     filename_orig = util.remove_timestring(filename)
+#     filename_orig = util_file.remove_timestring(filename)
 #     timestring = filename_orig[-15:]
 #     date_format = '%Y%m%d-%H%M%S'
 #     time_for_influx = datetime.strptime(timestring, date_format).astimezone(timezone.utc)

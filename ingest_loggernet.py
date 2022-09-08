@@ -7,7 +7,7 @@ from influxdb import InfluxDBClient
 
 import config
 import loggernet
-import util
+import util_file
 
 # I couldn't install rsync on the cmd prompt on the remote
 # (although I could on git bash...) but since I could get
@@ -96,11 +96,11 @@ def main():
     print("Starting running ingest_loggernet.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    logger = util.init_logger(config.loggernet_logfile, name='ingest_loggernet')
+    logger = util_file.init_logger(config.loggernet_logfile, name='ingest_loggernet')
     logger.info("\n\n------ Starting data collection in main()")
 
     logger.info("Fetching the influxdb clients.")
-    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
         InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
         InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),

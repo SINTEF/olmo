@@ -3,7 +3,8 @@ import pandas as pd
 from influxdb import InfluxDBClient
 
 import config
-import util
+import util_az
+import util_file
 
 '''
 File to print out two .txt files with a list of measurements in the
@@ -12,7 +13,7 @@ of the db structure).
 '''
 
 
-USER, PASSWORD = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+USER, PASSWORD = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 AZVM_HOST_IP = config.az_influx_pc
 DATABASE = 'oceanlab'
 
@@ -75,9 +76,9 @@ for m in measurements:
 
 f.close()
 
-util.upload_file(
+util_az.upload_file(
     local_file_list, os.path.basename(local_file_list),
     '$web', content_type='text/plain')
-util.upload_file(
+util_az.upload_file(
     local_file_examples, os.path.basename(local_file_examples),
     '$web', content_type='text/plain')

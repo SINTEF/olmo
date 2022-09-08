@@ -6,6 +6,7 @@ from influxdb import InfluxDBClient
 import config
 import ingest
 import util
+import util_file
 
 # File to ingest a specific piece of data into a table in the database.
 # Initially made to ingest lat/lon locations of sensors to the correct table.
@@ -16,7 +17,7 @@ import util
 # ---- input data:
 
 # Databases:
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 clients = [
     InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
     InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),

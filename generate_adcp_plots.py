@@ -9,17 +9,18 @@ from influxdb import InfluxDBClient
 import matplotlib.pyplot as plt
 
 import config
-import util
+import util_file
+import util_db
 
 
 def adcp_from_influx(client, timeslice):
-    sig_tables = ['signature_100_amplitude_munkholmen','signature_100_battery_voltage_munkholmen','signature_100_correlation_munkholmen','signature_100_current_direction_munkholmen','signature_100_current_speed_munkholmen','signature_100_error_code_munkholmen',
-                  'signature_100_heading_munkholmen','signature_100_pitch_munkholmen','signature_100_pressure_munkholmen','signature_100_roll_munkholmen','signature_100_sound_speed_munkholmen','signature_100_temperature_munkholmen','signature_100_velocity_munkholmen']
+    sig_tables = ['signature_100_amplitude_munkholmen', 'signature_100_battery_voltage_munkholmen', 'signature_100_correlation_munkholmen', 'signature_100_current_direction_munkholmen', 'signature_100_current_speed_munkholmen', 'signature_100_error_code_munkholmen',
+                  'signature_100_heading_munkholmen', 'signature_100_pitch_munkholmen', 'signature_100_pressure_munkholmen', 'signature_100_roll_munkholmen', 'signature_100_sound_speed_munkholmen', 'signature_100_temperature_munkholmen', 'signature_100_velocity_munkholmen']
 
     df = pd.DataFrame(columns=['time'])
     for i, tab in enumerate(sig_tables):
         print('loading:', tab)
-        df_new = util.query_influxdb(client, tab, '*', timeslice, False, approved='all')
+        df_new = util_db.query_influxdb(client, tab, '*', timeslice, False, approved='all')
         df_new = df_new.drop(columns=['approved', 'data_level', 'edge_device', 'platform', 'sensor', 'unit'])
         df = pd.merge(df, df_new, on='time', how='outer')
 
@@ -36,24 +37,6 @@ def adcp_speed_from_influx(client, timeslice):
             columns.append(k)
 
     df = pd.DataFrame(columns=columns)
-    for table in result:
-        for pt in table:
-            df = df.append(pt, ignore_index=True)
-    # Assuming that influx reports times in UTC:
-    df['time'] = pd.to_datetime(df['time'], format='%Y-%m-%dT%H:%M:%SZ')
-    df['time'] = df['time'].dt.tz_localize('UTC').dt.tz_convert('CET')
-    return df
-
-
-def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
-
-    if downsample:
-        q = f'''SELECT mean("{variable}") AS "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' GROUP BY {downsample}'''
-    else:
-        q = f'''SELECT "{variable}" FROM "{measurement}" WHERE {timeslice} AND "approved" = '{approved}' '''
-
-    result = client.query(q)
-    df = pd.DataFrame(columns=['time', variable])
     for table in result:
         for pt in table:
             df = df.append(pt, ignore_index=True)
@@ -89,7 +72,7 @@ def upload_figure(local_file, az_file):
     # logger.info('Backup, archive and transfer to azure completed successfully.')
 
 
-#standard_timeslice = 'time > now() - 5d'
+# standard_timeslice = 'time > now() - 5d'
 standard_timeslice = 'time > now() - 60d'
 standard_downsample = 'time(1m)'  # To turn off use: False
 plot = {
@@ -100,7 +83,7 @@ plot = {
     'upper_filter': 5000,
     'downsample': False,
     'approved': 'all',
-    }
+}
 
 
 def main():
@@ -108,7 +91,7 @@ def main():
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     # Below is the Azure DB client:
-    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     client = InfluxDBClient(
         host=config.az_influx_pc, port=8086,
         username=admin_user, password=admin_pwd,
@@ -116,7 +99,7 @@ def main():
 
     fig = make_subplots(rows=1, cols=1, subplot_titles=plot['title'])
     fig.update_layout(template='plotly_white')
-    # df = query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'], approved=p['approved'])
+    # df = util_db.query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'], approved=p['approved'])
     df = adcp_from_influx(client, plot['timeslice'])
 
     return df

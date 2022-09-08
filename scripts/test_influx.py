@@ -3,7 +3,7 @@ import requests
 from influxdb import InfluxDBClient
 
 import config
-import util
+import util_file
 
 '''
 Small file made when we wanted to check that we could access
@@ -11,7 +11,7 @@ the influxDB instance on the Azure VM over the internet.
 '''
 
 
-USER, PASSWORD = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+USER, PASSWORD = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 USER = 'XXXX'
 PASSWORD = 'XXXX'
 HOST_IP = 'XXXX'

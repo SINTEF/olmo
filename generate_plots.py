@@ -5,14 +5,15 @@ import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import cmocean
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 from influxdb import InfluxDBClient
 import influxdb_client
 
 import config
-import util
+import util_az
+import util_db
+import util_file
 
 
 def make_subplot(df, key, label):
@@ -68,7 +69,7 @@ def make_weather_plots(filename="weather_1d.html", upload_to_az=True):
     ]
 
     # Below is the Azure DB client:
-    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     client = InfluxDBClient(
         host=config.az_influx_pc, port=8086,
         username=admin_user, password=admin_pwd,
@@ -77,7 +78,7 @@ def make_weather_plots(filename="weather_1d.html", upload_to_az=True):
     fig = make_subplots(rows=len(plot_data), cols=1, subplot_titles=[p['title'] for p in plot_data])
     fig.update_layout(template='plotly_white')
     for i, p in enumerate(plot_data):
-        df = util.query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'])
+        df = util_db.query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'])
 
         # Simple simple filtering:
         df.loc[df[p['variable']] < p['lower_filter'], p['variable']] = np.nan
@@ -97,7 +98,7 @@ def make_weather_plots(filename="weather_1d.html", upload_to_az=True):
     fig.update_layout(height=100 + 400 * len(plot_data), width=1200, showlegend=False)
     fig.write_html(local_file)
     if upload_to_az:
-        util.upload_file(local_file, az_file, '$web', overwrite=True)
+        util_az.upload_file(local_file, az_file, '$web', overwrite=True)
 
 
 def name_to_bin_beam(name):
@@ -118,7 +119,7 @@ def adcp_raw_data_to_array(df, n_bins, n_beams):
 
 def query_influx_table(measurement, timespan):
 
-    influx_user, influx_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_read_credentials'))
+    influx_user, influx_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_read_credentials'))
     bucket = "oceanlab/autogen"
     token = f"{influx_user}:{influx_pwd}"
     url = "https://oceanlab.azure.sintef.no:8086"
@@ -249,7 +250,6 @@ def make_adcp_plots_all(upload_to_az=True):
     for i in range(4):
         plt.sca(a[i])
         plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest", vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
-        
         plt.title(f'Velocity {i + 1}' + titlestr[i])
         set_plots()
 
@@ -262,7 +262,7 @@ def make_adcp_plots_all(upload_to_az=True):
         for f in ['ADCP_Amplitude.png', 'ADCP_Correlation.png', 'ADCP_Velocity.png']:
             az_file = 'adcp/' + f
             if upload_to_az:
-                util.upload_file(os.path.join(config.output_dir, f), az_file, '$web', overwrite=True)
+                util_az.upload_file(os.path.join(config.output_dir, f), az_file, '$web', overwrite=True)
 
 
 def make_velocity_plots(days=2, upload_to_az=True):
@@ -334,7 +334,7 @@ def make_velocity_plots(days=2, upload_to_az=True):
     fig_filename = os.path.join(config.output_dir, 'ADCP_Velocity_' + str(days) + '.png')
     plt.savefig(fig_filename, dpi=300, bbox_inches='tight', transparent=False)
     az_file = 'adcp/' + os.path.split(fig_filename)[-1]
-    util.upload_file(fig_filename, az_file, '$web', content_type='image/png', overwrite=True)
+    util_az.upload_file(fig_filename, az_file, '$web', content_type='image/png', overwrite=True)
     warnings.filterwarnings('always')
 
 

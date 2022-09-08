@@ -44,7 +44,7 @@ def main():
         print("Doing timeslice:", timeslice, end='')
 
         # =================== Get the data:
-        df = util_db.query_influxdb(read_client, measurement, '*', timeslice, False, approved='all')
+        df = util_db.query_influxdb(read_client, measurement, timeslice)
         # The result doesn't have 'tag_' on tag cols, and the index isn't time yet.
         df = util_db.retag_tag_cols(df, util_db.get_tag_keys(read_client, measurement))
         df = df.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB

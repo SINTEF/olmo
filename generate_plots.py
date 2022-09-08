@@ -83,7 +83,9 @@ def make_weather_plots(filename="weather_1d.html", upload_to_az=True):
     fig = make_subplots(rows=len(plot_data), cols=1, subplot_titles=[p['title'] for p in plot_data])
     fig.update_layout(template='plotly_white')
     for i, p in enumerate(plot_data):
-        df = util_db.query_influxdb(client, p['measurement'], p['variable'], p['timeslice'], p['downsample'])
+        df = util_db.query_influxdb(
+            client, p['measurement'], p['timeslice'],
+            variable=p['variable'], downsample=p['downsample'], approved='yes')
 
         # Simple simple filtering:
         df.loc[df[p['variable']] < p['lower_filter'], p['variable']] = np.nan

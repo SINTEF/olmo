@@ -72,7 +72,7 @@ def main():
         # =================== Get the data:
         dfs = []
         for d in input_data:
-            dfs.append(util_db.query_influxdb(read_client, d[0], d[1], timeslice, False, approved='all'))
+            dfs.append(util_db.query_influxdb(read_client, d[0], timeslice, variable=d[1]))
         df_all = dfs[0]
         for t in dfs[1:]:
             df_all = pd.merge(df_all, t, how='left', on='time')

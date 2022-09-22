@@ -5,6 +5,7 @@ import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import cmocean.cm as cmo
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 from influxdb import InfluxDBClient
@@ -324,7 +325,7 @@ def make_velocity_plots(days=2, upload_to_az=True):
     for i in range(4):
         plt.sca(a[i])
         plt.pcolor(times_mat, depths, velocity[:, :, i], shading="nearest",
-                   vmin=-VMAX, vmax=VMAX, cmap='cmo.balance')
+                   vmin=-VMAX, vmax=VMAX, cmap=cmo.balance)
         if i == 0:
             plt.title(str(days) + ' days\n' + 'Figure updated at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' (local time, Trondheim)\n' + f'[Velocity {i + 1}] ' + titlestr[i], loc='left')
         else:

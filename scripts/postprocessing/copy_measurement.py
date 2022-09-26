@@ -5,15 +5,15 @@ from influxdb import InfluxDBClient
 
 from ctd import CTD
 import config
-import ingest
-import util
+import util_db
+import util_file
 
 '''
 Takes data from a measurement in one DB, and puts that into another.
 '''
 
 # Databases:
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 read_client = InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'example')
 write_clients = [
     InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
@@ -36,7 +36,7 @@ def main():
     print("Starting running add_processed_data.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    periods = util.break_down_time_period(start_time, end_time)
+    periods = util_db.break_down_time_period(start_time, end_time)
 
     # Get ctd object and load the calibration file.
     ctd = CTD()
@@ -47,13 +47,13 @@ def main():
         print("Doing timeslice:", timeslice, end='')
 
         # =================== Get the data:
-        df = util.query_influxdb(read_client, measurement, '*', timeslice, False, approved='all')
+        df = util_db.query_influxdb(read_client, measurement, timeslice)
         # The result doesn't have 'tag_' on tag cols, and the index isn't time yet.
-        df = util.retag_tag_cols(df, util.query_show_tag_keys(read_client, measurement))
+        df = util_db.retag_tag_cols(df, util_db.get_tag_keys(read_client, measurement))
         df = df.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB
 
-        # =================== Delete the data and reupload:
-        ingest.ingest_df(measurement, df, write_clients)
+        # =================== Upload to clinents:
+        util_db.ingest_df(measurement, df, write_clients)
         print(' ... Data written :)')
 
     print("Finished all at "

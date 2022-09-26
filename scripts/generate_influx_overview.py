@@ -3,7 +3,7 @@ import pandas as pd
 from influxdb import InfluxDBClient
 
 import config
-import util
+import util_file
 
 '''
 Upgraded version of "generate_db_overview.py"
@@ -13,7 +13,7 @@ db_name, measurement_name, value_keys, field_keys
 '''
 
 
-USER, PASSWORD = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+USER, PASSWORD = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 AZVM_HOST_IP = config.az_influx_pc
 
 

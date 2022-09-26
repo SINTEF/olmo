@@ -6,7 +6,7 @@ import subprocess
 import numpy as np
 
 import config
-import util
+import util_file
 import sensor_conversions
 
 # In this file we will simulate both "silcam files" and
@@ -29,8 +29,8 @@ files = glob.glob(os.path.join(config.output_dir, silc_file_start + '*'))
 print(files)
 for f in files:
     if os.path.isfile(f):
-        # NOTE this has been changed to the rsunc_inbox:
-        shutil.move(f, util.add_timestring(util.change_dir(f, config.rsync_inbox), TIME_STAMP))
+        # NOTE this has been changed to the rsync_inbox:
+        shutil.move(f, util_file.add_timestring(util_file.change_dir(f, config.rsync_inbox), TIME_STAMP))
     else:
         print(f"File not found/no data: {f}")
 # Finally at the flag that this process is complete
@@ -43,7 +43,7 @@ files = glob.glob(os.path.join(config.rsync_inbox, silc_file_start + '*' + TIME_
 with open(os.path.join(config.secrets_dir, 'azure_token_datalake'), 'r') as f:
     az_token = f.read()  # This token to run out end of 2021
 for f in files:
-    storage_location = f"silc_testing/{os.path.split(util.remove_timestring(f))[1]}"
+    storage_location = f"silc_testing/{os.path.split(util_file.remove_timestring(f))[1]}"
     process = subprocess.run([
         'az', 'storage', 'fs', 'file', 'upload', '-s', f, '-p', storage_location,
         '-f', 'oceanlabdlcontainer', '--account-name', 'oceanlabdlstorage',

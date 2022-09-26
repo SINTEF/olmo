@@ -6,14 +6,13 @@ import pandas as pd
 
 import sensor
 import config
-import util
-import ingest
+import util_db
+import util_file
 
-logger = util.init_logger(config.main_logfile, name='olmo.lisst_200')
+logger = util_file.init_logger(config.main_logfile, name='olmo.lisst_200')
 
 
 class Lisst_200(sensor.Sensor):
-    '''Class for rsyncing and ingesting the Lisst_200 data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
@@ -113,14 +112,14 @@ class Lisst_200(sensor.Sensor):
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l0}.')
             # influx_client.write_points(df, self.measurement_name_l0)
-            ingest.ingest_df(self.measurement_name_l0, df, self.influx_clients)
+            util_db.ingest_df(self.measurement_name_l0, df, self.influx_clients)
 
     def ingest_l1(self, files):
 
         for f in files:
             df = self.lisst200_csv_to_df(f)
 
-            df = util.force_float_cols(df, not_float_cols=['date'])
+            df = util_db.force_float_cols(df, not_float_cols=['date'])
             # TODO: Check this time is correct with what the instrument gives.
             df = df.set_index('date').tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
@@ -131,10 +130,10 @@ class Lisst_200(sensor.Sensor):
                           'tag_approved': 'no',
                           'tag_unit': 'none'}
 
-            df = util.add_tags(df, tag_values)
+            df = util_db.add_tags(df, tag_values)
 
             logger.info(f'Ingesting file {f} to {self.measurement_name_l1}.')
-            ingest.ingest_df(self.measurement_name_l1, df, self.influx_clients)
+            util_db.ingest_df(self.measurement_name_l1, df, self.influx_clients)
 
     def rsync_and_ingest(self):
 

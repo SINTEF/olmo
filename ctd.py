@@ -6,14 +6,13 @@ import xmltodict
 
 import sensor
 import config
-import util
-import ingest
+import util_db
+import util_file
 
-logger = util.init_logger(config.main_logfile, name='olmo.ctd')
+logger = util_file.init_logger(config.main_logfile, name='olmo.ctd')
 
 
 class CTD(sensor.Sensor):
-    '''Class for rsyncing and ingesting the munkholmen ctd data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
@@ -132,7 +131,7 @@ class CTD(sensor.Sensor):
             df_all = pd.read_csv(f, sep=',')
 
             time_col = 'Timestamp'
-            df_all = util.force_float_cols(df_all, not_float_cols=[time_col], error_to_nan=True)
+            df_all = util_db.force_float_cols(df_all, not_float_cols=[time_col], error_to_nan=True)
             df_all[time_col] = pd.to_datetime(df_all[time_col], format='%Y-%m-%d %H:%M:%S')
             df_all = df_all.set_index(time_col).tz_localize('CET', ambiguous='infer').tz_convert('UTC')
 
@@ -150,37 +149,37 @@ class CTD(sensor.Sensor):
             measurement_name = 'ctd_temperature_munkholmen'
             field_keys = {"Temperature": 'temperature'}
             tag_values['tag_unit'] = 'degrees_celcius'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_conductivity_munkholmen'
             field_keys = {"Conductivity": 'conductivity'}
             tag_values['tag_unit'] = 'siemens_per_metre'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_pressure_munkholmen'
             field_keys = {"Pressure": 'pressure'}
             tag_values['tag_unit'] = 'none'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # -------------drop----------------------------------------------- #
             measurement_name = 'ctd_sbe63_munkholmen'
             field_keys = {"SBE63": 'sbe63',
                           "SBE63Temperature": 'sbe63_temperature_voltage'}
             tag_values['tag_unit'] = 'none'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_salinity_munkholmen'
             field_keys = {"Salinity": 'salinity'}
             tag_values['tag_unit'] = 'none'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_voltages_munkholmen'
@@ -190,24 +189,24 @@ class CTD(sensor.Sensor):
                           "Volt4": 'volt4',
                           "Volt5": 'volt5'}
             tag_values['tag_unit'] = 'none'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_depth_munkholmen'
             field_keys = {"depth": 'depth'}
             tag_values['tag_unit'] = 'metres'
             tag_values['tag_data_level'] = 'processed'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             # ------------------------------------------------------------ #
             measurement_name = 'ctd_density_munkholmen'
             field_keys = {"density": 'density'}
             tag_values['tag_unit'] = 'kilograms_per_cubic_metre'
             tag_values['tag_data_level'] = 'processed'
-            df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-            ingest.ingest_df(measurement_name, df, self.influx_clients)
+            df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+            util_db.ingest_df(measurement_name, df, self.influx_clients)
 
             logger.info(f'File {f} ingested.')
 

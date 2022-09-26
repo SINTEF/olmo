@@ -2,8 +2,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-import util
-import ingest
+import util_db
 import processing
 
 '''
@@ -48,7 +47,7 @@ def ingest_loggernet_file(file_path, file_type, clients):
                     df.loc[df[col].str.match('NAN'), col] = -7999
 
         # Force cols to have time np.float64
-        df = ingest.float_col_fix(df, float_cols)
+        df = util_db.force_float_cols(df, float_cols=float_cols)
         # Loggernet data is in CET, but all influx data should be utc.
         df = df.set_index('date').tz_localize(timezone, ambiguous='infer').tz_convert('UTC')
 
@@ -80,67 +79,67 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "Longitude_decimal": 'longitude'}
         tag_values['tag_sensor'] = 'gps'
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'latitude', lower=62.5, upper=64)
         df = processing.constant_val_filter(df, 'longitude', lower=10, upper=11)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_position_displacement_munkholmen'
         field_keys = {"distance": 'position_displacement'}
         tag_values['tag_sensor'] = 'gps'
         tag_values['tag_unit'] = 'metres'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         # df = processing.constant_val_filter(df, 'displacement', lower=0, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_temperature_munkholmen'
         field_keys = {"temperature_digital": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celsius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'temperature', lower=-50, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_munkholmen'
         field_keys = {"pressure_digital": 'atmospheric_pressure'}
         tag_values['tag_unit'] = 'hecto_pascal'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'atmospheric_pressure', lower=500, upper=1500)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_munkholmen'
         field_keys = {"humidity_digital": 'humidity'}
         tag_values['tag_unit'] = 'percent'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'humidity', lower=0, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_dew_point_munkholmen'
         field_keys = {"dew_point": 'dew_point'}
         tag_values['tag_unit'] = 'degrees_celsius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         # df = processing.constant_val_filter(df, 'dew_point', lower=-50, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_munkholmen'
         field_keys = {"wind_speed_digital": 'wind_speed'}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'wind_speed', lower=0, upper=140)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_munkholmen'
         field_keys = {"wind_direction_digital": 'wind_direction'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'wind_direction', lower=1, upper=360)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Power_':
@@ -170,20 +169,20 @@ def ingest_loggernet_file(file_path, file_type, clients):
         field_keys = {"battery_voltage": 'battery_voltage',
                       "PV_Voltage1": "pv_voltage1"}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'battery_voltage', lower=0, upper=50)
         df = processing.constant_val_filter(df, 'pv_voltage1', lower=0, upper=50)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_current_munkholmen'
         field_keys = {"PV1_current": "input_current",
                       "Load_current": "load_current"}
         tag_values['tag_unit'] = 'amperes'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'input_current', lower=0, upper=100)
         df = processing.constant_val_filter(df, 'load_current', lower=0, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_energy_use_munkholmen'
@@ -192,8 +191,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "Energy_output_24H": "energy_output_24h",
                       "Energy_output_total": "energy_output_total"}
         tag_values['tag_unit'] = 'amp_hours'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_aux_munkholmen'
@@ -207,16 +206,16 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "Load_output": "load_output",
                       "Total_of_battery": "total_of_battery"}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'solar_regulator_power_munkholmen'
         field_keys = {"Solar_reg_temperature": "Solar_reg_temperature"}
         tag_values['tag_unit'] = 'degrees_celsius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'Solar_reg_temperature', lower=-50, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Meteo_avgd_':
@@ -241,41 +240,41 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'meteo_temperature_avg_munkholmen'
         field_keys = {"temperature_digital_Avg": 'temperature_avg'}
         tag_values['tag_unit'] = 'degrees_celsius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'temperature_avg', lower=-50, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_atmospheric_pressure_avg_munkholmen'
         field_keys = {"pressure_digital_Avg": 'atmospheric_pressure_avg'}
         tag_values['tag_unit'] = 'hecto_pascal'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'atmospheric_pressure_avg', lower=500, upper=1500)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_humidity_avg_munkholmen'
         field_keys = {"humidity_digital_Avg": 'humidity_avg'}
         tag_values['tag_unit'] = 'percent'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'humidity_avg', lower=0, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_speed_avg_munkholmen'
         field_keys = {"wind_speed_digital": 'wind_speed_avg'}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'wind_speed_avg', lower=0, upper=140)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_avg_munkholmen'
         field_keys = {"wind_direction_digital": 'wind_direction_avg'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'wind_direction_avg', lower=1, upper=360)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Current_':
@@ -297,91 +296,91 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'signature_100_current_speed_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('current_speed')}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_current_direction_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('current_direction')}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_amplitude_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('amplitude')}
         tag_values['tag_unit'] = 'db'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_correlation_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('correlation')}
         tag_values['tag_unit'] = 'percent'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_velocity_munkholmen'
         field_keys = {i: i for i in data_cols if i.startswith('velocity')}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_battery_voltage_munkholmen'
         field_keys = {'ADCP_battery_voltage': 'battery_voltage'}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_error_code_munkholmen'
         field_keys = {'ADCP_error_code': 'error_code'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_heading_munkholmen'
         field_keys = {'ADCP_heading': 'heading'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_pitch_munkholmen'
         field_keys = {'ADCP_pitch': 'pitch'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_pressure_munkholmen'
         field_keys = {'ADCP_pressure': 'pressure'}
         tag_values['tag_unit'] = 'dbar'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_roll_munkholmen'
         field_keys = {'ADCP_Roll': 'roll'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_sound_speed_munkholmen'
         field_keys = {'ADCP_sound_speed': 'sound_speed'}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_temperature_munkholmen'
         field_keys = {'ADCP_temperature': 'temperature'}
         tag_values['tag_unit'] = 'degrees_celsius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_configuration_munkholmen'
@@ -392,8 +391,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
             indexes = [1, 2, 3, 4, 7]
             df.loc[i, :] = [d.split(',')[j] for j in indexes]
         df.index = df_all.index
-        df = util.add_tags(df, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.add_tags(df, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_depth_config_munkholmen'
@@ -404,8 +403,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
             indexes = [5, 6]
             df.loc[i, :] = [d.split(',')[j] for j in indexes]
         df.index = df_all.index
-        df = util.add_tags(df, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.add_tags(df, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'CR6_EOL2p0_Wave_sensor_':
@@ -429,41 +428,41 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'wave_heading_munkholmen'
         field_keys = {"heading": 'heading'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'heading', lower=0, upper=360)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hs_munkholmen'
         field_keys = {"Hs": 'hs'}
         tag_values['tag_unit'] = 'metres'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'hs', lower=-100, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_period_munkholmen'
         field_keys = {"Period": 'period'}
         tag_values['tag_unit'] = 'seconds'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'period', lower=0, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hmax_munkholmen'
         field_keys = {"Hmax": 'hmax'}
         tag_values['tag_unit'] = 'metres'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'hmax', lower=-100, upper=100)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_direction_munkholmen'
         field_keys = {"direction": 'direction'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
         df = processing.constant_val_filter(df, 'direction', lower=0, upper=360)
-        ingest.ingest_df(measurement_name, df, clients)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_System_':
@@ -489,57 +488,57 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'system_temperature_ingdalen'
         field_keys = {"systemTemperature": 'system_temperature'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'system_atmospheric_pressure_ingdalen'
         field_keys = {"systemAirPressure": 'atmospheric_pressure'}
         tag_values['tag_unit'] = 'hecto_pascal'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'system_humidity_ingdalen'
         field_keys = {"systemRelHumidity": 'humidity'}
         tag_values['tag_unit'] = 'percent'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_battery_voltage_ingdalen'
         field_keys = {"victron_BattVolts": 'battery_voltage'}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_charge_current_ingdalen'
         field_keys = {"victron_ChargeCurr": 'charge_current'}
         tag_values['tag_unit'] = 'amperes'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_panel_voltage_ingdalen'
         field_keys = {"victron_PanelVolts": 'panel_voltage'}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_logger_voltage_ingdalen'
         field_keys = {"LoggerVoltage": 'logger_voltage'}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_logger_temperature_ingdalen'
         field_keys = {"LoggerTemperature": 'logger_temperature'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_victron_':
@@ -568,8 +567,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
         field_keys = {"victron_Device": 'tag_sensor',
                       "victron_SER": 'tag_serial',
                       "victron_FW": 'fw'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # The below three vars (victron_BattVolts, victron_PanelVolts, victron_ChargeCurr)
         # are also included in the system table.
@@ -580,8 +579,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
         #               "victron_BattVolts": 'battery_voltage',
         #               "victron_PanelVolts": 'panel_voltage'}
         # tag_values['tag_unit'] = 'volts'
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # # ---------------------------------------------------------------- #
         # measurement_name = 'victron_charge_current_ingdalen'
@@ -589,8 +588,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
         #               "victron_SER": 'tag_serial',
         #               "victron_ChargeCurr": 'charge_current'}
         # tag_values['tag_unit'] = 'amperes'
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_panel_power_ingdalen'
@@ -598,8 +597,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "victron_SER": 'tag_serial',
                       "victron_PanelPower": 'panel_power'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'victron_messages_ingdalen'
@@ -608,8 +607,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "victron_State": 'state',
                       "victron_ERR": 'error'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_SUNA_':
@@ -635,32 +634,32 @@ def ingest_loggernet_file(file_path, file_type, clients):
         field_keys = {"sunaSerial": 'tag_serial',
                       "sunaNitrateMicroMol": 'nitrate_micromol'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_nitrate_milligram_ingdalen'
         field_keys = {"sunaSerial": 'tag_serial',
                       "sunaNitrateMilliGrams": 'nitrate_milligram'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_internal_humidity_ingdalen'
         field_keys = {"sunaSerial": 'tag_serial',
                       "sunaInternalHumidity": 'humidity'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'suna_housing_temperature_ingdalen'
         field_keys = {"sunaSerial": 'tag_serial',
                       "sunaTemperatureHousing": 'temperature'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_signatureRecord_':
@@ -691,119 +690,119 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "signatureDataTypeString": 'data_type_string',
                       "signatureSerialNumber": 'tag_serial_number',
                       "signatureConfiguration": 'configuration'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_sound_velocity_ingdalen'
         field_keys = {"signatureSoundVelocity": 'sound_velocity'}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_temperature_ingdalen'
         field_keys = {"signatureTemperature": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_pressure_ingdalen'
         field_keys = {"signaturePressure": 'pressure'}
         tag_values['tag_unit'] = 'none'  # atmospheres
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_heading_ingdalen'
         field_keys = {"signatureHeading": 'heading'}
         tag_values['tag_unit'] = 'none'  # degrees
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_pitch_ingdalen'
         field_keys = {"signaturePitch": 'pitch'}
         tag_values['tag_unit'] = 'none'  # degrees
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_roll_ingdalen'
         field_keys = {"signatureRoll": 'roll'}
         tag_values['tag_unit'] = 'none'  # degrees
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_status_ingdalen'
         field_keys = {"signatureError": 'error',
                       "signatureStatus0": 'status0',
                       "signatureStatus": 'status'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_cells_ingdalen'
         field_keys = {"signatureCells": 'cells'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_beams_ingdalen'
         field_keys = {"signatureBeams": 'beams'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_cell_size_ingdalen'
         field_keys = {"signatureCellSize": 'cell_size'}
         tag_values['tag_unit'] = 'none'  # metres 5
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_blanking_ingdalen'
         field_keys = {"signatureBlanking": 'blanking'}
         tag_values['tag_unit'] = 'none'  # metres 2
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_battery_ingdalen'
         field_keys = {"signatureBattery": 'battery'}
         tag_values['tag_unit'] = 'none'  # volts 23.4
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_battery_ingdalen'
         field_keys = {"signatureBattery": 'battery'}
         tag_values['tag_unit'] = 'none'  # volts 23.4
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_nominal_correlation_ingdalen'
         field_keys = {"signatureNominalCorrelation": 'nominal_correlation'}
         tag_values['tag_unit'] = 'none'  # percent? 82
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_ambiguity_velocity_ingdalen'
         field_keys = {"signatureAmbiguityVelocity": 'ambiguity_velocity'}
         tag_values['tag_unit'] = 'none'  # metres_per_second 10.39
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_echo_frequency_ingdalen'
         field_keys = {"signatureEchoFrequency": 'echo_frequency'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # # ==================================================================== #
     # if file_type == 'IngdalenCR6_signatureCurrentProf_':
@@ -853,8 +852,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdBattery": 'battery'}
         tag_values['tag_unit'] = 'none'  # volts 13.63
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_temperature_ingdalen'
@@ -862,8 +861,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdTemperature": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'  # 8.5882
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_conductivity_ingdalen'
@@ -871,8 +870,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdConductivity": 'conductivity'}
         tag_values['tag_unit'] = 'none'  # ? 31.6308
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_pressure_ingdalen'
@@ -880,8 +879,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdPressure": 'pressure'}
         tag_values['tag_unit'] = 'none'  # ? 10.431
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_dissolved_oxygen_ingdalen'
@@ -889,8 +888,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdDissOxygen": 'dissolved_oxygen'}
         tag_values['tag_unit'] = 'none'  # ? 9.087
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_salinity_ingdalen'
@@ -898,8 +897,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdSalinity": 'salinity'}
         tag_values['tag_unit'] = 'none'  # ? 29.6189
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_sound_velocity_ingdalen'
@@ -907,8 +906,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdSoundVel": 'sound_velocity'}
         tag_values['tag_unit'] = 'metres_per_second'  # ? 1478.221
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'seabird_spec_cond_ingdalen'  # ???
@@ -916,8 +915,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "seabirdSerial": 'tag_serial',
                       "seabirdSpecCond": 'spec_cond'}
         tag_values['tag_unit'] = 'none'  # ? 47.0862
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_Power_':
@@ -945,43 +944,43 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # ---------------------------------------------------------------- #
         measurement_name = 'power_state_ingdalen'
         field_keys = {f'powerState({i})': f'power_state_{i}' for i in range(1, 12)}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_voltage_ingdalen'
         field_keys = {f'powerVoltage({i})': f'power_voltage_{i}' for i in range(1, 12)}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'power_current_ingdalen'
         field_keys = {f'powerCurrent({i})': f'power_current_{i}' for i in range(1, 12)}
         tag_values['tag_unit'] = 'amperes'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'mux_voltage_ingdalen'
         field_keys = {f'muxVoltage({i})': f'mux_voltage_{i}' for i in range(1, 4)}
         tag_values['tag_unit'] = 'volts'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'mux_current_ingdalen'
         field_keys = {f'muxCurrent({i})': f'mux_current_{i}' for i in range(1, 4)}
         tag_values['tag_unit'] = 'amperes'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'mux_temperature_ingdalen'
         field_keys = {f'muxTemperature({i})': f'mux_temperature_{i}' for i in range(1, 4)}
         tag_values['tag_unit'] = 'degrees_celcius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_PAR_':
@@ -1006,42 +1005,42 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # # ---------------------------------------------------------------- #
         # measurement_name = 'par_surface_serial_ingdalen'
         # field_keys = {"parSrfSerial": 'surface_serial'}
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # # ---------------------------------------------------------------- #
         # measurement_name = 'par_subsea_serial_ingdalen'
         # field_keys = {"parSubSerial": 'subsea_serial'}
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_live_ingdalen'
         field_keys = {"parSrfSerial": 'tag_serial',
                       "parSrfLive": 'par_surface_live'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_live_ingdalen'
         field_keys = {"parSubSerial": 'tag_serial',
                       "parSubLive": 'par_subsea_live'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_average_ingdalen'
         field_keys = {"parSrfSerial": 'tag_serial',
                       "parSrfAvg": 'par_surface_average'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_average_ingdalen'
         field_keys = {"parSubSerial": 'tag_serial',
                       "parSubAvg": 'par_subsea_average'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_orientation_ingdalen'
@@ -1049,8 +1048,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "parSrfPitch": 'par_surface_pitch',
                       "parSrfRoll": 'par_surface_roll'}
         tag_values['tag_unit'] = 'none'  # ? 0.6
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_orientation_ingdalen'
@@ -1058,24 +1057,24 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "parSubPitch": 'par_subsea_pitch',
                       "parSubRoll": 'par_subsea_roll'}
         tag_values['tag_unit'] = 'none'  # ? -1.5
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_surface_temperature_ingdalen'
         field_keys = {"parSrfSerial": 'tag_serial',
                       "parSrfTemp": 'par_surface_temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'  # ? 15.3
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'par_subsea_temperature_ingdalen'
         field_keys = {"parSubSerial": 'tag_serial',
                       "parSubTemp": 'par_subsea_temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'  # ? 13.7
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_MetData_':
@@ -1100,57 +1099,57 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'meteo_wind_speed_ingdalen'
         field_keys = {"avgWindSpeed": 'wind_speed'}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_wind_direction_ingdalen'
         field_keys = {"avgWindDir": 'wind_direction'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_gust_speed_ingdalen'
         field_keys = {"gustWindSpeed": 'gust_speed'}
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_gust_direction_ingdalen'
         field_keys = {"gustWindDir": 'gust_direction'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_maximet_temperature_ingdalen'
         field_keys = {"maximetTemperature": 'maximet_temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_maximet_pressure_ingdalen'
         field_keys = {"maximetPressure": 'maximet_pressure'}
         tag_values['tag_unit'] = 'hecto_pascal'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_maximet_humidity_ingdalen'
         field_keys = {"maximetHumidity": 'maximet_humidity'}
         tag_values['tag_unit'] = 'percent'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'meteo_maximet_solar_ingdalen'
         field_keys = {"maximetSolar": 'maximet_solar'}
         tag_values['tag_unit'] = 'none'  # ? 896
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_Hydrocat_':
@@ -1175,94 +1174,94 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # # ---------------------------------------------------------------- #
         # measurement_name = 'hydrocat_serial_ingdalen'
         # field_keys = {"hydrocatSerial": 'serial'}
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_temperature_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatTemperature": 'temperature'}
         tag_values['tag_unit'] = 'degrees_celcius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_conductivity_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatConductivity": 'conductivity'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_pressure_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatPressure": 'pressure'}
         tag_values['tag_unit'] = 'atmospheres'  # 0.968 ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_dissolved_oxygen_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatDissOxygen": 'dissolved_oxygen'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_salinity_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatSalinity": 'salinity'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_sound_velocity_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatSoundVel": 'sound_velocity'}
         tag_values['tag_unit'] = 'degrees_celcius'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_spec_cond_ingdalen'  # ?
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatSpecCond": 'spec_cond'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_fluorescence_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatFluorescence": 'fluorescence'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_turbidity_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatTurbidity": 'turbidity'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_ph_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatPH": 'ph'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'hydrocat_oxygen_saturation_ingdalen'
         field_keys = {"hydrocatSerial": 'tag_serial',
                       "hydrocatOxygenSaturation": 'oxygen_saturation'}
         tag_values['tag_unit'] = 'none'  # ?
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_GPSData_':
@@ -1287,29 +1286,29 @@ def ingest_loggernet_file(file_path, file_type, clients):
         field_keys = {"Latitude": 'latitude',
                       "Longitude": 'longitude'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'gps_dop_ingdalen'
         field_keys = {"DOP": 'dop'}
         tag_values['tag_unit'] = 'none'  # ? 1.2
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'gps_sats_ingdalen'
         field_keys = {"Sats": 'sats'}
         tag_values['tag_unit'] = 'none'  # ? 7
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'gps_position_displacement_ingdalen'
         field_keys = {"PositionDev": 'position_displacement'}
         tag_values['tag_unit'] = 'metres'  # ? 100.0999
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_Debug_':
@@ -1332,8 +1331,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # ---------------------------------------------------------------- #
         measurement_name = 'debug_log_ingdalen'
         field_keys = {"debugMessage": 'debug_log'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_CFluor_':
@@ -1360,22 +1359,22 @@ def ingest_loggernet_file(file_path, file_type, clients):
         # # ---------------------------------------------------------------- #
         # measurement_name = 'cflour_model_ingdalen'
         # field_keys = {"CFluor_Model": 'cflour_model'}
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # # ---------------------------------------------------------------- #
         # measurement_name = 'cflour_serial_ingdalen'
         # field_keys = {"CFluor_Serial": 'cflour_serial'}
-        # df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        # ingest.ingest_df(measurement_name, df, clients)
+        # df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        # util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'cflour_cdom_ingdalen'
         field_keys = {"CFluor_Model": 'tag_sensor',
                       "CFluor_Serial": 'tag_serial',
                       "CFluor_CDOM": 'cflour_cdom'}
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_Wave_':
@@ -1400,31 +1399,31 @@ def ingest_loggernet_file(file_path, file_type, clients):
         measurement_name = 'wave_hs_ingdalen'
         field_keys = {"Hs": 'hs'}
         tag_values['tag_unit'] = 'metres'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_hmax_ingdalen'
         field_keys = {"Hmax": 'hmax'}
         tag_values['tag_unit'] = 'metres'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_period_ingdalen'
         field_keys = {"DominantPeriodFW": 'dominant_period_fw',
                       "PavgTE": 'p_avg_te'}
         tag_values['tag_unit'] = 'seconds'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_direction_ingdalen'
         field_keys = {"WaveDirectionFW": 'wave_direction_fw',
                       "MeanWaveDirection": 'mean_wave_direction'}
         tag_values['tag_unit'] = 'degrees'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'wave_acceleration_ingdalen'
@@ -1432,8 +1431,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
                       "maxAccY": 'max_acc_y',
                       "maxAccZ": 'max_acc_z'}
         tag_values['tag_unit'] = 'none'
-        df = util.filter_and_tag_df(df_all, field_keys, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
     # ==================================================================== #
     if file_type == 'IngdalenCR6_signatureCurrentProf_':
@@ -1468,8 +1467,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
         data = df_all.loc[:, 'signatureCellDistProfile'].values.reshape((1, n_bins))
         df = pd.DataFrame(data=data, index=[idx], columns=cols)
         tag_values['tag_unit'] = 'metres'
-        df = util.add_tags(df, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.add_tags(df, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_velocity_ingdalen'
@@ -1482,8 +1481,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
             data[0, i * n_bins: (i + 1) * n_bins] = df_all.loc[:, f'signatureVelocityProfile({i + 1})'].values.reshape((1, n_bins))
         df = pd.DataFrame(data=data, index=[idx], columns=cols)
         tag_values['tag_unit'] = 'metres_per_second'
-        df = util.add_tags(df, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.add_tags(df, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_amplitude_ingdalen'
@@ -1496,8 +1495,8 @@ def ingest_loggernet_file(file_path, file_type, clients):
             data[0, i * n_bins: (i + 1) * n_bins] = df_all.loc[:, f'signatureAmplitudeProfile({i + 1})'].values.reshape((1, n_bins))
         df = pd.DataFrame(data=data, index=[idx], columns=cols)
         tag_values['tag_unit'] = 'none'
-        df = util.add_tags(df, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.add_tags(df, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)
 
         # ---------------------------------------------------------------- #
         measurement_name = 'signature_100_correlation_ingdalen'
@@ -1510,5 +1509,5 @@ def ingest_loggernet_file(file_path, file_type, clients):
             data[0, i * n_bins: (i + 1) * n_bins] = df_all.loc[:, f'signatureCorrelationProfile({i + 1})'].values.reshape((1, n_bins))
         df = pd.DataFrame(data=data, index=[idx], columns=cols)
         tag_values['tag_unit'] = 'none'
-        df = util.add_tags(df, tag_values)
-        ingest.ingest_df(measurement_name, df, clients)
+        df = util_db.add_tags(df, tag_values)
+        util_db.ingest_df(measurement_name, df, clients)

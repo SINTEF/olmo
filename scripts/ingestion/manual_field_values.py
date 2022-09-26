@@ -4,8 +4,8 @@ import datetime
 from influxdb import InfluxDBClient
 
 import config
-import ingest
-import util
+import util_db
+import util_file
 
 # File to ingest a specific piece of data into a table in the database.
 # Initially made to ingest lat/lon locations of sensors to the correct table.
@@ -16,7 +16,7 @@ import util
 # ---- input data:
 
 # Databases:
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 clients = [
     InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
     InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
@@ -59,7 +59,7 @@ def main():
         df[k] = v
     print(measurement_name, df)
     print(datetime.datetime.now(datetime.timezone.utc))
-    ingest.ingest_df(measurement_name, df, clients)
+    util_db.ingest_df(measurement_name, df, clients)
 
     print("All data ingested successfully, exiting.")
 

@@ -7,8 +7,8 @@ from urllib.parse import quote_plus as url_quote
 from influxdb import InfluxDBClient
 
 import config
-import util
-import ingest
+import util_db
+import util_file
 
 
 def db_create_engine(url: str):
@@ -42,7 +42,7 @@ def main():
     print("Starting running ingest_node2.py at "
           + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    logger = util.init_logger(config.node2_logfile, name='ingest_node2')
+    logger = util_file.init_logger(config.node2_logfile, name='ingest_node2')
     logger.info("\n\n------ Starting data collection in main()")
 
     db_url = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
@@ -58,7 +58,7 @@ def main():
         exit()
 
     logger.info("Fetching the influxdb clients.")
-    admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+    admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
         InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
         InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
@@ -118,7 +118,7 @@ def main():
         # date column should be the index, with utc timezone:
         df = df.set_index('date').tz_convert('UTC')
 
-        ingest.ingest_df(d[2], df, clients)
+        util_db.ingest_df(d[2], df, clients)
 
     logger.info("All data transferred and ingested successfully, exiting.")
 

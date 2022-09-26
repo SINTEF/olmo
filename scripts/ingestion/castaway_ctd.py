@@ -5,8 +5,8 @@ import datetime
 from influxdb import InfluxDBClient
 
 import config
-import ingest
-import util
+import util_db
+import util_file
 
 # File to ingest a 'castaway CTD' file.
 
@@ -22,7 +22,7 @@ files = [
 ]
 
 # Databases:
-admin_user, admin_pwd = util.get_influx_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
+admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
 clients = [
     InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
     InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
@@ -81,7 +81,7 @@ def main():
         df_all = pd.read_csv(file, header=HEADER_LENGTH + 1)
         # Convert col names to simple names:
         df_all.rename(columns=col_names, inplace=True)
-        df_all = ingest.float_col_fix(df_all, 'all')
+        df_all = util_db.force_float_cols(df_all, not_float_cols=[])
         # Remember, all times in influxDB as UTC.
         start_time = datetime.datetime.strptime(header['Cast time (UTC)'], "%Y-%m-%d %H:%M:%S")
         delta = datetime.timedelta(seconds=np.float64(header['Cast duration (Seconds)']) / (df_all.shape[0] - 1))
@@ -94,8 +94,8 @@ def main():
         for k, v in vars_units.items():
             measurement_name = measurement_names.replace('VARIABLE', k)
             tag_values['tag_unit'] = v
-            df = util.filter_and_tag_df(df_all, {k: k}, tag_values)
-            ingest.ingest_df(measurement_name, df, clients)
+            df = util_db.filter_and_tag_df(df_all, {k: k}, tag_values)
+            util_db.ingest_df(measurement_name, df, clients)
         print(f'Finished ingesting file {file}')
 
     print("All data ingested successfully, exiting.")

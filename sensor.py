@@ -2,7 +2,7 @@ import os
 import logging
 import re
 
-import util
+import util_file
 import config
 
 logger = logging.getLogger('olmo.sensor')
@@ -81,7 +81,7 @@ class Sensor:
         if (self.data_dir is None) or (file_regex is None):
             raise ValueError("fetch_files_list() requires 'data_dir' and 'file_regex' are set.")
 
-        ls_out, ls_err = util.ls_remote(
+        ls_out, ls_err = util_file.ls_remote(
             config.munkholmen_user, config.munkholmen_pc,
             self.data_dir, port=config.munkholmen_ssh_port)
 
@@ -169,11 +169,11 @@ class Sensor:
         return rsynced_files
 
     def get_influx_user(self, file=os.path.join(config.secrets_dir, 'influx_admin_credentials')):
-        admin_user, _ = util.get_influx_user_pwd(file)
+        admin_user, _ = util_file.get_user_pwd(file)
         return admin_user
 
     def get_influx_pwd(self, file=os.path.join(config.secrets_dir, 'influx_admin_credentials')):
-        _, admin_pwd = util.get_influx_user_pwd(file)
+        _, admin_pwd = util_file.get_user_pwd(file)
         return admin_pwd
 
     def get_azure_token(self, file=os.path.join(config.secrets_dir, 'azure_token_datalake')):

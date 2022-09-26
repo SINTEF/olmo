@@ -6,13 +6,12 @@ from influxdb import DataFrameClient
 
 import sensor
 import config
-import util
+import util_db
 
 logger = logging.getLogger('olmo.adcp')
 
 
 class ADCP(sensor.Sensor):
-    '''Class for rsyncing and ingesting the ADCP data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
@@ -172,7 +171,7 @@ class ADCP(sensor.Sensor):
             for i in range(PNORC.shape[0]):
                 not_float_cols.append(f"amplitude_unit_{i}")
                 not_float_cols.append(f"checksum_pnorc_{i}")
-            df_ingest = util.force_float_cols(df_ingest, not_float_cols=not_float_cols)
+            df_ingest = util_db.force_float_cols(df_ingest, not_float_cols=not_float_cols)
 
             # TODO: Check that this time is correctly input now:
             df_ingest = df_ingest.set_index('date').tz_localize('UTC', ambiguous='infer')

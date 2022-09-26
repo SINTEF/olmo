@@ -9,7 +9,6 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
 
 
 class Munkholmen_Pi(sensor.Sensor):
-    '''Class for rsyncing and ingesting the munkholmen raspberry pi status data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',

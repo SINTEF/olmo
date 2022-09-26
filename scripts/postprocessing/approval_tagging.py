@@ -38,7 +38,7 @@ def main():
 
         for client in clients:
             # =================== Get the data:
-            df = util_db.query_influxdb(client, measurement, '*', timeslice, False, approved='all')
+            df = util_db.query_influxdb(client, measurement, timeslice)
             df = df.set_index('time').tz_convert('UTC')  # Should be in correct TZ as comes from DB
             # print(df)
 

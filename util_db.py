@@ -149,7 +149,7 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     return df
 
 
-def query_influxdb(client, measurement, variable, timeslice, downsample, approved='yes'):
+def query_influxdb(client, measurement, timeslice, variable='*', downsample=False, approved='all'):
     '''
     Querires influxDB measurement within some particular timeslice.
 
@@ -162,13 +162,13 @@ def query_influxdb(client, measurement, variable, timeslice, downsample, approve
     ----------
     client : influxdb.InfluxDBClient
     measurement : str
+    timeslice : str
+        Example: 'time > now() - 60d'
+        Example: "time > '2022-06-01T00:00:00Z' AND time < '2022-07-10T08:00:00Z'"
     variable : str or list
         If '*' will return all
         If 'list' should be a list of variables (str)
         If str, should be exact variable name
-    timeslice : str
-        Example: 'time > now() - 60d'
-        Example: "time > '2022-06-01T00:00:00Z' AND time < '2022-07-10T08:00:00Z'"
     downsample : bool or str
         If not False should be str of form: 'time(1m)'
     approved : str

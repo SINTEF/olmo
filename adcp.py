@@ -12,7 +12,6 @@ logger = logging.getLogger('olmo.adcp')
 
 
 class ADCP(sensor.Sensor):
-    '''Class for rsyncing and ingesting the ADCP data.'''
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',

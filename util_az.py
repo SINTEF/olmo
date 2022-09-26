@@ -58,7 +58,7 @@ def container_ls(container, prefix=None):
     with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
         aztoken = f.read()
 
-    # az storage blob list --container-name container1 
+    # az storage blob list --container-name container1
     # az storage fs list --account-name myadlsaccount --account-key 0000-0000
     # process = subprocess.Popen([
     #     'az', 'storage', 'fs', 'list',

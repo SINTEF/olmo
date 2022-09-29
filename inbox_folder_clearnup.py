@@ -50,11 +50,11 @@ def clean_influx_backups(days=5, weeks=3, months=3):
     '''
 
     day = datetime.datetime.now()
-    print(day.strftime('%Y%m%d'))
+    days_to_keep = [day.strftime('%Y%m%d')]
     counter = 0
     while True:
         day = day - datetime.timedelta(days=1)
-        print('d', day.strftime('%Y%m%d'))
+        days_to_keep.append(day.strftime('%Y%m%d'))
         counter += 1
         if counter >= (days - 1):
             break
@@ -62,7 +62,7 @@ def clean_influx_backups(days=5, weeks=3, months=3):
     while True:
         day = day - datetime.timedelta(days=1)
         if day.strftime('%d') in ['01', '07', '14', '21']:
-            print('w', day.strftime('%Y%m%d'))
+            days_to_keep.append(day.strftime('%Y%m%d'))
             counter += 1
         if counter >= weeks:
             break
@@ -70,15 +70,20 @@ def clean_influx_backups(days=5, weeks=3, months=3):
     while True:
         day = day - datetime.timedelta(days=1)
         if day.strftime('%d') == '01':
-            print('m', day.strftime('%Y%m%d'))
+            days_to_keep.append(day.strftime('%Y%m%d'))
             counter += 1
         if counter >= months:
             break
 
-    util_az.container_ls('oceanlabdlcontainer', prefix='influx_backups/')
-    # util_az.upload_file('test.txt', 'test/test.txt', 'oceanlabdlcontainer')
+    backups = util_az.container_ls('oceanlabdlcontainer', prefix=config.az_backups_folder, token_file='azure_token_dlcontainer')
+
+    for f in backups:
+        if f[len(config.backup_basename):len(config.backup_basename) + 8] not in days_to_keep:
+            util_az.delete_file(
+                config.az_backups_folder + '/' + f,
+                'oceanlabdlcontainer', token_file='azure_token_dlcontainer')
 
 
 if __name__ == "__main__":
-    # clean_inbox_folders()
+    clean_inbox_folders()
     clean_influx_backups()

@@ -22,6 +22,9 @@ write_clients = [
 
 # Measurements to be copied:
 measurement = 'ctd_correctsbe63_munkholmen'
+# measurements = [
+#     'ctd_correctsbe63_munkholmen',
+# ]
 
 # Time period:
 start_time = '2022-06-01T00:00:00Z'

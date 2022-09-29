@@ -1,6 +1,7 @@
 import os
 import subprocess
 import logging
+import json
 
 import config
 
@@ -16,7 +17,7 @@ def upload_file(local_file, az_file, container, content_type='text/html', overwr
     Parameters
     ----------
     local_file : str
-        Path to local file file.
+        Path to local file.
     az_file : str
         Path and name of file uploaded to azure.
     container : str
@@ -42,3 +43,76 @@ def upload_file(local_file, az_file, container, content_type='text/html', overwr
         print("we got an error")
         raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
     # logger.info('Backup, archive and transfer to azure completed successfully.')
+
+
+def delete_file(az_file, container, token_file='azure_token_web'):
+    '''
+    Deletes a fiels from the the azure dl storage.
+
+    Parameters
+    ----------
+    az_file : str
+        Path and name of file to be deleted.
+    container : str
+        Name of 'container' in azure where the file is stored.
+    token_file : str
+    '''
+
+    with open(os.path.join(config.secrets_dir, token_file)) as f:
+        aztoken = f.read()
+
+    process = subprocess.Popen([
+        'az', 'storage', 'fs', 'file', 'delete', '--yes',
+        '--account-name', 'oceanlabdlstorage',
+        '--file-system', container,
+        '--path', az_file,
+        '--sas-token', aztoken[:-1]],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate(timeout=60)
+    if process.returncode != 0:
+        print("We got an error.")
+        raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
+
+
+def container_ls(container, prefix=None, token_file='azure_token_web'):
+    '''
+    List the files in the given container. Prefix used for 'subfolders'.
+
+    Parameters
+    ----------
+    container : str
+    prefix : None or str
+    token_file : str
+    '''
+
+    with open(os.path.join(config.secrets_dir, token_file)) as f:
+        aztoken = f.read()
+
+    process = subprocess.Popen([
+        'az', 'storage', 'fs', 'file', 'list',
+        '--account-name', 'oceanlabdlstorage',
+        '--file-system', container,
+        '--path', prefix,
+        '--sas-token', aztoken[:-1]],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate(timeout=60)
+    if process.returncode != 0:
+        print("We got an error.")
+        raise ValueError("process.returncode != 0.\n" + stderr.decode(errors="ignore"))
+    else:
+        stdout = json.loads(stdout.decode('utf-8'))
+        # Output has the form:
+        #     [{"contentLength": 1049468602,
+        #     "etag": "0x8DA9F6301D6B099",
+        #     "group": "$superuser",
+        #     "isDirectory": false,
+        #     "lastModified": "2022-09-26T02:01:20",
+        #     "name": "influx_backups/influxbackup_20220926.zip",
+        #     "owner": "$superuser",
+        #     "permissions": "rw-r-----"}, ... ]
+        files = []
+        for f in stdout:
+            files.append(f['name'][len(prefix) + 1:])  # We remove the prefix also
+        return files

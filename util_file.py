@@ -71,9 +71,9 @@ def remove_timestring(filepath):
         return base_name
 
 
-def ls_remote(user, machine, directory, port=22):
+def ls_remote(user, machine, directory, port=22, custom_search=None):
     '''
-    Perform 'ls' over ssh onto linux machine. Uses ssh.
+    Perform 'ls' over ssh onto linux machine.
 
     Parameters
     ----------
@@ -93,8 +93,37 @@ def ls_remote(user, machine, directory, port=22):
 
     command = f"ls {directory}"
     stdin, stdout, stderr = ssh.exec_command(command)
+    stdout = stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
 
-    return stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
+    return stdout
+
+
+def find_remote(user, machine, directory, serach, port=22):
+    '''
+    Perform 'find {directory} -name '{custom_search}'"' over ssh onto linux machine.
+
+    Parameters
+    ----------
+    user : str
+    machine : str
+        IP address of the maching you will connect to.
+    directory : str
+    search : str
+    port : int, default 22
+
+    Returns
+    -------
+    str
+    '''
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(machine, username=user, port=port)
+
+    command = f"find {directory} -name '{serach}'"
+    stdin, stdout, stderr = ssh.exec_command(command)
+    stdout = stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
+
+    return stdout
 
 
 def get_user_pwd(file):

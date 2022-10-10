@@ -12,7 +12,7 @@ class Munkholmen_Pi(sensor.Sensor):
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            file_regex_l0=r"status.csv",
+            file_search_l0=r"status.csv",
             drop_recent_files_l0=0,
             remove_remote_files_l0=False,
             max_files_l0=None,
@@ -21,7 +21,7 @@ class Munkholmen_Pi(sensor.Sensor):
         # Init the Sensor() class: Unused vars/levels are set to None.
         super(Munkholmen_Pi, self).__init__()
         self.data_dir = data_dir
-        self.file_regex_l0 = file_regex_l0
+        self.file_search_l0 = file_search_l0
         self.drop_recent_files_l0 = drop_recent_files_l0
         self.remove_remote_files_l0 = remove_remote_files_l0
         self.max_files_l0 = max_files_l0

@@ -66,7 +66,7 @@ class Sensor:
         self.measurement_name_l2 = measurement_name_l2
         self.measurement_name_l3 = measurement_name_l3
 
-    def fetch_files_list(self, file_regex, recursive_file_search, drop_recent_files, custom_search=None):
+    def fetch_files_list(self, file_regex, recursive_file_search, drop_recent_files):
         '''Use regex to find all files up to self.drop_recent_files
 
         Will match all files from the remote data_dir using the file_regex
@@ -91,18 +91,22 @@ class Sensor:
         if (self.data_dir is None) or (file_regex is None):
             raise ValueError("fetch_files_list() requires 'data_dir' and 'file_regex' are set.")
 
+        # TODO: Need to handle the ls_err (below in both statements) in some way.
         if recursive_file_search:
             ls_out, ls_err = util_file.find_remote(
                 config.munkholmen_user, config.munkholmen_pc,
                 self.data_dir, file_regex, port=config.munkholmen_ssh_port)
-            print(ls_out)
+            # Using find_remote() it should already filter. Thus just split up string:
+            files = ls_out.split('\n')
+            if files[-1] == '':
+                files = files[:-1]
+            # Remove the 'self.data_dir' from the file path, so consistet with below
+            for i, f in enumerate(files):
+                files[i] = f[len(self.data_dir) + 1:]
         else:
             ls_out, ls_err = util_file.ls_remote(
                 config.munkholmen_user, config.munkholmen_pc,
                 self.data_dir, port=config.munkholmen_ssh_port)
-
-            # TODO: Need to handle the ls_err in some way.
-
             files = []
             while True:
                 match = re.search(file_regex, ls_out)
@@ -112,13 +116,13 @@ class Sensor:
                     files.append(match.group())
                     ls_out = ls_out[match.span()[1]:]
 
-            if len(files) <= drop_recent_files:
-                logger.info(f"No new files found matching regex pattern: {file_regex}")
-                return None
-            elif drop_recent_files == 0:
-                return files
-            else:
-                return files[:-drop_recent_files]
+        if len(files) <= drop_recent_files:
+            logger.info(f"No new files found matching regex pattern: {file_regex}")
+            return None
+        elif drop_recent_files == 0:
+            return files
+        else:
+            return files[:-drop_recent_files]
 
     def rsync(self):
         '''rsync's files from munkholmen to the controller PC.
@@ -155,8 +159,8 @@ class Sensor:
                     logger.error(f"Rsync for file {f} didn't work, output sent to stdout, (probably the log from the cronjob).")
                     return rsynced_files
                 else:
-                    logger.info(f"rsync'ed file: {os.path.join(config.rsync_inbox_adcp, f)}")
-                    rsynced_files.append(os.path.join(config.rsync_inbox_adcp, f))
+                    logger.info(f"rsync'ed file: {os.path.join(config.rsync_inbox_adcp, os.path.basename(f))}")
+                    rsynced_files.append(os.path.join(config.rsync_inbox_adcp, os.path.basename(f)))
 
             return rsynced_files
 

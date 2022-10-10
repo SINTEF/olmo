@@ -101,6 +101,7 @@ def ls_remote(user, machine, directory, port=22, custom_search=None):
 def find_remote(user, machine, directory, serach, port=22):
     '''
     Perform 'find {directory} -name '{custom_search}'"' over ssh onto linux machine.
+    Note this returns the full file path, not relative to 'directory'.
 
     Parameters
     ----------

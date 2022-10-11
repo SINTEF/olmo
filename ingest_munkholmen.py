@@ -4,7 +4,7 @@ from influxdb import InfluxDBClient
 
 import config
 import util_file
-from ctd import CTD
+# from ctd import CTD
 from gas_analyser import GasAnalyser
 # from adcp import ADCP
 # from lisst_200 import Lisst_200
@@ -20,19 +20,20 @@ def main():
 
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
-    clients = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'test'),
-        # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+    # open_clients = [
+    #     InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+    #     # InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+    # ]
+    methane_client = [
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_closed'),
     ]
-
-    # ctd = CTD(influx_clients=clients)
+    # ctd = CTD(influx_clients=open_clients)
     # ctd.rsync_and_ingest()
 
-    print('loading analyser class:')
-    gas = GasAnalyser(influx_clients=clients)
+    gas = GasAnalyser(influx_clients=methane_client)
     gas.rsync_and_ingest()
 
-    # lisst = Lisst_200(influx_clients=clients)
+    # lisst = Lisst_200(influx_clients=open_clients)
     # lisst.rsync_and_ingest()
 
     # adcp = ADCP()

@@ -1,5 +1,6 @@
 import logging
 import datetime
+import re
 import numpy as np
 import pandas as pd
 
@@ -304,3 +305,22 @@ def break_down_time_period(start_time, end_time):
             end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
 
     return periods
+
+
+def format_str(string):
+    '''
+    Formats a string such that it conforms to Williams conventions for
+    db names (lower case, no special chars except '_').
+
+    Parameters
+    ----------
+    string : str
+
+    Returns
+    -------
+    str
+    '''
+    string.replace('-', '_')
+    string = re.sub('[^A-Za-z0-9_]+', '', string)  # Remove special chars (except '_')
+    string = re.sub('\s+', '', string)
+    return string.lower()

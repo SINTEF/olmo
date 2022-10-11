@@ -103,6 +103,7 @@ class Sensor:
             # Remove the 'self.data_dir' from the file path, so consistet with below
             for i, f in enumerate(files):
                 files[i] = f[len(self.data_dir) + 1:]
+            files.sort()
         else:
             ls_out, ls_err = util_file.ls_remote(
                 config.munkholmen_user, config.munkholmen_pc,

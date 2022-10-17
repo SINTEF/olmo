@@ -18,11 +18,20 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     methane_client = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_closed'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_test_lara'),
     ]
 
     gas = GasAnalyser(influx_clients=methane_client)
     gas.rsync_and_ingest()
+
+    # From vizualisations, we see that there are values < 0 that are probably errors
+    # tag_approved_level will be changed to "no" from "none" as likely not passing filter
+    print(gas)
+
+# to ask will: 
+# where/how to dev?
+# 1) how to edit dfs?
+# 2)  
 
 
 if __name__ == "__main__":

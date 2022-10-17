@@ -10,6 +10,7 @@ import util_file
 
 logger = util_file.init_logger(config.main_logfile, name='olmo.gasanalyser')
 
+# Test by running in one folder? How do you develop and not ingest actually
 
 class GasAnalyser(sensor.Sensor):
     def __init__(
@@ -19,12 +20,12 @@ class GasAnalyser(sensor.Sensor):
             file_search_l0='gga_????-??-??_f????.txt',
             drop_recent_files_l0=1,
             remove_remote_files_l0=False,
-            max_files_l0=None,
+            max_files_l0=1,
             recursive_file_search_l1=True,
             file_search_l1='gga_????-??-??_f????.txt.zip',
             drop_recent_files_l1=1,
             remove_remote_files_l1=False,
-            max_files_l1=None,
+            max_files_l1=1,
             influx_clients=None):
 
         # Init the Sensor() class: Unused vars/levels are set to None.
@@ -47,8 +48,8 @@ class GasAnalyser(sensor.Sensor):
         for f in files:
 
             # Special conditions:
-            # Note that the place we get the data from will continually fefil with data. So we will
-            # cotinually reingest data. This is not optimal.
+            # Note that the place we get the data from will continually refill with data. So we will
+            # continually reingest data. This is not optimal.
             #
             # If date is 2002-01-01: We should skip it.
             # If data is > 2022-09-01: We should label it as from the munkholmen buoy, otherwise its origin is unknown.
@@ -102,7 +103,8 @@ class GasAnalyser(sensor.Sensor):
                               "   [CH4]_ppm_sd": util_db.format_str("   [CH4]_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                # put return statement here
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_h2o'
@@ -110,15 +112,23 @@ class GasAnalyser(sensor.Sensor):
                               "   [H2O]_ppm_sd": util_db.format_str("   [H2O]_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_co2'
                 field_keys = {"      [CO2]_ppm": util_db.format_str("      [CO2]_ppm"),
                               "   [CO2]_ppm_sd": util_db.format_str("   [CO2]_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
-                df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)                
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
+
+                # From vizualisations, we see that there are values < 0 that are probably errors
+                # tag_approved_level will be changed to "no" from "none" as likely not passing filter
+                df.loc[df.co2_ppm < 0, 'tag_values'] = "no"
+
+
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #print(df.head())
+
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_ch4d'
@@ -126,7 +136,7 @@ class GasAnalyser(sensor.Sensor):
                               "  [CH4]d_ppm_sd": util_db.format_str("  [CH4]d_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_co2d'
@@ -134,7 +144,7 @@ class GasAnalyser(sensor.Sensor):
                               "  [CO2]d_ppm_sd": util_db.format_str("  [CO2]d_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_gasp'
@@ -142,7 +152,7 @@ class GasAnalyser(sensor.Sensor):
                               "   GasP_torr_sd": util_db.format_str("   GasP_torr_sd")}
                 tag_values['tag_unit'] = 'torr'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_gast'
@@ -150,7 +160,7 @@ class GasAnalyser(sensor.Sensor):
                               "      GasT_C_sd": util_db.format_str("      GasT_C_sd")}
                 tag_values['tag_unit'] = 'degrees_celcius'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_ambt'
@@ -158,7 +168,7 @@ class GasAnalyser(sensor.Sensor):
                               "      AmbT_C_sd": util_db.format_str("      AmbT_C_sd")}
                 tag_values['tag_unit'] = 'degrees_celcius'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_aux'
@@ -171,7 +181,7 @@ class GasAnalyser(sensor.Sensor):
                               "       MIU_DESC": util_db.format_str("       MIU_DESC")}
                 tag_values['tag_unit'] = 'none'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                util_db.ingest_df(measurement_name, df, self.influx_clients)
+                #util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 logger.info(f'File {f} ingested.')
             except (ValueError, KeyError) as error:
@@ -186,5 +196,5 @@ class GasAnalyser(sensor.Sensor):
             self.ingest_l0(files['l0'])
         if files['l1'] is not None:
             self.ingest_l0(files['l1'])  # NOTE: we are sending l1 files to the l0 ingester here.
-
+# What does the above comment mean? 
         logger.info('ctd.rsync_and_ingest() finished.')

@@ -128,7 +128,7 @@ def add_tags(df, tag_values):
     return df
 
 
-def filter_and_tag_df(df_all, field_keys, tag_values):
+def filter_and_tag_df(df_all, field_keys, tag_values, disapprove_nans=False):
     '''
     Given a df with a large set of data returns a df with only the data
     from 'field_keys' and tagged with 'tag_values'
@@ -141,6 +141,9 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     tag_values : dict
         Should be key value pairs of tag names and tag values.
         It is assume all rows in the df have the same tag values.
+    disapprove_nan : bool
+        Does nothing if tag_approved not in df.
+        Will set 'tag_approved' to 'no' if any field key has value -7999
 
     Returns
     -------
@@ -149,6 +152,10 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     df = df_all.loc[:, [k for k in field_keys.keys()]]
     df = df.rename(columns=field_keys)
     df = add_tags(df, tag_values)
+    if disapprove_nans:
+        if 'tag_approved' in tag_values:
+            for field in field_keys.values():
+                df.loc[df[field] == -7999., 'tag_approved'] = 'no'
     return df
 
 

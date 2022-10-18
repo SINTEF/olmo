@@ -12,13 +12,13 @@ def main():
     print("Starting running ingest_gasanalyser.py at "
           + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    logger = util_file.init_logger(config.main_logfile, name='ingest_gasanalyser')
+    logger = util_file.init_logger(config.gas_logfile, name='ingest_gasanalyser')
     logger.info("\n\n------ Starting sync/ingest.")
 
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     methane_client = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_test_lara'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_test_will'),
     ]
 
     gas = GasAnalyser(influx_clients=methane_client)

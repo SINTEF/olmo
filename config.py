@@ -23,6 +23,7 @@ az_influx_pc = data['az_influx_pc']
 rsync_inbox = os.path.join(base_dir, 'Rsync_inbox')
 rsync_inbox_adcp = os.path.join(base_dir, 'Rsync_inbox_adcp')
 main_logfile = "log_munkholmen_ingest_"
+gas_logfile = "log_gasanalyser_ingest_"
 
 
 # Sync loggernet:

@@ -24,15 +24,6 @@ def main():
     gas = GasAnalyser(influx_clients=methane_client)
     gas.rsync_and_ingest()
 
-    # From vizualisations, we see that there are values < 0 that are probably errors
-    # tag_approved_level will be changed to "no" from "none" as likely not passing filter
-    print(gas)
-
-# to ask will: 
-# where/how to dev?
-# 1) how to edit dfs?
-# 2)  
-
 
 if __name__ == "__main__":
     main()

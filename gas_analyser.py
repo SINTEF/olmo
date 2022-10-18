@@ -10,7 +10,6 @@ import util_file
 
 logger = util_file.init_logger(config.main_logfile, name='olmo.gasanalyser')
 
-# Test by running in one folder? How do you develop and not ingest actually
 
 class GasAnalyser(sensor.Sensor):
     def __init__(
@@ -103,7 +102,6 @@ class GasAnalyser(sensor.Sensor):
                               "   [CH4]_ppm_sd": util_db.format_str("   [CH4]_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
-                # put return statement here
                 util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
@@ -112,22 +110,18 @@ class GasAnalyser(sensor.Sensor):
                               "   [H2O]_ppm_sd": util_db.format_str("   [H2O]_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
                 df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
+                util_db.ingest_df(measurement_name, df, self.influx_clients)
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_co2'
                 field_keys = {"      [CO2]_ppm": util_db.format_str("      [CO2]_ppm"),
                               "   [CO2]_ppm_sd": util_db.format_str("   [CO2]_ppm_sd")}
                 tag_values['tag_unit'] = 'ppm'
-                df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)                
-
+                df = util_db.filter_and_tag_df(df_all, field_keys, tag_values)
                 # From vizualisations, we see that there are values < 0 that are probably errors
                 # tag_approved_level will be changed to "no" from "none" as likely not passing filter
                 df.loc[df.co2_ppm < 0, 'tag_approved'] = "no"
-
-
                 util_db.ingest_df(measurement_name, df, self.influx_clients)
-                #print(df.head())
-
 
                 # ------------------------------------------------------------ #
                 measurement_name = 'gasanalyser_ch4d'

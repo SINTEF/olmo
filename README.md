@@ -82,3 +82,10 @@ Notebooks are found in the `Notebooks` folder. You will also note there is a tab
 # Front end
 
 We have implemented a grafana front end, and have some data being displayed on the website. However these are not currently open resources.
+
+
+# Development
+
+To develop the code, we generally test into a newly created DB. Running python files from your 'personal'
+user on the controller PC. Files on the remote (rasberry pi for example) computer should not be deleted.
+This can be done using the variable `drop_recent_files_lX`, obviously setting this to false.

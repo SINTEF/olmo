@@ -18,7 +18,7 @@ def main():
     logger.info("Fetching the influxdb clients.")
     admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     methane_client = [
-        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_test_will'),
+        InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'methane_private'),
     ]
 
     gas = GasAnalyser(influx_clients=methane_client)

@@ -185,6 +185,8 @@ class GasAnalyser(sensor.Sensor):
         if files['l0'] is not None:
             self.ingest_l0(files['l0'])
         if files['l1'] is not None:
-            self.ingest_l0(files['l1'])  # NOTE: we are sending l1 files to the l0 ingester here.
-# What does the above comment mean?
+            # NOTE: we are sending l1 files to the l0 ingester here.
+            # l0 is .txt files, l1 is .zip files. We will unzip within .ingest_l0.
+            self.ingest_l0(files['l1'])
+
         logger.info('ctd.rsync_and_ingest() finished.')

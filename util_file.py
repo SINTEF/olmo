@@ -71,7 +71,7 @@ def remove_timestring(filepath):
         return base_name
 
 
-def ls_remote(user, machine, directory, port=22, custom_search=None):
+def ls_remote(user, machine, directory, port=22):
     '''
     Perform 'ls' over ssh onto linux machine.
 

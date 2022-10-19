@@ -98,9 +98,9 @@ def ls_remote(user, machine, directory, port=22, custom_search=None):
     return stdout
 
 
-def find_remote(user, machine, directory, serach, port=22):
+def find_remote(user, machine, directory, search, port=22):
     '''
-    Perform 'find {directory} -name '{custom_search}'"' over ssh onto linux machine.
+    Perform 'find {directory} -name '{search}'"' over ssh onto linux machine.
     Note this returns the full file path, not relative to 'directory'.
 
     Parameters
@@ -120,7 +120,7 @@ def find_remote(user, machine, directory, serach, port=22):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(machine, username=user, port=port)
 
-    command = f"find {directory} -name '{serach}'"
+    command = f"find {directory} -name '{search}'"
     stdin, stdout, stderr = ssh.exec_command(command)
     stdout = stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
 

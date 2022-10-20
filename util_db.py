@@ -70,7 +70,7 @@ def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=Fals
     if float_cols is not None:
         assert not_float_cols is None, "Only one col list should be given"
         for col in df.columns:
-            if col in float_cols:
+            if (col in float_cols) and (col[:4] != 'tag_'):
                 if error_to_nan:
                     df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999.0)
                     df[col] = df[col].astype(np.float64)
@@ -80,7 +80,7 @@ def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=Fals
     elif not_float_cols is not None:
         assert float_cols is None, "Only one col list should be given"
         for col in df.columns:
-            if col not in not_float_cols:
+            if (col not in not_float_cols) and (col[:4] != 'tag_'):
                 if error_to_nan:
                     df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999.0)
                     df[col] = df[col].astype(np.float64)

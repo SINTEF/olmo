@@ -10,6 +10,7 @@
 ## Connect to InfluxDB using the commandline:
 
     $ influx
+    $ influx -username UNAME -password PASSWORD -precision rfc3339
 
 ## Basic commands from within the cl client:
 
@@ -33,7 +34,6 @@ Add a data point:
 
     INSERT meaurement_name,key=5 value=12
 
-
 Show measurements for name: meaurement_name:
 
     SELECT * FROM meaurement_name LIMIT 3
@@ -44,8 +44,9 @@ Drop meaurement_name measurements:
 
 Show field keys:
 
-    SHOW FIELD KEYS FROM "meaurement_name-A6"
-    
+    SHOW FIELD KEYS FROM "meaurement_name"
+    SHOW FIELD KEYS ON db_name FROM "meaurement_name"
+
 Get power records from measurement with tag and time range:
 
     SELECT "power" FROM "drilling" WHERE ("module_id"='rover') AND time >= now() - 9h
@@ -61,3 +62,9 @@ Drop all series for tag:
 Drop a datapoint need to happen by filtering on time:
 
     DELETE FROM "drilling" WHERE time > '2022-06-05 15:10:42' and time < '2022-06-07 03:20:42'
+
+Some user commands:
+
+    CREATE USER username WITH PASSWORD 'password'
+    GRANT READ ON database_name TO username
+    SHOW GRANTS FOR username

@@ -85,5 +85,7 @@ def clean_influx_backups(days=5, weeks=3, months=3):
 
 
 if __name__ == "__main__":
+    print("Starting running inbox_folder_clearnup.py at "
+          + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     clean_inbox_folders()
     clean_influx_backups()

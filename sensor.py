@@ -14,10 +14,14 @@ class Sensor:
             self,
             # ---- Rsync params:
             data_dir=None,
-            file_regex_l0=None,
-            file_regex_l1=None,
-            file_regex_l2=None,
-            file_regex_l3=None,
+            recursive_file_search_l0=False,
+            recursive_file_search_l1=False,
+            recursive_file_search_l2=False,
+            recursive_file_search_l3=False,
+            file_search_l0=None,
+            file_search_l1=None,
+            file_search_l2=None,
+            file_search_l3=None,
             drop_recent_files_l0=1,
             drop_recent_files_l1=1,
             drop_recent_files_l2=1,
@@ -37,10 +41,14 @@ class Sensor:
             measurement_name_l3=None,):
 
         self.data_dir = data_dir
-        self.file_regex_l0 = file_regex_l0
-        self.file_regex_l1 = file_regex_l1
-        self.file_regex_l2 = file_regex_l2
-        self.file_regex_l3 = file_regex_l3
+        self.recursive_file_search_l0 = recursive_file_search_l0
+        self.recursive_file_search_l1 = recursive_file_search_l1
+        self.recursive_file_search_l2 = recursive_file_search_l2
+        self.recursive_file_search_l3 = recursive_file_search_l3
+        self.file_search_l0 = file_search_l0
+        self.file_search_l1 = file_search_l1
+        self.file_search_l2 = file_search_l2
+        self.file_search_l3 = file_search_l3
         self.drop_recent_files_l0 = drop_recent_files_l0
         self.drop_recent_files_l1 = drop_recent_files_l1
         self.drop_recent_files_l2 = drop_recent_files_l2
@@ -58,7 +66,7 @@ class Sensor:
         self.measurement_name_l2 = measurement_name_l2
         self.measurement_name_l3 = measurement_name_l3
 
-    def fetch_files_list(self, file_regex, drop_recent_files):
+    def fetch_files_list(self, file_regex, recursive_file_search, drop_recent_files):
         '''Use regex to find all files up to self.drop_recent_files
 
         Will match all files from the remote data_dir using the file_regex
@@ -70,6 +78,8 @@ class Sensor:
         Parameters
         ----------
         file_regex : str
+        recursive_file_search : bool
+            If the file_regex is to be interpreted as the input to a linux 'find' query, not regex
         drop_recent_files : int
             Number of latest files to ignore.
 
@@ -81,20 +91,31 @@ class Sensor:
         if (self.data_dir is None) or (file_regex is None):
             raise ValueError("fetch_files_list() requires 'data_dir' and 'file_regex' are set.")
 
-        ls_out, ls_err = util_file.ls_remote(
-            config.munkholmen_user, config.munkholmen_pc,
-            self.data_dir, port=config.munkholmen_ssh_port)
-
-        # TODO: Need to handle the ls_err in some way.
-
-        files = []
-        while True:
-            match = re.search(file_regex, ls_out)
-            if match is None:
-                break
-            else:
-                files.append(match.group())
-                ls_out = ls_out[match.span()[1]:]
+        # TODO: Need to handle the ls_err (below in both statements) in some way.
+        if recursive_file_search:
+            ls_out, ls_err = util_file.find_remote(
+                config.munkholmen_user, config.munkholmen_pc,
+                self.data_dir, file_regex, port=config.munkholmen_ssh_port)
+            # Using find_remote() it should already filter. Thus just split up string:
+            files = ls_out.split('\n')
+            if files[-1] == '':
+                files = files[:-1]
+            # Remove the 'self.data_dir' from the file path, so consistet with below
+            for i, f in enumerate(files):
+                files[i] = f[len(self.data_dir) + 1:]
+            files.sort()
+        else:
+            ls_out, ls_err = util_file.ls_remote(
+                config.munkholmen_user, config.munkholmen_pc,
+                self.data_dir, port=config.munkholmen_ssh_port)
+            files = []
+            while True:
+                match = re.search(file_regex, ls_out)
+                if match is None:
+                    break
+                else:
+                    files.append(match.group())
+                    ls_out = ls_out[match.span()[1]:]
 
         if len(files) <= drop_recent_files:
             logger.info(f"No new files found matching regex pattern: {file_regex}")
@@ -139,32 +160,32 @@ class Sensor:
                     logger.error(f"Rsync for file {f} didn't work, output sent to stdout, (probably the log from the cronjob).")
                     return rsynced_files
                 else:
-                    logger.info(f"rsync'ed file: {os.path.join(config.rsync_inbox_adcp, f)}")
-                    rsynced_files.append(os.path.join(config.rsync_inbox_adcp, f))
+                    logger.info(f"rsync'ed file: {os.path.join(config.rsync_inbox_adcp, os.path.basename(f))}")
+                    rsynced_files.append(os.path.join(config.rsync_inbox_adcp, os.path.basename(f)))
 
             return rsynced_files
 
-        def fetch_and_sync(file_regex, drop_recent_files, remove_remote_files, max_files):
-            files = self.fetch_files_list(file_regex, drop_recent_files)
+        def fetch_and_sync(file_regex, recursive_file_search, drop_recent_files, remove_remote_files, max_files):
+            files = self.fetch_files_list(file_regex, recursive_file_search, drop_recent_files)
             files = rsync_file_level(files, remove_remote_files, max_files)
             return files
 
         rsynced_files = {'l0': None, 'l1': None, 'l2': None, 'l3': None}
-        if isinstance(self.file_regex_l0, str):
+        if isinstance(self.file_search_l0, str):
             rsynced_files['l0'] = fetch_and_sync(
-                self.file_regex_l0, self.drop_recent_files_l0,
+                self.file_search_l0, self.recursive_file_search_l0, self.drop_recent_files_l0,
                 self.remove_remote_files_l0, self.max_files_l0)
-        if isinstance(self.file_regex_l1, str):
+        if isinstance(self.file_search_l1, str):
             rsynced_files['l1'] = fetch_and_sync(
-                self.file_regex_l1, self.drop_recent_files_l1,
+                self.file_search_l1, self.recursive_file_search_l1, self.drop_recent_files_l1,
                 self.remove_remote_files_l1, self.max_files_l1)
-        if isinstance(self.file_regex_l2, str):
+        if isinstance(self.file_search_l2, str):
             rsynced_files['l2'] = fetch_and_sync(
-                self.file_regex_l2, self.drop_recent_files_l2,
+                self.file_search_l2, self.recursive_file_search_l2, self.drop_recent_files_l2,
                 self.remove_remote_files_l2, self.max_files_l2)
-        if isinstance(self.file_regex_l3, str):
+        if isinstance(self.file_search_l3, str):
             rsynced_files['l3'] = fetch_and_sync(
-                self.file_regex_l3, self.drop_recent_files_l3,
+                self.file_search_l3, self.recursive_file_search_l3, self.drop_recent_files_l3,
                 self.remove_remote_files_l3, self.max_files_l3)
         return rsynced_files
 

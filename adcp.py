@@ -15,7 +15,7 @@ class ADCP(sensor.Sensor):
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            file_regex_l1=r"adcp_(\d{14})\.dat",
+            file_search_l1=r"adcp_(\d{14})\.dat",
             drop_recent_files_l1=1,
             remove_remote_files_l1=True,
             max_files_l1=20,
@@ -25,7 +25,7 @@ class ADCP(sensor.Sensor):
         # Init the Sensor() class: Unused levels are set to None.
         super(ADCP, self).__init__()
         self.data_dir = data_dir
-        self.file_regex_l1 = file_regex_l1
+        self.file_search_l1 = file_search_l1
         self.drop_recent_files_l1 = drop_recent_files_l1
         self.remove_remote_files_l1 = remove_remote_files_l1
         self.max_files_l1 = max_files_l1

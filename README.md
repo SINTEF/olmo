@@ -14,7 +14,7 @@ and ingest the data. In cases where there is an `_L#`, there can be 4 different
 versions of this variable for the 4 data quality levels.
 
  * `data_dir`: Directory on the munkholmen raspberry pi where data files are found
- * `file_regex_l#`: Regex used to match files in `data_dir` (or list of regex's). This is the main
+ * `file_search_l#`: Regex used to match files in `data_dir` (or list of regex's). This is the main
  controller for the 'level', setting this to None will mean the level is ignored in rsync/ingest.
  * `drop_recent_files_l#`: Number of latest files to ignore (in case they are being written to)
  * `remove_remote_files_l#`
@@ -82,3 +82,10 @@ Notebooks are found in the `Notebooks` folder. You will also note there is a tab
 # Front end
 
 We have implemented a grafana front end, and have some data being displayed on the website. However these are not currently open resources.
+
+
+# Development
+
+To develop the code, we generally test into a newly created DB. Running python files from your 'personal'
+user on the controller PC. Files on the remote (rasberry pi for example) computer should not be deleted.
+This can be done using the variable `drop_recent_files_lX`, obviously setting this to false.

@@ -16,7 +16,7 @@ class CTD(sensor.Sensor):
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            file_regex_l0=r"ready_ctd_(\d{14})\.csv",
+            file_search_l0=r"ready_ctd_(\d{14})\.csv",
             drop_recent_files_l0=0,
             remove_remote_files_l0=True,
             max_files_l0=None,
@@ -25,7 +25,7 @@ class CTD(sensor.Sensor):
         # Init the Sensor() class: Unused vars/levels are set to None.
         super(CTD, self).__init__()
         self.data_dir = data_dir
-        self.file_regex_l0 = file_regex_l0
+        self.file_search_l0 = file_search_l0
         self.drop_recent_files_l0 = drop_recent_files_l0
         self.remove_remote_files_l0 = remove_remote_files_l0
         self.max_files_l0 = max_files_l0

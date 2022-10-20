@@ -73,7 +73,7 @@ def remove_timestring(filepath):
 
 def ls_remote(user, machine, directory, port=22):
     '''
-    Perform 'ls' over ssh onto linux machine. Uses ssh.
+    Perform 'ls' over ssh onto linux machine.
 
     Parameters
     ----------
@@ -93,8 +93,38 @@ def ls_remote(user, machine, directory, port=22):
 
     command = f"ls {directory}"
     stdin, stdout, stderr = ssh.exec_command(command)
+    stdout = stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
 
-    return stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
+    return stdout
+
+
+def find_remote(user, machine, directory, search, port=22):
+    '''
+    Perform 'find {directory} -name '{search}'"' over ssh onto linux machine.
+    Note this returns the full file path, not relative to 'directory'.
+
+    Parameters
+    ----------
+    user : str
+    machine : str
+        IP address of the maching you will connect to.
+    directory : str
+    search : str
+    port : int, default 22
+
+    Returns
+    -------
+    str
+    '''
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(machine, username=user, port=port)
+
+    command = f"find {directory} -name '{search}'"
+    stdin, stdout, stderr = ssh.exec_command(command)
+    stdout = stdout.read().decode(errors='ignore'), stderr.read().decode(errors='ignore')
+
+    return stdout
 
 
 def get_user_pwd(file):

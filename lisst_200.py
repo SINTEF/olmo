@@ -16,12 +16,12 @@ class Lisst_200(sensor.Sensor):
     def __init__(
             self,
             data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            file_regex_l0=r"lisst_L(\d{7})\.RBN",
+            file_search_l0=r"lisst_L(\d{7})\.RBN",
             drop_recent_files_l0=0,
             remove_remote_files_l0=True,
             max_files_l0=10,
             measurement_name_l0='munk_lisst-200_l0',
-            file_regex_l1=r"ready_lisst_I(\d{7})\.CSV",
+            file_search_l1=r"ready_lisst_I(\d{7})\.CSV",
             drop_recent_files_l1=0,
             remove_remote_files_l1=True,
             max_files_l1=None,
@@ -31,12 +31,12 @@ class Lisst_200(sensor.Sensor):
         # Init the Sensor() class: Unused vars/levels are set to None.
         super(Lisst_200, self).__init__()
         self.data_dir = data_dir
-        self.file_regex_l0 = file_regex_l0
+        self.file_search_l0 = file_search_l0
         self.drop_recent_files_l0 = drop_recent_files_l0
         self.remove_remote_files_l0 = remove_remote_files_l0
         self.max_files_l0 = max_files_l0
         self.measurement_name_l0 = measurement_name_l0
-        self.file_regex_l1 = file_regex_l1
+        self.file_search_l1 = file_search_l1
         self.drop_recent_files_l1 = drop_recent_files_l1
         self.remove_remote_files_l1 = remove_remote_files_l1
         self.max_files_l1 = max_files_l1

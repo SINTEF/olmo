@@ -1,5 +1,6 @@
 import logging
 import datetime
+import re
 import numpy as np
 import pandas as pd
 
@@ -69,18 +70,20 @@ def force_float_cols(df, float_cols=None, not_float_cols=None, error_to_nan=Fals
     if float_cols is not None:
         assert not_float_cols is None, "Only one col list should be given"
         for col in df.columns:
-            if col in float_cols:
+            if (col in float_cols) and (col[:4] != 'tag_'):
                 if error_to_nan:
-                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999.0)
+                    df[col] = df[col].astype(np.float64)
                 else:
                     df[col] = df[col].astype(np.float64)
         return df
     elif not_float_cols is not None:
         assert float_cols is None, "Only one col list should be given"
         for col in df.columns:
-            if col not in not_float_cols:
+            if (col not in not_float_cols) and (col[:4] != 'tag_'):
                 if error_to_nan:
-                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999)
+                    df[col] = df[col].apply(pd.to_numeric, errors='coerce').fillna(-7999.0)
+                    df[col] = df[col].astype(np.float64)
                 else:
                     df[col] = df[col].astype(np.float64)
         return df
@@ -125,7 +128,7 @@ def add_tags(df, tag_values):
     return df
 
 
-def filter_and_tag_df(df_all, field_keys, tag_values):
+def filter_and_tag_df(df_all, field_keys, tag_values, disapprove_nans=False):
     '''
     Given a df with a large set of data returns a df with only the data
     from 'field_keys' and tagged with 'tag_values'
@@ -138,6 +141,9 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     tag_values : dict
         Should be key value pairs of tag names and tag values.
         It is assume all rows in the df have the same tag values.
+    disapprove_nan : bool
+        Does nothing if tag_approved not in df.
+        Will set 'tag_approved' to 'no' if any field key has value -7999
 
     Returns
     -------
@@ -146,6 +152,10 @@ def filter_and_tag_df(df_all, field_keys, tag_values):
     df = df_all.loc[:, [k for k in field_keys.keys()]]
     df = df.rename(columns=field_keys)
     df = add_tags(df, tag_values)
+    if disapprove_nans:
+        if 'tag_approved' in tag_values:
+            for field in field_keys.values():
+                df.loc[df[field] == -7999., 'tag_approved'] = 'no'
     return df
 
 
@@ -304,3 +314,22 @@ def break_down_time_period(start_time, end_time):
             end_time_.strftime('%Y-%m-%dT%H:%M:%SZ')))
 
     return periods
+
+
+def format_str(string):
+    '''
+    Formats a string such that it conforms to Williams conventions for
+    db names (lower case, no special chars except '_').
+
+    Parameters
+    ----------
+    string : str
+
+    Returns
+    -------
+    str
+    '''
+    string.replace('-', '_')
+    string = re.sub('[^A-Za-z0-9_]+', '', string)  # Remove special chars (except '_')
+    string = re.sub('\s+', '', string)
+    return string.lower()

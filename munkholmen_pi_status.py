@@ -11,7 +11,7 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
 class Munkholmen_Pi(sensor.Sensor):
     def __init__(
             self,
-            data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
+            data_dir=f'/media/{config.munkholmen_user}/DATA',
             file_search_l0=r"status.csv",
             drop_recent_files_l0=0,
             remove_remote_files_l0=False,

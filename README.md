@@ -1,6 +1,33 @@
 # olmo
 OceanLab Observatory
 
+# Data access
+
+## Graphical portal (grafana)
+
+The starting page for exploring the data graphically is the data portal [here](https://oceanlab.azure.sintef.no/). This is the same site that you will reach if you start at our [homepage](https://oceanlabobservatory.no/) and click on the 'Data Portal' link. On that page you find information about or links to:
+
+ * Our data usage rights
+ * A full list of 'tables' (including an a list of example data from those tables)
+ * A list of pre built dashboards where you find plots of the most commonly used data.
+ * Information on how to download the data found in a plot.
+
+## API access / download from python script
+
+Given user credentials you can write queries directly to the database. This is done using the 'flux' query language. See a getting started [here](https://docs.influxdata.com/influxdb/cloud/query-data/get-started/query-influxdb/).
+
+We reccomend using python pass the flux query to the influx https endpoint. There is an example script you can work from in this repository here:
+
+ `scripts/download_data_api.py`
+
+To run this script you will need some libraries, and set up the environment. This can be done:
+
+  `conda env install -f environment.yml`
+
+  `conda activate olmo`
+
+  `python setup.py develop`
+
 # Data collection
 
 ## Munkholmen sensor data

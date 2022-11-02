@@ -30,13 +30,9 @@ df = query_to_df(f'''
         |> filter(fn:(r) => r._measurement == "{measurement}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
     ''')
-print(f'''
-# ---------------------------- Basic query.
-Here is a full list of columns:
-{', '.join(df.columns)}
-
-{df.head()}
-''')
+print('\n# ---------------------------- Basic query.')
+print(f"Here is a full list of columns:\n{','.join(df.columns)}")
+print(df.head())
 
 # Filtered query, returning only a subset of columns
 df = query_to_df(f'''
@@ -46,10 +42,8 @@ df = query_to_df(f'''
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "platform", "unit", "temperature"])
     ''')
-print(f'''
-# ---------------------------- Filtered query
-{df.head()}
-''')
+print('\n# ---------------------------- Filtered query')
+print(df.head())
 
 # Query different table:
 # NOTE: There are tables for the position of the sensors. Each table/sensor
@@ -62,10 +56,8 @@ df = query_to_df(f'''
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "platform", "latitude", "longitude", "unit"])
     ''')
-print(f'''
-# ---------------------------- Querying a different table.
-{df.head()}
-''')
+print('\n# ---------------------------- Querying a different table.')
+print(df.head())
 
 # Query a specific time range (see changes in '|> range' row)
 timespan = 'start: 2022-06-24T12:00:00Z, stop: 2022-06-24T14:00:00Z'
@@ -77,10 +69,8 @@ df = query_to_df(f'''
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "platform", "unit", "temperature"])
     ''')
-print(f'''
-# ---------------------------- Specific time range
-{df.head()}
-''')
+print('\n# ---------------------------- Specific time range')
+print(df.head())
 
 # Interesting use of filters (this can be quite powerful)
 # Here we find any tables with 'latitude' as a field name.
@@ -94,10 +84,6 @@ df = query_to_df(f'''
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "_measurement", "platform", "latitude"])
     ''')
-print(f'''
-# ---------------------------- Filter based on _field, not _measurement.
-Unique measurement (table) names returned in this search:
-{df['_measurement'].unique()}
-
-{df.head()}
-''')
+print('\n# ---------------------------- Filter based on _field, not _measurement.')
+print(f"Unique measurement (table) names returned in this search:\n{df['_measurement'].unique()}")
+print(df.head())

@@ -12,35 +12,21 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.gasanalyser')
 
 
 class GasAnalyser(sensor.Sensor):
-    def __init__(
-            self,
-            data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA/gas',
-            recursive_file_search_l0=True,
-            file_search_l0='gga_????-??-??_f????.txt',
-            drop_recent_files_l0=1,
-            remove_remote_files_l0=False,
-            max_files_l0=None,
-            recursive_file_search_l1=True,
-            file_search_l1='gga_????-??-??_f????.txt.zip',
-            drop_recent_files_l1=1,
-            remove_remote_files_l1=False,
-            max_files_l1=None,
-            influx_clients=None):
-
-        # Init the Sensor() class: Unused vars/levels are set to None.
+    def __init__(self, influx_clients=None):
+        # Init the Sensor() class: This sets some defaults.
         super(GasAnalyser, self).__init__()
-        self.data_dir = data_dir
-        self.recursive_file_search_l0 = recursive_file_search_l0
-        self.file_search_l0 = file_search_l0
-        self.drop_recent_files_l0 = drop_recent_files_l0
-        self.remove_remote_files_l0 = remove_remote_files_l0
-        self.max_files_l0 = max_files_l0
-        self.recursive_file_search_l1 = recursive_file_search_l1
-        self.file_search_l1 = file_search_l1
-        self.drop_recent_files_l1 = drop_recent_files_l1
-        self.remove_remote_files_l1 = remove_remote_files_l1
-        self.max_files_l1 = max_files_l1
         self.influx_clients = influx_clients
+        self.data_dir = f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA/gas'
+        self.recursive_file_search_l0 = True
+        self.file_search_l0 = 'gga_????-??-??_f????.txt'
+        self.drop_recent_files_l0 = 1
+        self.remove_remote_files_l0 = False
+        self.max_files_l0 = None
+        self.recursive_file_search_l1 = True
+        self.file_search_l1 = 'gga_????-??-??_f????.txt.zip'
+        self.drop_recent_files_l1 = 1
+        self.remove_remote_files_l1 = False
+        self.max_files_l1 = None
 
     def ingest_l0(self, files):
 

@@ -9,23 +9,15 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.munkholmen_pi')
 
 
 class Munkholmen_Pi(sensor.Sensor):
-    def __init__(
-            self,
-            data_dir=f'/media/{config.munkholmen_user}/DATA',
-            file_search_l0=r"status.csv",
-            drop_recent_files_l0=0,
-            remove_remote_files_l0=False,
-            max_files_l0=None,
-            influx_clients=None):
-
-        # Init the Sensor() class: Unused vars/levels are set to None.
+    def __init__(self, influx_clients=None):
+        # Init the Sensor() class: This sets some defaults.
         super(Munkholmen_Pi, self).__init__()
-        self.data_dir = data_dir
-        self.file_search_l0 = file_search_l0
-        self.drop_recent_files_l0 = drop_recent_files_l0
-        self.remove_remote_files_l0 = remove_remote_files_l0
-        self.max_files_l0 = max_files_l0
         self.influx_clients = influx_clients
+        self.data_dir = f'/media/{config.munkholmen_user}/DATA'
+        self.file_search_l0 = r"status.csv"
+        self.drop_recent_files_l0 = 0
+        self.remove_remote_files_l0 = False
+        self.max_files_l0 = None
 
     def ingest_l0(self, files):
 

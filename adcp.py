@@ -12,25 +12,17 @@ logger = logging.getLogger('olmo.adcp')
 
 
 class ADCP(sensor.Sensor):
-    def __init__(
-            self,
-            data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            file_search_l1=r"adcp_(\d{14})\.dat",
-            drop_recent_files_l1=1,
-            remove_remote_files_l1=True,
-            max_files_l1=20,
-            db_name='example',  # This is outdated in other files, but this whole file is outdated now...
-            measurement_name_l1='adcp_raw_test'):
-
-        # Init the Sensor() class: Unused levels are set to None.
+    def __init__(self, influx_clients=None):
+        # Init the Sensor() class: This sets some defaults.
         super(ADCP, self).__init__()
-        self.data_dir = data_dir
-        self.file_search_l1 = file_search_l1
-        self.drop_recent_files_l1 = drop_recent_files_l1
-        self.remove_remote_files_l1 = remove_remote_files_l1
-        self.max_files_l1 = max_files_l1
-        self.db_name = db_name
-        self.measurement_name_l1 = measurement_name_l1
+        self.influx_clients = influx_clients
+        self.data_dir = f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA'
+        self.file_search_l1 = r"adcp_(\d{14})\.dat"
+        self.drop_recent_files_l1 = 1
+        self.remove_remote_files_l1 = True
+        self.max_files_l1 = 20
+        self.db_name = 'example'  # This is outdated in other files, but this whole file is outdated now...
+        self.measurement_name_l1 = 'adcp_raw_test'
 
     def data_to_df(self, filename):
         '''Takes a adcp_*.dat fileaname and returns DataFrames for PNORI, PNORS, and PNORC'''

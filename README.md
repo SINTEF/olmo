@@ -18,15 +18,13 @@ Given user credentials you can write queries directly to the database. This is d
 
 We reccomend using python pass the flux query to the influx https endpoint. There is an example script you can work from in this repository here:
 
- `scripts/download_data_api.py`
+ `scripts/api_examples.py`
 
-To run this script you will need some libraries, and set up the environment. This can be done:
+To run this script you will need some libraries, and to set up the environment. This can be done via:
 
-  `conda env install -f environment.yml`
-
-  `conda activate olmo`
-
-  `python setup.py develop`
+ * `conda env install -f environment.yml`
+ * `conda activate olmo`
+ * `python setup.py develop`
 
 # Data collection
 

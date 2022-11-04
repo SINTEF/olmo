@@ -1,5 +1,5 @@
-# olmo
-OceanLab Observatory
+# OLMO
+OceanLab Observatory, Automated Data Handling
 
 # Data access
 
@@ -66,7 +66,7 @@ To generate the access token:
 
  * Click on Shared access tokens and create one.
 
- * Under Allowed IP addresses p the IP of the machien you are on. This can be found with: `curl api.ipify.org`
+ * Under Allowed IP addresses p the IP of the computer you are on. This can be found with: `curl api.ipify.org`
 
 Note that the current access token on Torfinn2 expires at the start of 2023.
 
@@ -106,11 +106,11 @@ Notebooks are found in the `Notebooks` folder. You will also note there is a tab
 
 # Front end
 
-We have implemented a grafana front end, and have some data being displayed on the website. However these are not currently open resources.
+We have implemented a grafana front end, and have some data being displayed on the website. These are not currently open resources.
 
 
 # Development
 
-To develop the code, we generally test into a newly created DB. Running python files from your 'personal'
-user on the controller PC. Files on the remote (rasberry pi for example) computer should not be deleted.
-This can be done using the variable `drop_recent_files_lX`, obviously setting this to false.
+To develop the code, we generally test into a newly created DB. Running python files from your 'personal' user on the controller PC.
+
+Files on the remote computers should not be deleted until testing has verified that the workflow works correctly. This can be done using the variable `drop_recent_files_lX`, by setting this to false.

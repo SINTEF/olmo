@@ -10,61 +10,32 @@ logger = logging.getLogger('olmo.sensor')
 
 class Sensor:
     '''Base sensor class that non-loggernet sensors should inherit from.'''
-    def __init__(
-            self,
-            # ---- Rsync params:
-            data_dir=None,
-            recursive_file_search_l0=False,
-            recursive_file_search_l1=False,
-            recursive_file_search_l2=False,
-            recursive_file_search_l3=False,
-            file_search_l0=None,
-            file_search_l1=None,
-            file_search_l2=None,
-            file_search_l3=None,
-            drop_recent_files_l0=1,
-            drop_recent_files_l1=1,
-            drop_recent_files_l2=1,
-            drop_recent_files_l3=1,
-            remove_remote_files_l0=True,
-            remove_remote_files_l1=True,
-            remove_remote_files_l2=True,
-            remove_remote_files_l3=True,
-            max_files_l0=None,
-            max_files_l1=None,
-            max_files_l2=None,
-            max_files_l3=None,
-            # ---- Ingest params:
-            measurement_name_l0=None,
-            measurement_name_l1=None,
-            measurement_name_l2=None,
-            measurement_name_l3=None,):
-
-        self.data_dir = data_dir
-        self.recursive_file_search_l0 = recursive_file_search_l0
-        self.recursive_file_search_l1 = recursive_file_search_l1
-        self.recursive_file_search_l2 = recursive_file_search_l2
-        self.recursive_file_search_l3 = recursive_file_search_l3
-        self.file_search_l0 = file_search_l0
-        self.file_search_l1 = file_search_l1
-        self.file_search_l2 = file_search_l2
-        self.file_search_l3 = file_search_l3
-        self.drop_recent_files_l0 = drop_recent_files_l0
-        self.drop_recent_files_l1 = drop_recent_files_l1
-        self.drop_recent_files_l2 = drop_recent_files_l2
-        self.drop_recent_files_l3 = drop_recent_files_l3
-        self.remove_remote_files_l0 = remove_remote_files_l0
-        self.remove_remote_files_l1 = remove_remote_files_l1
-        self.remove_remote_files_l2 = remove_remote_files_l2
-        self.remove_remote_files_l3 = remove_remote_files_l3
-        self.max_files_l0 = max_files_l0
-        self.max_files_l1 = max_files_l1
-        self.max_files_l2 = max_files_l2
-        self.max_files_l3 = max_files_l3
-        self.measurement_name_l0 = measurement_name_l0
-        self.measurement_name_l1 = measurement_name_l1
-        self.measurement_name_l2 = measurement_name_l2
-        self.measurement_name_l3 = measurement_name_l3
+    def __init__(self):
+        self.data_dir = None
+        self.recursive_file_search_l0 = False
+        self.recursive_file_search_l1 = False
+        self.recursive_file_search_l2 = False
+        self.recursive_file_search_l3 = False
+        self.file_search_l0 = None
+        self.file_search_l1 = None
+        self.file_search_l2 = None
+        self.file_search_l3 = None
+        self.drop_recent_files_l0 = 1
+        self.drop_recent_files_l1 = 1
+        self.drop_recent_files_l2 = 1
+        self.drop_recent_files_l3 = 1
+        self.remove_remote_files_l0 = False
+        self.remove_remote_files_l1 = False
+        self.remove_remote_files_l2 = False
+        self.remove_remote_files_l3 = False
+        self.max_files_l0 = None
+        self.max_files_l1 = None
+        self.max_files_l2 = None
+        self.max_files_l3 = None
+        self.measurement_name_l0 = None
+        self.measurement_name_l1 = None
+        self.measurement_name_l2 = None
+        self.measurement_name_l3 = None
 
     def fetch_files_list(self, file_regex, recursive_file_search, drop_recent_files):
         '''Use regex to find all files up to self.drop_recent_files

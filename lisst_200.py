@@ -13,35 +13,21 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.lisst_200')
 
 
 class Lisst_200(sensor.Sensor):
-    def __init__(
-            self,
-            data_dir=f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA',
-            file_search_l0=r"lisst_L(\d{7})\.RBN",
-            drop_recent_files_l0=0,
-            remove_remote_files_l0=True,
-            max_files_l0=10,
-            measurement_name_l0='munk_lisst-200_l0',
-            file_search_l1=r"ready_lisst_I(\d{7})\.CSV",
-            drop_recent_files_l1=0,
-            remove_remote_files_l1=True,
-            max_files_l1=None,
-            measurement_name_l1='lisst_200',
-            influx_clients=None):
-
-        # Init the Sensor() class: Unused vars/levels are set to None.
+    def __init__(self, influx_clients=None):
+        # Init the Sensor() class: This sets some defaults.
         super(Lisst_200, self).__init__()
-        self.data_dir = data_dir
-        self.file_search_l0 = file_search_l0
-        self.drop_recent_files_l0 = drop_recent_files_l0
-        self.remove_remote_files_l0 = remove_remote_files_l0
-        self.max_files_l0 = max_files_l0
-        self.measurement_name_l0 = measurement_name_l0
-        self.file_search_l1 = file_search_l1
-        self.drop_recent_files_l1 = drop_recent_files_l1
-        self.remove_remote_files_l1 = remove_remote_files_l1
-        self.max_files_l1 = max_files_l1
-        self.measurement_name_l1 = measurement_name_l1
         self.influx_clients = influx_clients
+        self.data_dir = f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA'
+        self.file_search_l0 = r"lisst_L(\d{7})\.RBN"
+        self.drop_recent_files_l0 = 0
+        self.remove_remote_files_l0 = True
+        self.max_files_l0 = 10
+        self.measurement_name_l0 = 'munk_lisst-200_l0'
+        self.file_search_l1 = r"ready_lisst_I(\d{7})\.CSV"
+        self.drop_recent_files_l1 = 0
+        self.remove_remote_files_l1 = True
+        self.max_files_l1 = None
+        self.measurement_name_l1 = 'lisst_200'
 
     def lisst200_csv_to_df(self, csv_filename):
         '''Take a LISST-200 .CSV file and returns a pandas DataFrame'''

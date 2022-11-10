@@ -22,9 +22,12 @@ We reccomend using python pass the flux query to the influx https endpoint. Ther
 
 To run this script you will need some libraries, and to set up the environment. This can be done via:
 
- * `conda env install -f environment.yml`
+ * `cd` into the folder where you have this code repository
+ * `conda env create -f environment_users.yml`
  * `conda activate olmo`
  * `python setup.py develop`
+ * `cd scripts`
+ * `python api_examples.py`
 
 # Data collection
 

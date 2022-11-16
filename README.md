@@ -22,12 +22,12 @@ We reccomend using python to pass the flux query to the influx https endpoint. T
 
 To run this script you will need some libraries, and to set up the environment. This can be done via:
 
+ * Download this code repository
  * `cd` into the folder where you have this code repository
  * `conda env create -f environment_users.yml`
  * `conda activate olmo`
  * `python setup.py develop`
- * `cd scripts`
- * `python api_examples.py`
+ * `python scripts/api_examples.py`
 
 If you are unsure which data we have available, and in which 'tables' in the DB that data is found you can either look [here](https://oceanlab.azure.sintef.no/d/YinybPjnk/list-of-all-data?orgId=1) for a full list of tables available. Or you can search using flux, for example in `scripts/api_examples.py` there is a query that returns a list of all 'tables' written to in the last six hours that have a 'field key' (data column) as latitude.
 

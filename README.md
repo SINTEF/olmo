@@ -16,7 +16,7 @@ The starting page for exploring the data graphically is the data portal [here](h
 
 Given user credentials you can write queries directly to the database. This is done using the 'flux' query language. See a getting started [here](https://docs.influxdata.com/influxdb/cloud/query-data/get-started/query-influxdb/).
 
-We reccomend using python pass the flux query to the influx https endpoint. There is an example script you can work from in this repository here:
+We reccomend using python to pass the flux query to the influx https endpoint. There is an example script you can work from in this repository here:
 
  `scripts/api_examples.py`
 
@@ -28,6 +28,8 @@ To run this script you will need some libraries, and to set up the environment. 
  * `python setup.py develop`
  * `cd scripts`
  * `python api_examples.py`
+
+If you are unsure which data we have available, and in which 'tables' in the DB that data is found you can either look [here](https://oceanlab.azure.sintef.no/d/YinybPjnk/list-of-all-data?orgId=1) for a full list of tables available. Or you can search using flux, for example in `scripts/api_examples.py` there is a query that returns a list of all 'tables' written to in the last six hours that have a 'field key' (data column) as latitude.
 
 # Data collection
 

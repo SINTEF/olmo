@@ -1,4 +1,5 @@
 import influxdb_client
+import pandas as pd
 
 '''
 Basic file to query data using the influxdb API
@@ -26,9 +27,10 @@ timespan = '-2h'
 measurement = 'meteo_temperature_munkholmen'
 df = query_to_df(f'''
     from(bucket:"{bucket}")
-        |> range(start:{timespan})
+        |> range(start:-2h)
         |> filter(fn:(r) => r._measurement == "{measurement}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        |> limit(n: 50)
     ''')
 print('\n# ---------------------------- Basic query.')
 print(f"Here is a full list of columns:\n{','.join(df.columns)}")
@@ -41,6 +43,7 @@ df = query_to_df(f'''
         |> filter(fn:(r) => r._measurement == "{measurement}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "platform", "unit", "temperature"])
+        |> limit(n: 50)
     ''')
 print('\n# ---------------------------- Filtered query')
 print(df.head())
@@ -55,6 +58,7 @@ df = query_to_df(f'''
         |> filter(fn:(r) => r._measurement == "{measurement}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "platform", "latitude", "longitude", "unit"])
+        |> limit(n: 50)
     ''')
 print('\n# ---------------------------- Querying a different table.')
 print(df.head())
@@ -68,6 +72,7 @@ df = query_to_df(f'''
         |> filter(fn:(r) => r._measurement == "{measurement}")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "platform", "unit", "temperature"])
+        |> limit(n: 50)
     ''')
 print('\n# ---------------------------- Specific time range')
 print(df.head())
@@ -76,14 +81,20 @@ print(df.head())
 # Here we find any tables with 'latitude' as a field name.
 # NOTE: I also '|> keep' the measurement name, as that might be helpful.
 # NOTE: Filtering by this field filters away other fields (but not tags).
-timespan = '-2h'
+# timespan = 'start: -1y'  # All tables written to in the last year,. this will take a while to run
+timespan = 'start: -6h'  # Note, will only search for tables written to in the last 6 hrs
 df = query_to_df(f'''
     from(bucket:"{bucket}")
-        |> range(start:{timespan})
+        |> range({timespan})
+        |> last()
         |> filter(fn:(r) => r._field == "latitude")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         |> keep(columns: ["_time", "_measurement", "platform", "latitude"])
+        |> limit(n: 50)
     ''')
 print('\n# ---------------------------- Filter based on _field, not _measurement.')
-print(f"Unique measurement (table) names returned in this search:\n{df['_measurement'].unique()}")
-print(df.head())
+if isinstance(df, pd.DataFrame):
+    print(f"Unique measurement (table) names returned in this search:\n{df['_measurement'].unique()}")
+    print(df.head())
+else:
+    print(df)

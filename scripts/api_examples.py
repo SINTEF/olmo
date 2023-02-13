@@ -3,7 +3,6 @@ import pandas as pd
 
 '''
 Basic file to query data using the influxdb API
-
 For further query examples see here:
 https://github.com/influxdata/influxdb-client-python/blob/master/examples/query.py
 '''
@@ -21,76 +20,45 @@ def query_to_df(query):
     return df
 
 
-# Basic query, returning all columns:
-# NOTE: 'result', 'table', '_start' and '_stop' are probably not useful to you.
-# NOTE: the 'pivot' column is required to format our query nicely into pd.DataFrame
-df = query_to_df(f'''
+silcam = query_to_df(f'''
     from(bucket:"{bucket}")
-        |> range(start:-2h)
-        |> filter(fn:(r) => r._measurement == "meteo_temperature_munkholmen")
+        |> range(start: 2022-12-01T12:00:00Z, stop: 2022-12-07T12:00:00Z)
+        |> filter(fn:(r) => r._measurement == "silcam_total_volume_contentration_munkholmen")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-        |> limit(n: 50)
-    ''')
-print('\n# ---------------------------- Basic query.')
-print(f"Here is a full list of columns:\n{','.join(df.columns)}")
-print(df.head())
-
-# Filtered query, returning only a subset of columns
-df = query_to_df(f'''
-    from(bucket:"{bucket}")
-        |> range(start:-2h)
-        |> filter(fn:(r) => r._measurement == "meteo_temperature_munkholmen")
-        |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-        |> keep(columns: ["_time", "platform", "unit", "temperature"])
-        |> limit(n: 50)
-    ''')
-print('\n# ---------------------------- Filtered query')
-print(df.head())
-
-# Query different table:
-# NOTE: There are tables for the position of the sensors. Each table/sensor
-# should have a platform, and each platform should have a table giving its position.
-df = query_to_df(f'''
-    from(bucket:"{bucket}")
-        |> range(start:-2h)
-        |> filter(fn:(r) => r._measurement == "meteo_position_munkholmen")
-        |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-        |> keep(columns: ["_time", "platform", "latitude", "longitude", "unit"])
-        |> limit(n: 50)
-    ''')
-print('\n# ---------------------------- Querying a different table.')
-print(df.head())
-
-# Query a specific time range (see changes in '|> range' row)
-df = query_to_df(f'''
-    from(bucket:"{bucket}")
-        |> range(start: 2022-06-24T12:00:00Z, stop: 2022-06-24T14:00:00Z)
-        |> filter(fn:(r) => r._measurement == "meteo_temperature_munkholmen")
-        |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-        |> keep(columns: ["_time", "platform", "unit", "temperature"])
         |> limit(n: 50)
     ''')
 print('\n# ---------------------------- Specific time range')
-print(df.head())
+print(silcam.columns)
 
-# Interesting use of filters (this can be quite powerful)
-# Here we find any tables with 'latitude' as a field name.
-# NOTE: I also '|> keep' the measurement name, as that might be helpful.
-# NOTE: Filtering by this field filters away other fields (but not tags).
-# timespan = 'start: -1y'  # All tables written to in the last year,. this will take a while to run
-timespan = 'start: -6h'  # Note, will only search for tables written to in the last 6 hrs
-df = query_to_df(f'''
+
+#### get water current data from approx 10m depth ####
+
+USER, PASSWORD = 'iliad_waterquality', 'hXHCLX2UjjbgxrHZ'
+DATABASE = 'oceanlab'
+RETPOLICY = 'autogen'
+bucket = f"{DATABASE}/{RETPOLICY}"
+url = "https://oceanlab.azure.sintef.no:8086"
+
+
+current_speed = query_to_df(f'''
     from(bucket:"{bucket}")
-        |> range({timespan})
-        |> last()
-        |> filter(fn:(r) => r._field == "latitude")
+        |> range(start: 2022-12-01T12:00:00Z, stop: 2022-12-07T12:00:00Z)
+        |> filter(fn:(r) => r._measurement == "signature_100_current_speed_munkholmen")
         |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-        |> keep(columns: ["_time", "_measurement", "platform", "latitude"])
+        |> keep(columns: ["_time", "_measurement", "platform", "current_speed_adcp(2)"])
         |> limit(n: 50)
     ''')
-print('\n# ---------------------------- Filter based on _field, not _measurement.')
-if isinstance(df, pd.DataFrame):
-    print(f"Unique measurement (table) names returned in this search:\n{df['_measurement'].unique()}")
-    print(df.head())
-else:
-    print(df)
+print('\n# ---------------------------- Specific time range')
+print(current_speed.columns)
+
+
+current_direction = query_to_df(f'''
+    from(bucket:"{bucket}")
+        |> range(start: 2022-12-01T12:00:00Z, stop: 2022-12-07T12:00:00Z)
+        |> filter(fn:(r) => r._measurement == "signature_100_current_direction_munkholmen")
+        |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        |> keep(columns: ["_time", "_measurement", "platform", "current_direction_adcp(2)"])
+        |> limit(n: 50)
+    ''')
+print('\n# ---------------------------- Specific time range')
+print(current_direction.columns)

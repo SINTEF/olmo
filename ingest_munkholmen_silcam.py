@@ -23,6 +23,7 @@ def main():
 
     silcam = Munkholmen_silcam(influx_clients=clients)
     silcam.ingest()
+    #silcam.save_to_azure()
 
 
 if __name__ == "__main__":

@@ -8,7 +8,8 @@ import config
 logger = logging.getLogger('olmo.util_az')
 
 
-def upload_file(local_file, az_file, container, content_type='text/html', overwrite=True):
+def upload_file(local_file, az_file, container, content_type='text/html', overwrite=True,
+                token_file='azure_token_web'):
     '''
     Upload a file to the azure dl storage.
 
@@ -26,7 +27,7 @@ def upload_file(local_file, az_file, container, content_type='text/html', overwr
     overwrite : bool
     '''
 
-    with open(os.path.join(config.secrets_dir, 'azure_token_web')) as f:
+    with open(os.path.join(config.secrets_dir, token_file)) as f:
         aztoken = f.read()
     process = subprocess.Popen([
         'az', 'storage', 'fs', 'file', 'upload',

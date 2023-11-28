@@ -18,6 +18,7 @@ class AIS(sensor.Sensor):
         self.influx_clients = influx_clients
         self.mmsi_list = {'munkholmen': 992581014,
                           'ingdalen': 992581017,
+                          'elly': 257130790,
                           'gunnerus': 258342000,
                           'ntnuflyer': 257012170,
                           'ntnu_usv_grethe': 258006650

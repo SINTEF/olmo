@@ -17,7 +17,7 @@ class CTD(sensor.Sensor):
         # Init the Sensor() class: This sets some defaults.
         super(CTD, self).__init__()
         self.influx_clients = influx_clients
-        self.data_dir = f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA'
+        self.data_dir = f'/media/{config.munkholmen_user}/DATA/CTD'
         self.file_search_l0 = r"ready_ctd_(\d{14})\.csv"
         self.drop_recent_files_l0 = 0
         self.remove_remote_files_l0 = True

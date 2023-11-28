@@ -103,7 +103,7 @@ def main():
     admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     clients = [
         InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
-        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
     ]
     # ---- List files in the remote directory:
     stdout, stderr = dir_remote(config.loggernet_user, config.loggernet_pc)
@@ -123,7 +123,7 @@ def main():
         # ---- scp the files over, then delete
         for f in files[:-1]:  # Don't copy the latest file - it might be being written to.
 
-            # print(f"Ingesting file: {f}")
+            logger.info(f"Ingesting file: {f}")
 
             # Check we don't have a version of the file locally.
             if os.path.isfile(os.path.join(config.loggernet_inbox, f)):

@@ -12,12 +12,16 @@ logger = util_file.init_logger(config.main_logfile, name='olmo.ctd')
 
 
 class AIS(sensor.Sensor):
-    def __init__(self, influx_clients=None):
-        # Init the Sensor() class: This sets some defaults.
+    def __init__(
+            self,
+            influx_clients=None):
+
+        # Init the Sensor() class: Unused vars/levels are set to None.
         super(AIS, self).__init__()
         self.influx_clients = influx_clients
         self.mmsi_list = {'munkholmen': 992581014,
                           'ingdalen': 992581017,
+                          'elly': 257130790,
                           'gunnerus': 258342000,
                           'ntnuflyer': 257012170,
                           'ntnu_usv_grethe': 258006650

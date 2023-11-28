@@ -22,7 +22,7 @@ def main():
     admin_user, admin_pwd = util_file.get_user_pwd(os.path.join(config.secrets_dir, 'influx_admin_credentials'))
     open_clients = [
         InfluxDBClient(config.az_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
-        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'test'),
+        InfluxDBClient(config.sintef_influx_pc, 8086, admin_user, admin_pwd, 'oceanlab'),
     ]
 
     ctd = CTD(influx_clients=open_clients)

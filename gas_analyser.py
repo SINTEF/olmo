@@ -19,7 +19,7 @@ class GasAnalyser(sensor.Sensor):
         self.data_dir = f'/home/{config.munkholmen_user}/olmo/munkholmen/DATA/gas'
         self.recursive_file_search_l0 = True
         self.file_search_l0 = 'gga_????-??-??_f????.txt'
-        self.drop_recent_files_l0 = 1
+        self.drop_recent_files_l0 = 0
         self.remove_remote_files_l0 = False
         self.max_files_l0 = None
         self.recursive_file_search_l1 = True
@@ -59,7 +59,7 @@ class GasAnalyser(sensor.Sensor):
             # be bothered dealing with (strange timestamps, not all cols)
             try:
                 from_munkholmen = False
-                if f[-20:-10] in ['2002-01-01']:
+                if f[-20:-10] in ['1800-01-01']:
                     # print(f"Skipping file: {f}")
                     continue
                 elif datetime.datetime.strptime(f[-20:-10], '%Y-%m-%d') > datetime.datetime(2022, 8, 31, 23, 59, 00):
